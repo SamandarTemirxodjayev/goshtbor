@@ -3,6 +3,7 @@ const cors = require("cors");
 const express = require("express");
 const mongoose = require("mongoose");
 const routerRegister = require("./routes/register.router");
+const routerUser = require("./routes/user.router");
 const swaggerUi = require("swagger-ui-express");
 const YAML = require("js-yaml");
 const fs = require("fs");
@@ -34,6 +35,7 @@ cron.schedule("0 */1 * * *", async () => {
 });
 
 app.use("/register", routerRegister);
+app.use("/user", routerUser);
 const swaggerDocument = YAML.load(
 	fs.readFileSync(path.join(__dirname, "swagger.yaml"), "utf8"),
 );

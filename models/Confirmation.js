@@ -33,13 +33,10 @@ confirmSchema.statics.checkAndDeleteExpired = async function (uuid) {
 	}
 
 	if (confirmation.expiredAt < new Date()) {
-		console.log("Confirmation is expired.");
 		await this.findByIdAndDelete(confirmation._id);
-		console.log("Deleted confirmation.");
 		return {expired: true};
 	}
 
-	console.log("Confirmation is not expired.");
 	return {expired: false, confirmation: confirmation};
 };
 

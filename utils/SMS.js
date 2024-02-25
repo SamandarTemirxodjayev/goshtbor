@@ -1,4 +1,4 @@
-exports.sendSMS = async (phone, text) => {
+exports.sendSMS = async (phone, code) => {
 	const data = new URLSearchParams();
 	data.append("login", "samandar");
 	data.append("password", "gJlv405114TAidbzf9uz");
@@ -8,7 +8,7 @@ exports.sendSMS = async (phone, text) => {
 	const sms = [
 		{
 			phone,
-			text,
+			text: `Shu kodni hech kimga aytmang! Uni faqat firibgarlar so'raydi! Nikomu ne soobshayte etot kod! Ego Sprashivayut tol'ko moshenniki!\n\n Tasdiqash uchun kod: ${code}`,
 		},
 	];
 	data.append("data", JSON.stringify(sms));
@@ -16,12 +16,5 @@ exports.sendSMS = async (phone, text) => {
 	fetch("http://185.8.212.184/smsgateway/", {
 		method: "POST",
 		body: data,
-		headers: {
-			"User-Agent": "Opera 10.00",
-		},
-		timeout: 5000,
-	})
-		.then((response) => response.text())
-		.then((text) => console.log(text))
-		.catch((err) => console.error(err));
+	}).catch((err) => console.error(err));
 };

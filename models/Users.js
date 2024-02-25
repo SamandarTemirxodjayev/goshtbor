@@ -12,13 +12,16 @@ const userSchema = new mongoose.Schema({
 	},
 	male: {
 		type: Boolean,
+		default: false,
 	},
 	photo_url: {
 		type: String,
 	},
-	data: {
+	email: {
 		type: String,
-		required: true,
+	},
+	phone: {
+		type: String,
 	},
 	isBan: {
 		type: Boolean,
