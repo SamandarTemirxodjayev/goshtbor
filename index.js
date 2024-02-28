@@ -2,13 +2,12 @@ require("dotenv").config();
 const cors = require("cors");
 const express = require("express");
 const mongoose = require("mongoose");
-const routerRegister = require("./routes/register.router");
-const routerUser = require("./routes/user.router");
 const swaggerUi = require("swagger-ui-express");
 const YAML = require("js-yaml");
 const fs = require("fs");
 const path = require("path");
 const cron = require("node-cron");
+const router = require("./routes/router.js");
 const app = express();
 
 app.use(express.json());
@@ -26,6 +25,7 @@ mongoose
 
 app.listen(process.env.PORT || 3000, () => {
 	console.log("Server is running on port 3000");
+	require("./cdn/index.js");
 });
 
 cron.schedule("0 */1 * * *", async () => {
@@ -34,8 +34,7 @@ cron.schedule("0 */1 * * *", async () => {
 	console.log("Expired confirmations cleaned up");
 });
 
-app.use("/register", routerRegister);
-app.use("/user", routerUser);
+app.use("/api", router);
 const swaggerDocument = YAML.load(
 	fs.readFileSync(path.join(__dirname, "swagger.yaml"), "utf8"),
 );
