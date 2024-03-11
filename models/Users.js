@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
+const {Schema, model} = require("mongoose");
 
-const userSchema = new mongoose.Schema({
+const userSchema = new Schema({
 	name: {
 		type: String,
 	},
@@ -27,10 +27,14 @@ const userSchema = new mongoose.Schema({
 		type: Boolean,
 		default: false,
 	},
+	user_level: {
+		type: Number,
+		default: 0,
+	},
 });
 
 userSchema.set("timestamps", true);
 
-const Users = mongoose.model("users", userSchema);
+const Users = model("users", userSchema);
 
 module.exports = Users;

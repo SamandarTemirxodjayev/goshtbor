@@ -16,5 +16,7 @@ exports.sendSMS = async (phone, code) => {
 	fetch("http://185.8.212.184/smsgateway/", {
 		method: "POST",
 		body: data,
-	}).catch((err) => console.error(err));
+	})
+		.catch((err) => console.error(err))
+		.then((res) => console.log(res));
 };

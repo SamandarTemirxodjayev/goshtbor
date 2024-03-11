@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
+const {Schema, model} = require("mongoose");
 
-const confirmSchema = new mongoose.Schema({
+const confirmSchema = new Schema({
 	type: {
 		type: String,
 		required: true,
@@ -40,6 +40,6 @@ confirmSchema.statics.checkAndDeleteExpired = async function (uuid) {
 	return {expired: false, confirmation: confirmation};
 };
 
-const Confirmations = mongoose.model("confirmations", confirmSchema);
+const Confirmations = model("confirmations", confirmSchema);
 
 module.exports = Confirmations;
