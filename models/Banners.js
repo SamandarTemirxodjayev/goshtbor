@@ -5,9 +5,9 @@ const bannerSchema = new mongoose.Schema({
 		type: String,
 		required: true,
 	},
-	brand_photo_url: {
-		type: String,
-		required: true,
+	brand: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: "brands",
 	},
 	title: {
 		type: String,

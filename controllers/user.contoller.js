@@ -1,6 +1,10 @@
 exports.getUser = async (req, res) => {
 	try {
-		return res.status(200).json(req.userId);
+		return res.status(200).json({
+			status: "success",
+			message: "User fetched successfully",
+			data: req.userId,
+		});
 	} catch (error) {
 		return res.status(500).send(error);
 	}

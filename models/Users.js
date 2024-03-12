@@ -7,13 +7,6 @@ const userSchema = new Schema({
 	surname: {
 		type: String,
 	},
-	birthdate: {
-		type: Date,
-	},
-	male: {
-		type: Boolean,
-		default: false,
-	},
 	photo_url: {
 		type: String,
 	},
