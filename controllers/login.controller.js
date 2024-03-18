@@ -16,7 +16,7 @@ exports.login = async (req, res) => {
 		if (!user) {
 			return res.status(400).json({
 				status: "error",
-				message: "User non exists",
+				message: "Foydalanuvchi Tizimda Mavjud Emas",
 			});
 		}
 		let confirmationw = await Confirmations.findOne({data});
@@ -28,7 +28,7 @@ exports.login = async (req, res) => {
 			if (!expired) {
 				return res.status(400).json({
 					status: "waiting",
-					message: "Confirmation already exists",
+					message: "OTP kod oldindan jo'natilgan",
 					data: {
 						id: confirmation._id,
 						uuid: confirmation.uuid,
@@ -57,7 +57,7 @@ exports.login = async (req, res) => {
 
 			return res.status(200).json({
 				status: "success",
-				message: "Email sent",
+				message: "OTP kod elektron pochtaga yuborildi",
 				data: {
 					id: newConfirmation._id,
 					uuid: id,
@@ -81,7 +81,7 @@ exports.login = async (req, res) => {
 
 			return res.status(200).json({
 				status: "success",
-				message: "SMS sent",
+				message: "SMS kod yuborildi",
 				data: {
 					id: newConfirmation._id,
 					uuid: id,
@@ -104,7 +104,7 @@ exports.postUUIDConfirm = async (req, res) => {
 		if (!confirmations) {
 			return res.status(404).json({
 				status: "error",
-				message: "Confirmation not found",
+				message: "Xatolik",
 			});
 		}
 		const {expired, confirmation} = await Confirmations.checkAndDeleteExpired(
@@ -114,7 +114,7 @@ exports.postUUIDConfirm = async (req, res) => {
 		if (expired) {
 			return res.status(400).json({
 				status: "error",
-				message: "Confirmation expired. send new code",
+				message: "Qaytadan yuborin, kodni muddati tugagan",
 			});
 		}
 
@@ -122,7 +122,7 @@ exports.postUUIDConfirm = async (req, res) => {
 		if (!isMatch) {
 			return res.status(400).json({
 				status: "error",
-				message: "Invalid code",
+				message: "Kod Xato",
 			});
 		}
 
@@ -136,7 +136,7 @@ exports.postUUIDConfirm = async (req, res) => {
 
 		return res.json({
 			status: "success",
-			message: "Confirmed",
+			message: "Tasdiqlandi",
 			data: {
 				auth_token: token,
 				token_type: "bearer",

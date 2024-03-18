@@ -4,8 +4,8 @@ exports.getAllCategories = async (req, res) => {
 	try {
 		const category = await Category.find();
 		return res.status(200).json({
-			status: "success",
-			message: "Categories fetched successfully",
+			status: 200,
+			message: "Kategoriyalar Muvaffaqiyatli Yuklab Olindi",
 			data: category,
 		});
 	} catch (error) {
@@ -23,7 +23,7 @@ exports.createCategory = async (req, res) => {
 		const category = new Category(req.body);
 		await category.save();
 		return res.status(200).json({
-			status: "success",
+			status: 200,
 			message: "Category created successfully",
 			data: category,
 		});
@@ -41,8 +41,8 @@ exports.deleteCategory = async (req, res) => {
 		}
 		const category = await Category.findByIdAndDelete(req.params.id);
 		return res.status(200).json({
-			status: "success",
-			message: "Category deleted successfully",
+			status: 200,
+			message: "Kategoriya Muvaffaqiyatli O'chirildi",
 			data: category,
 		});
 	} catch (error) {
@@ -57,12 +57,18 @@ exports.updateCategory = async (req, res) => {
 				message: "You are not authorized to perform this action",
 			});
 		}
-		const category = await Category.findByIdAndUpdate(req.params.id, req.body, {
-			new: true,
-		});
+		const category = await Category.findByIdAndUpdate(
+			req.params.id,
+			{
+				name: req.body.name,
+			},
+			{
+				new: true,
+			},
+		);
 		return res.status(200).json({
-			status: "success",
-			message: "Category updated successfully",
+			status: 200,
+			message: "Kategoriya Muvaffaqiyatli Yangilandi",
 			data: category,
 		});
 	} catch (error) {

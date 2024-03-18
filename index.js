@@ -2,7 +2,6 @@ require("dotenv").config();
 const cors = require("cors");
 const express = require("express");
 const mongoose = require("mongoose");
-const swaggerUi = require("swagger-ui-express");
 const YAML = require("js-yaml");
 const fs = require("fs");
 const path = require("path");
@@ -35,7 +34,3 @@ cron.schedule("0 */1 * * *", async () => {
 });
 
 app.use("/api", router);
-const swaggerDocument = YAML.load(
-	fs.readFileSync(path.join(__dirname, "swagger.yaml"), "utf8"),
-);
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));

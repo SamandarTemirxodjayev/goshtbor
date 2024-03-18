@@ -1,8 +1,10 @@
+const bcrypt = require("bcrypt");
+
 exports.getUser = async (req, res) => {
 	try {
 		return res.status(200).json({
 			status: "success",
-			message: "User fetched successfully",
+			message: "Foydalanuvchi Tizimdan Yuklab Olindi",
 			data: req.userId,
 		});
 	} catch (error) {
@@ -17,11 +19,8 @@ exports.postUserEdit = async (req, res) => {
 		if (req.body.surname) {
 			req.userId.surname = req.body.surname;
 		}
-		if (req.body.birthdate) {
-			req.userId.birthdate = req.body.birthdate;
-		}
-		if (req.body.male) {
-			req.userId.male = req.body.male;
+		if (req.body.email) {
+			req.userId.email = req.body.email;
 		}
 		if (req.body.photo_url) {
 			req.userId.photo_url = req.body.photo_url;
@@ -29,7 +28,7 @@ exports.postUserEdit = async (req, res) => {
 		await req.userId.save();
 		return res.status(200).json({
 			status: "success",
-			message: "User updated",
+			message: "Foydalanuvchi Yangilandi",
 			data: req.userId,
 		});
 	} catch (error) {
