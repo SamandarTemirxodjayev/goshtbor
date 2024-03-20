@@ -4,7 +4,9 @@ const toast = useToast();
 let categories = ref([]);
 let isOpen = ref(false);
 let isLoading = ref(true);
-let categoryText = ref("");
+let categoryText_uz = ref("");
+let categoryText_en = ref("");
+let categoryText_ru = ref("");
 let photo_url = ref(null);
 let editedItem = ref(null);
 let isEditOpen = ref(false);
@@ -31,8 +33,16 @@ const columns = [
     label: "ID",
   },
   {
-    key: "name",
-    label: "Nomi",
+    key: "name_uz",
+    label: "Nomi (O'zbek tilida)",
+  },
+  {
+    key: "name_ru",
+    label: "Nomi (Rus tilida)",
+  },
+  {
+    key: "name_en",
+    label: "Nomi (Ingliz tilida)",
   },
   {
     key: "photo_url",
@@ -110,7 +120,9 @@ const addCategory = async () => {
       },
       body: JSON.stringify({
         photo_url: data.fileUrl,
-        name: categoryText.value,
+        name_uz: categoryText_uz.value,
+        name_ru: categoryText_ru.value,
+        name_en: categoryText_en.value,
       }),
     });
     isOpen.value = false;
@@ -186,7 +198,9 @@ defineShortcuts({
 <template>
   <div>
     <div class="text-2xl font-bold">Kategoriyalar</div>
-    <div class="shadow-2xl border border-gray-300 dark:border-gray-500 items-center my-4">
+    <div
+      class="shadow-2xl border border-gray-300 dark:border-gray-500 items-center my-4"
+    >
       <div class="flex p-2 justify-end">
         <UButton size="lg" @click="isOpen = true">Kategoriya Qo'shish</UButton>
       </div>
@@ -304,11 +318,27 @@ defineShortcuts({
         <UForm @submit="addCategory">
           <UFormGroup
             class="my-[2%]"
-            label="Kategoriya Uchun Nom Kiriting"
+            label="Kategoriya Uchun Nom Kiriting (O'zbek tilida)"
             name="photo"
             size="lg"
           >
-            <UInput type="text" size="lg" v-model="categoryText" />
+            <UInput type="text" size="lg" v-model="categoryText_uz" />
+          </UFormGroup>
+          <UFormGroup
+            class="my-[2%]"
+            label="Kategoriya Uchun Nom Kiriting (Rus tilida)"
+            name="photo"
+            size="lg"
+          >
+            <UInput type="text" size="lg" v-model="categoryText_ru" />
+          </UFormGroup>
+          <UFormGroup
+            class="my-[2%]"
+            label="Kategoriya Uchun Nom Kiriting (Ingliz tilida)"
+            name="photo"
+            size="lg"
+          >
+            <UInput type="text" size="lg" v-model="categoryText_en" />
           </UFormGroup>
           <UFormGroup
             class="my-[2%]"

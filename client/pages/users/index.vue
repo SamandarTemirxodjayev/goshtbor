@@ -36,10 +36,6 @@ const columns = [
     label: "ID",
   },
   {
-    key: "username",
-    label: "Username",
-  },
-  {
     key: "name",
     label: "Ismi",
   },
@@ -48,8 +44,12 @@ const columns = [
     label: "Familiyasi",
   },
   {
-    key: "phone_number",
+    key: "phone",
     label: "Telefon Raqami",
+  },
+  {
+    key: "email",
+    label: "E-mail",
   },
   {
     key: "createdAt",
@@ -87,6 +87,10 @@ const deleteUser = async (id) => {
       toast.add({ title: data.message });
       const res = await $fetch(BASE_URL + "/user/get-all", {
         method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       });
       users.value = res.data;
     } else {

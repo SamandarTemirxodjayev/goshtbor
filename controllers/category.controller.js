@@ -13,6 +13,7 @@ exports.getAllCategories = async (req, res) => {
 	}
 };
 exports.createCategory = async (req, res) => {
+	const {name_uz, name_ru, name_en, photo_url} = req.body;
 	try {
 		if (req.userId.user_level === 0) {
 			return res.status(400).json({
@@ -20,7 +21,12 @@ exports.createCategory = async (req, res) => {
 				message: "You are not authorized to perform this action",
 			});
 		}
-		const category = new Category(req.body);
+		const category = new Category({
+			name_uz,
+			name_ru,
+			name_en,
+			photo_url,
+		});
 		await category.save();
 		return res.status(200).json({
 			status: 200,

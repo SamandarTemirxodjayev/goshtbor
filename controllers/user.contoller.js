@@ -60,3 +60,26 @@ exports.postUserEdit = async (req, res) => {
 		return res.status(500).send(error);
 	}
 };
+exports.getAllUsers = async (req, res) => {
+	try {
+		const users = await Users.find();
+		return res.status(200).json({
+			status: 200,
+			message: "Foydalanuvchilar Muvaffaqiyatli Yuklab Olindi",
+			data: users,
+		});
+	} catch (error) {
+		return res.status(500).json(error);
+	}
+};
+exports.deleteUser = async (req, res) => {
+	try {
+		await Users.findByIdAndDelete(req.params.id);
+		return res.status(200).json({
+			status: 200,
+			message: "Foydalanuvchi O'chirildi",
+		});
+	} catch (error) {
+		return res.status(500).send(error);
+	}
+};

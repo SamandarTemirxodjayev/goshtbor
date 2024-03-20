@@ -19,11 +19,12 @@ const loginToSystem = async () => {
   isLoading.value = true;
   try {
     if (code.value === null) {
-      const resData = await $fetch(BASE_URL + "/user/getme", {
+      const resData = await $fetch(BASE_URL + "/user/get-me", {
         method: "POST",
         body: JSON.stringify({ data: email.value, type: "email" }),
       });
-      if (resData.data.user != 1) {
+      if (resData.data.user_level == 0) {
+        isLoading.value = false;
         return toast.add({
           title: "Email yoki parol xatolik",
           status: "error",
