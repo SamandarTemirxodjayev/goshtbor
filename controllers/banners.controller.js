@@ -2,9 +2,9 @@ const Banners = require("../models/Banners");
 
 exports.getBanners = async (req, res) => {
 	try {
-		const banners = await Banners.find();
+		const banners = await Banners.find().populate("brand");
 		return res.status(200).json({
-			status: "success",
+			status: 200,
 			message: "Banners fetched successfully",
 			data: banners,
 		});
@@ -23,7 +23,7 @@ exports.createBanner = async (req, res) => {
 		const banner = new Banners(req.body);
 		await banner.save();
 		return res.status(200).json({
-			status: "success",
+			status: 200,
 			message: "Banner created successfully",
 			data: banner,
 		});
@@ -43,7 +43,7 @@ exports.updateBanner = async (req, res) => {
 			new: true,
 		});
 		return res.status(200).json({
-			status: "success",
+			status: 200,
 			message: "Banner updated successfully",
 			data: banner,
 		});
@@ -61,7 +61,7 @@ exports.deleteBanner = async (req, res) => {
 		}
 		const banner = await Banners.findByIdAndDelete(req.params.id);
 		return res.status(200).json({
-			status: "success",
+			status: 200,
 			message: "Banner deleted successfully",
 			data: banner,
 		});

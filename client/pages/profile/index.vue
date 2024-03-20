@@ -17,10 +17,13 @@ onMounted(async () => {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     });
-    toast.add({ title: data.message });
     user.value = data.data;
     isLoading.value = false;
   } catch (error) {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem("token");
+      navigateTo("/exit");
+    }
     return console.log(error);
   }
 });
@@ -42,6 +45,10 @@ const handleSubmitForm = async () => {
     toast.add({ title: "Boshidan Tizimga Kiring" });
     navigateTo("/exit");
   } catch (error) {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem("token");
+      navigateTo("/exit");
+    }
     console.log(error);
   }
   isLoading.value = false;

@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 exports.getUser = async (req, res) => {
 	try {
 		return res.status(200).json({
-			status: "success",
+			status: 200,
 			message: "Foydalanuvchi Tizimdan Yuklab Olindi",
 			data: req.userId,
 		});
@@ -27,7 +27,7 @@ exports.postUserEdit = async (req, res) => {
 		}
 		await req.userId.save();
 		return res.status(200).json({
-			status: "success",
+			status: 200,
 			message: "Foydalanuvchi Yangilandi",
 			data: req.userId,
 		});

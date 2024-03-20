@@ -1,14 +1,18 @@
 const Brand = require("../models/Brands");
 
 exports.createBrand = async (req, res) => {
+	const {photo_url, name} = req.body;
+	if (!photo_url)
+		return res.status(400).json({message: "Photo url is required"});
+	if (!name) return res.status(400).json({message: "Name is required"});
 	try {
 		const brand = new Brand({
-			photo_url: req.body.photo_url,
-			name: req.body.name,
+			photo_url,
+			name,
 		});
 		await brand.save();
 		return res.status(200).json({
-			message: "Brand created successfully!",
+			message: "Brend Yaratildi",
 			data: brand,
 		});
 	} catch (error) {
@@ -20,10 +24,15 @@ exports.createBrand = async (req, res) => {
 exports.deleteBrand = async (req, res) => {
 	try {
 		const brand = await Brand.findByIdAndDelete(req.params.id);
-		return res.status(200).json({
-			message: "Brand deleted successfully!",
-			data: brand,
-		});
+		if (brand) {
+			return res.status(200).json({
+				message: "Brend o'chirildi",
+				status: 200,
+				data: brand,
+			});
+		} else {
+			return res.status(404).json({message: "Brend Topilmadi", status: 404});
+		}
 	} catch (error) {
 		return res.status(500).json({message: error.message});
 	}
@@ -52,7 +61,7 @@ exports.updateBrand = async (req, res) => {
 			},
 		);
 		return res.status(200).json({
-			message: "Brand updated successfully!",
+			message: "Brend Yangilandi",
 			data: brand,
 		});
 	} catch (error) {

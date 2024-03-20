@@ -1,30 +1,29 @@
 <script setup>
 const toast = useToast();
 
-let categories = ref([]);
+let banners = ref([]);
 let isOpen = ref(false);
 let isLoading = ref(true);
-let categoryText = ref("");
 let photo_url = ref(null);
+let brandName = ref("");
 let editedItem = ref(null);
 let isEditOpen = ref(false);
 
 onMounted(async () => {
   try {
-    const data = await $fetch(BASE_URL + "/category", {
+    const data = await $fetch(BASE_URL + "/brands", {
       method: "GET",
     });
-    categories.value = data.data;
+    banners.value = data.data;
     isLoading.value = false;
   } catch (error) {
     if (error.response && error.response.status === 401) {
       localStorage.removeItem("token");
       navigateTo("/exit");
     }
-    return console.log(error);
+    console.log(error);
   }
 });
-
 const columns = [
   {
     key: "_id",
@@ -54,91 +53,26 @@ const columns = [
 const items = (row) => [
   [
     {
-      label: "Tahrirlash",
-      icon: "i-heroicons-pencil-square-20-solid",
-      click: () => editCategory(row),
-    },
-    {
       label: "O'chirish",
       icon: "i-heroicons-trash-20-solid",
-      click: () => deleteCategory(row._id),
+      click: () => deleteBanner(row._id),
+    },
+    {
+      label: "Tahrirlash",
+      icon: "i-heroicons-pencil-square-20-solid",
+      click: () => editBanner(row),
     },
   ],
 ];
-const deleteCategory = async (id) => {
-  isLoading.value = true;
-  try {
-    const data = await $fetch(BASE_URL + "/category/" + id, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
-    if (data.status === 200) {
-      toast.add({ title: data.message });
-      const res = await $fetch(BASE_URL + "/category", {
-        method: "GET",
-      });
-      categories.value = res.data;
-    } else {
-      toast.add({ title: data.message });
-    }
-  } catch (error) {
-    if (error.response && error.response.status === 401) {
-      localStorage.removeItem("token");
-      navigateTo("/exit");
-    }
-    console.log(error);
-  }
-  isLoading.value = false;
-};
-const addCategory = async () => {
-  isLoading.value = true;
-  try {
-    const formdata = new FormData();
-    formdata.append("file", photo_url.value);
-    const { data } = await $fetch(CDN_URL + "/upload", {
-      method: "POST",
-      body: formdata,
-    });
-    const fetchBanner = await $fetch(BASE_URL + "/category", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-      body: JSON.stringify({
-        photo_url: data.fileUrl,
-        name: categoryText.value,
-      }),
-    });
-    isOpen.value = false;
-    toast.add({ title: fetchBanner.message });
-    const res = await $fetch(BASE_URL + "/category", {
-      method: "GET",
-    });
-    photo_url.value = null;
-    categories.value = res.data;
-    categoryText.value = "";
-  } catch (error) {
-    if (error.response && error.response.status === 401) {
-      localStorage.removeItem("token");
-      navigateTo("/exit");
-    }
-    console.log(error);
-  }
-  isLoading.value = false;
-};
-const editCategory = (row) => {
+const editBanner = (row) => {
   editedItem.value = JSON.parse(JSON.stringify(row));
   isEditOpen.value = true;
 };
-const handleEditCategory = async () => {
+const handleEditBanner = async () => {
   isLoading.value = true;
   try {
     const fetchCategory = await $fetch(
-      BASE_URL + "/category/" + editedItem.value._id,
+      BASE_URL + "/brands/" + editedItem.value._id,
       {
         method: "PUT",
         headers: {
@@ -152,12 +86,40 @@ const handleEditCategory = async () => {
     );
     isEditOpen.value = false;
     toast.add({ title: fetchCategory.message });
-    const res = await $fetch(BASE_URL + "/category", {
+    const res = await $fetch(BASE_URL + "/brands", {
       method: "GET",
     });
     editedItem.value = null;
-    categories.value = res.data;
+    banners.value = res.data;
     categoryText.value = "";
+  } catch (error) {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem("token");
+      navigateTo("/exit");
+    }
+    console.log(error);
+  }
+  isLoading.value = false;
+};
+const deleteBanner = async (id) => {
+  isLoading.value = true;
+  try {
+    const data = await $fetch(BASE_URL + "/brands/" + id, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    if (data.status === 200) {
+      toast.add({ title: data.message });
+      const res = await $fetch(BASE_URL + "/brands", {
+        method: "GET",
+      });
+      banners.value = res.data;
+    } else {
+      toast.add({ title: data.message });
+    }
   } catch (error) {
     if (error.response && error.response.status === 401) {
       localStorage.removeItem("token");
@@ -172,6 +134,42 @@ function handleFileChange(event) {
     photo_url.value = event.target.files[0];
   }
 }
+const addBanner = async () => {
+  isLoading.value = true;
+  try {
+    const formdata = new FormData();
+    formdata.append("file", photo_url.value);
+    const { data } = await $fetch(CDN_URL + "/upload", {
+      method: "POST",
+      body: formdata,
+    });
+    const fetchBanner = await $fetch(BASE_URL + "/brands", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({
+        photo_url: data.fileUrl,
+        name: brandName.value,
+      }),
+    });
+    isOpen.value = false;
+    toast.add({ title: fetchBanner.message });
+    const res = await $fetch(BASE_URL + "/brands", {
+      method: "GET",
+    });
+    photo_url.value = null;
+    banners.value = res.data;
+  } catch (error) {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem("token");
+      navigateTo("/exit");
+    }
+    console.log(error);
+  }
+  isLoading.value = false;
+};
 defineShortcuts({
   escape: {
     usingInput: true,
@@ -185,10 +183,12 @@ defineShortcuts({
 
 <template>
   <div>
-    <div class="text-2xl font-bold">Kategoriyalar</div>
-    <div class="shadow-2xl border border-gray-300 dark:border-gray-500 items-center my-4">
-      <div class="flex p-2 justify-end">
-        <UButton size="lg" @click="isOpen = true">Kategoriya Qo'shish</UButton>
+    <div class="text-2xl font-bold">Brendlar</div>
+    <div
+      class="shadow-2xl border border-gray-300 dark:border-gray-500 items-center my-4"
+    >
+      <div class="flex p-4 justify-end">
+        <UButton size="lg" @click="isOpen = true">Brend Qo'shish</UButton>
       </div>
     </div>
     <UTable
@@ -199,10 +199,10 @@ defineShortcuts({
       }"
       :progress="{ color: 'primary', animation: 'carousel' }"
       :columns="columns"
-      :rows="categories"
+      :rows="banners"
       :empty-state="{
         icon: 'i-heroicons-circle-stack-20-solid',
-        label: 'Bannerlar Mavjud Emas',
+        label: 'Brendlar Mavjud Emas',
       }"
     >
       <template #photo_url-data="{ row }">
@@ -226,10 +226,64 @@ defineShortcuts({
       <template #empty-state>
         <div class="flex flex-col items-center justify-center py-6 gap-3">
           <span class="italic text-sm">Ma'lumot Mavjud Emas</span>
-          <UButton label="Kategoriya Qo'shish" @click="isOpen = true" />
+          <UButton label="Brend Qo'shish" @click="isOpen = true" />
         </div>
       </template>
     </UTable>
+    <UModal v-model="isOpen" prevent-close>
+      <UCard
+        :ui="{
+          ring: '',
+          divide: 'divide-y divide-gray-100 dark:divide-gray-800',
+        }"
+      >
+        <template #header>
+          <div class="flex items-center justify-between">
+            <h3
+              class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
+            >
+              Brendlar Qo'shish
+            </h3>
+            <UButton
+              color="gray"
+              variant="ghost"
+              icon="i-heroicons-x-mark-20-solid"
+              class="-my-1"
+              @click="isOpen = false"
+            />
+          </div>
+        </template>
+
+        <UForm @submit="addBanner">
+          <UFormGroup
+            class="my-[2%]"
+            label="Brend Nomini Kiriting"
+            name="photo"
+            size="lg"
+          >
+            <UInput type="text" size="lg" v-model="brandName" />
+          </UFormGroup>
+          <UFormGroup
+            class="my-[2%]"
+            label="Brend Uchun Rasm Tanglang"
+            name="photo"
+            size="lg"
+          >
+            <UInput type="file" size="lg" @change="handleFileChange" />
+          </UFormGroup>
+          <UFormGroup class="my-[2%]" name="submit" size="xl">
+            <UButton
+              :loading="isLoading"
+              type="submit"
+              color="primary"
+              size="xl"
+              block
+              >Tasdiqlash</UButton
+            >
+          </UFormGroup>
+        </UForm>
+      </UCard>
+    </UModal>
 
     <UModal v-model="isEditOpen" prevent-close>
       <UCard
@@ -243,7 +297,7 @@ defineShortcuts({
             <h3
               class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
             >
-              Kategoriyani Tahrirlash
+              Brendlar Qo'shish
             </h3>
             <UButton
               color="gray"
@@ -255,75 +309,22 @@ defineShortcuts({
           </div>
         </template>
 
-        <UForm @submit="handleEditCategory">
+        <UForm @submit="handleEditBanner">
           <UFormGroup
             class="my-[2%]"
-            label="Kategoriya Uchun Nom Kiriting"
+            label="Brend Nomini Kiriting"
             name="photo"
             size="lg"
           >
             <UInput type="text" size="lg" v-model="editedItem.name" />
           </UFormGroup>
-          <UFormGroup class="my-[2%]" name="submit" size="lg">
-            <UButton
-              :loading="isLoading"
-              type="submit"
-              color="primary"
-              size="lg"
-              block
-              >Tasdiqlash</UButton
-            >
-          </UFormGroup>
-        </UForm>
-      </UCard>
-    </UModal>
-    <UModal v-model="isOpen" prevent-close>
-      <UCard
-        :ui="{
-          ring: '',
-          divide: 'divide-y divide-gray-100 dark:divide-gray-800',
-        }"
-      >
-        <template #header>
-          <div class="flex items-center justify-between">
-            <h3
-              class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
-            >
-              Kategoriya Qo'shish
-            </h3>
-            <UButton
-              color="gray"
-              variant="ghost"
-              icon="i-heroicons-x-mark-20-solid"
-              class="-my-1"
-              @click="isOpen = false"
-            />
-          </div>
-        </template>
 
-        <UForm @submit="addCategory">
-          <UFormGroup
-            class="my-[2%]"
-            label="Kategoriya Uchun Nom Kiriting"
-            name="photo"
-            size="lg"
-          >
-            <UInput type="text" size="lg" v-model="categoryText" />
-          </UFormGroup>
-          <UFormGroup
-            class="my-[2%]"
-            label="Rasm yuklang"
-            name="photo"
-            size="lg"
-          >
-            <UInput type="file" size="lg" @change="handleFileChange" />
-          </UFormGroup>
-          <UFormGroup class="my-[2%]" name="submit" size="lg">
+          <UFormGroup class="my-[2%]" name="submit" size="xl">
             <UButton
               :loading="isLoading"
               type="submit"
               color="primary"
-              size="lg"
+              size="xl"
               block
               >Tasdiqlash</UButton
             >

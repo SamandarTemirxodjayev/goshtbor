@@ -56,7 +56,7 @@ exports.postRegister = async (req, res) => {
 			await newConfirmation.save();
 
 			return res.status(200).json({
-				status: "success",
+				status: 200,
 				message: "Email sent",
 				data: {
 					id: newConfirmation._id,
@@ -80,7 +80,7 @@ exports.postRegister = async (req, res) => {
 			await newConfirmation.save();
 
 			return res.status(200).json({
-				status: "success",
+				status: 200,
 				message: "SMS sent",
 				data: {
 					id: newConfirmation._id,
@@ -144,7 +144,7 @@ exports.postUUIDConfirm = async (req, res) => {
 		const token = await createToken(newUser._id);
 
 		return res.json({
-			status: "success",
+			status: 200,
 			message: "Confirmed",
 			data: {
 				auth_token: token,

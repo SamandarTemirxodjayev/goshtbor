@@ -38,6 +38,11 @@ const links = [
     to: "/categories",
   },
   {
+    label: "Brendlar",
+    icon: "i-heroicons-cube-transparent",
+    to: "/brands",
+  },
+  {
     label: "Chiqish",
     icon: "i-heroicons-chevron-double-left",
     to: "/exit",

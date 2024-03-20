@@ -15,7 +15,7 @@ exports.createNotification = async (req, res) => {
 		});
 		await notifications.save();
 		return res.json({
-			status: "success",
+			status: 200,
 			message: "Notification created",
 			data: notifications,
 		});
@@ -34,7 +34,7 @@ exports.getNotifications = async (req, res) => {
 		}));
 
 		res.status(200).send({
-			status: "success",
+			status: 200,
 			message: "Notifications",
 			data: customizedNotifications,
 		});
@@ -55,7 +55,7 @@ exports.markNotificationAsRead = async (req, res) => {
 		}
 
 		res.status(200).send({
-			status: "success",
+			status: 200,
 			message: "Notification marked as read",
 			data: notification,
 		});
@@ -83,7 +83,7 @@ exports.markAsReadAllNotifications = async (req, res) => {
 		}));
 
 		res.status(200).send({
-			status: "success",
+			status: 200,
 			message: "Notifications marked as read",
 			data: customizedNotifications,
 		});
@@ -101,7 +101,7 @@ exports.deleteNotification = async (req, res) => {
 		}
 		await Notification.findByIdAndDelete(req.params.id);
 		return res.status(200).send({
-			status: "success",
+			status: 200,
 			message: "Notification deleted",
 		});
 	} catch (error) {
@@ -122,7 +122,7 @@ exports.upadateNotification = async (req, res) => {
 			content: req.body.content,
 		});
 		return res.status(200).send({
-			status: "success",
+			status: 200,
 			message: "Notification updated",
 		});
 	} catch (error) {

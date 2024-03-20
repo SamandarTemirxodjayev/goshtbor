@@ -7,6 +7,6 @@ const router = Router();
 router.get("/", controller.getBrands);
 router.post("/", adminMiddleware, controller.createBrand);
 router.delete("/:id", adminMiddleware, controller.deleteBrand);
-router.patch("/:id", adminMiddleware, controller.updateBrand);
+router.put("/:id", adminMiddleware, controller.updateBrand);
 
 module.exports = router;

@@ -56,7 +56,7 @@ exports.login = async (req, res) => {
 			await newConfirmation.save();
 
 			return res.status(200).json({
-				status: "success",
+				status: 200,
 				message: "OTP kod elektron pochtaga yuborildi",
 				data: {
 					id: newConfirmation._id,
@@ -80,7 +80,7 @@ exports.login = async (req, res) => {
 			await newConfirmation.save();
 
 			return res.status(200).json({
-				status: "success",
+				status: 200,
 				message: "SMS kod yuborildi",
 				data: {
 					id: newConfirmation._id,
@@ -135,7 +135,7 @@ exports.postUUIDConfirm = async (req, res) => {
 		const token = await createToken(user._id);
 
 		return res.json({
-			status: "success",
+			status: 200,
 			message: "Tasdiqlandi",
 			data: {
 				auth_token: token,
