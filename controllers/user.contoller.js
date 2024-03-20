@@ -1,4 +1,4 @@
-const bcrypt = require("bcrypt");
+const Users = require("../models/Users");
 
 exports.getUser = async (req, res) => {
 	try {
@@ -9,6 +9,31 @@ exports.getUser = async (req, res) => {
 		});
 	} catch (error) {
 		return res.status(500).send(error);
+	}
+};
+exports.postUser = async (req, res) => {
+	try {
+		const {data, type} = req.body;
+		if (type === "email") {
+			console.log(req.body);
+			const user = await Users.findOne({email: data});
+			if (!user) {
+				return res
+					.status(404)
+					.json({status: 404, message: "Foydalanuvchi Tizimda Mavjud Emas"});
+			}
+			return res.status(200).json({
+				status: 200,
+				message: "Foydalanuvchi Yuklab Olindi",
+				data: user,
+			});
+		}
+		return res.status(400).json({status: 400, message: "Invalid type"});
+	} catch (error) {
+		return res.status(500).json({
+			status: 500,
+			message: error.message,
+		});
 	}
 };
 exports.postUserEdit = async (req, res) => {
