@@ -9,7 +9,15 @@ const bannerSchema = new mongoose.Schema({
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "brands",
 	},
-	title: {
+	title_uz: {
+		type: String,
+		required: true,
+	},
+	title_ru: {
+		type: String,
+		required: true,
+	},
+	title_en: {
 		type: String,
 		required: true,
 	},

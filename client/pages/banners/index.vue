@@ -7,7 +7,9 @@ let isLoading = ref(true);
 let photo_url = ref(null);
 let brands = ref([]);
 let brand = ref("");
-let text = ref("");
+let text_uz = ref("");
+let text_ru = ref("");
+let text_en = ref("");
 let discount = ref(0);
 let bannerColor = ref("#000000");
 let discountColor = ref("#000000");
@@ -113,7 +115,9 @@ const addBanner = async () => {
       body: JSON.stringify({
         photo_url: data.fileUrl,
         brand: brand.value,
-        title: text.value,
+        title_uz: text_uz.value,
+        title_ru: text_ru.value,
+        title_en: text_en.value,
         discount: discount.value,
         background_color: bannerColor.value,
         sub_background_color: discountColor.value,
@@ -127,7 +131,9 @@ const addBanner = async () => {
     });
     photo_url.value = null;
     brand.value = "";
-    text.value = "";
+    text_uz.value = "";
+    text_ru.value = "";
+    text_en.value = "";
     discount.value = 0;
     bannerColor.value = "#000000";
     discountColor.value = "#000000";
@@ -184,7 +190,7 @@ defineShortcuts({
         >
           <div class="card-left">
             <p class="text-[25px] font-semibold leading-[32px] text-white">
-              {{ row.title }}
+              {{ row.title_uz }}
             </p>
             <p
               :style="`background-color: ${row.sub_background_color}`"
@@ -283,11 +289,27 @@ defineShortcuts({
 
           <UFormGroup
             class="my-[2%]"
-            label="Banner Uchun Tekst Yozin"
+            label="Banner Uchun Tekst Yozin (O'zbek tilida)"
             name="text"
             size="lg"
           >
-            <UInput type="text" size="lg" v-model="text" />
+            <UInput type="text" size="lg" v-model="text_uz" />
+          </UFormGroup>
+          <UFormGroup
+            class="my-[2%]"
+            label="Banner Uchun Tekst Yozin (Rus tilida)"
+            name="text"
+            size="lg"
+          >
+            <UInput type="text" size="lg" v-model="text_ru" />
+          </UFormGroup>
+          <UFormGroup
+            class="my-[2%]"
+            label="Banner Uchun Tekst Yozin (Ingliz tilida)"
+            name="text"
+            size="lg"
+          >
+            <UInput type="text" size="lg" v-model="text_en" />
           </UFormGroup>
           <UFormGroup
             class="my-[2%]"

@@ -4,10 +4,16 @@ const Users = require("../models/Users");
 async function UserMiddleware(req, res, next) {
 	const authorizationHeader = req.headers.authorization;
 	if (!authorizationHeader) {
-		return res.status(401).json({
-			error: "Not Authorized!",
-			message: "Missing authorization header",
-		});
+		return res
+			.status(401)
+			.json({
+				error: "Not Authorized!",
+				message: "Missing authorization header",
+			})
+			.set({
+				"Content-Type": "application/json",
+				"WWW-Authenticate": 'Bearer realm="api"',
+			});
 	}
 
 	const accessToken = authorizationHeader.split(" ")[1];

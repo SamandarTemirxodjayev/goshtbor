@@ -132,7 +132,9 @@ const addCategory = async () => {
     });
     photo_url.value = null;
     categories.value = res.data;
-    categoryText.value = "";
+    categoryText_uz.value = "";
+    categoryText_ru.value = "";
+    categoryText_en.value = "";
   } catch (error) {
     if (error.response && error.response.status === 401) {
       localStorage.removeItem("token");

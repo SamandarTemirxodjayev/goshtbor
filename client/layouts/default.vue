@@ -43,6 +43,11 @@ const links = [
     to: "/brands",
   },
   {
+    label: "Mahsulotlar",
+    icon: "i-heroicons-squares-2x2",
+    to: "/products",
+  },
+  {
     label: "Chiqish",
     icon: "i-heroicons-chevron-double-left",
     to: "/exit",
