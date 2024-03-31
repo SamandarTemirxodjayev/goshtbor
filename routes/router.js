@@ -6,6 +6,7 @@ const routerLogin = require("./login.router.js");
 const routerNotification = require("./notification.router.js");
 const routerBanner = require("./banners.router.js");
 const routerBrand = require("./brand.router.js");
+const routerProducts = require("./products.router.js");
 const router = Router();
 
 router.use("/register", routerRegister);
@@ -15,5 +16,6 @@ router.use("/login", routerLogin);
 router.use("/notification", routerNotification);
 router.use("/banners", routerBanner);
 router.use("/brands", routerBrand);
+router.use("/products", routerProducts);
 
 module.exports = router;

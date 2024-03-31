@@ -20,6 +20,12 @@ exports.createBanner = async (req, res) => {
 				message: "You are not authorized to perform this action",
 			});
 		}
+		if (!req.body.photo_url) {
+			return res.status(400).json({
+				status: "error",
+				message: "Please provide photo_url",
+			});
+		}
 		const banner = new Banners(req.body);
 		await banner.save();
 		return res.status(200).json({

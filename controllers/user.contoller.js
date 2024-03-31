@@ -37,13 +37,6 @@ exports.postUser = async (req, res) => {
 };
 exports.postUserEdit = async (req, res) => {
 	try {
-		const isExistsUser = await Users.findOne({surname: req.body.surname});
-		if (isExistsUser) {
-			return res.status(400).json({
-				status: 400,
-				message: "Username Tizimda Mavjud",
-			});
-		}
 		if (req.body.name) {
 			req.userId.name = req.body.name;
 		}

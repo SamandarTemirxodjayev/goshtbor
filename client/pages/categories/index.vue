@@ -29,10 +29,6 @@ onMounted(async () => {
 
 const columns = [
   {
-    key: "_id",
-    label: "ID",
-  },
-  {
     key: "name_uz",
     label: "Nomi (O'zbek tilida)",
   },
