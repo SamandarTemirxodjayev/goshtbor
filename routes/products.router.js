@@ -5,6 +5,8 @@ const adminMiddleware = require("../middleware/admin.middleware.js");
 const router = Router();
 
 router.get("/", controller.getProducts);
+router.get("/new", controller.getNewProducts);
+router.get("/popular", controller.getPopularProducts);
 router.post("/", adminMiddleware, controller.createProduct);
 router.delete("/:id", adminMiddleware, controller.deleteProduct);
 router.put("/:id", adminMiddleware, controller.updateProduct);

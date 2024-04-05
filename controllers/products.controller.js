@@ -2,17 +2,107 @@ const Products = require("../models/Products");
 
 exports.getProducts = async (req, res) => {
 	try {
+		const page = parseInt(req.query.page, 10) || 1;
+		const limit = parseInt(req.query.limit, 10) || 10;
+		const skip = (page - 1) * limit;
+
 		const products = await Products.find()
 			.populate("category")
-			.populate("brand");
+			.populate("brand")
+			.skip(skip)
+			.limit(limit);
+
+		const totalItems = await Products.countDocuments();
+		const totalPages = Math.ceil(totalItems / limit);
+
 		return res.status(200).json({
 			message: "Products fetched successfully!",
 			data: products,
+			pagination: {
+				totalItems,
+				currentPage: page,
+				totalPages,
+				limit,
+			},
 		});
 	} catch (error) {
 		return res.status(500).json({message: error.message});
 	}
 };
+
+exports.getNewProducts = async (req, res) => {
+	try {
+		const fiveDaysAgo = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000);
+		const page = parseInt(req.query.page, 10) || 1;
+		const limit = parseInt(req.query.limit, 10) || 10;
+		const skip = (page - 1) * limit;
+
+		let products = await Products.find({
+			createdAt: {$gte: fiveDaysAgo},
+		})
+			.skip(skip)
+			.limit(limit)
+			.exec();
+
+		let totalItems;
+
+		if (!products.length && page === 1) {
+			products = await Products.find({}).sort({createdAt: -1}).limit(10).exec();
+			totalItems = await Products.countDocuments({});
+		} else {
+			totalItems = await Products.countDocuments({
+				createdAt: {$gte: fiveDaysAgo},
+			});
+		}
+
+		const totalPages = Math.ceil(totalItems / limit);
+
+		return res.json({
+			message: "New Products fetched successfully!",
+			status: 200,
+			data: products,
+			pagination: {
+				totalItems,
+				currentPage: page,
+				totalPages,
+				limit,
+			},
+		});
+	} catch (error) {
+		return res.status(500).send(error);
+	}
+};
+exports.getPopularProducts = async (req, res) => {
+	try {
+		const page = parseInt(req.query.page, 10) || 1;
+		const limit = parseInt(req.query.limit, 10) || 10;
+		const skip = (page - 1) * limit;
+
+		const products = await Products.find({})
+			.sort({saleds: -1})
+			.skip(skip)
+			.limit(limit)
+			.exec();
+
+		const totalItems = await Products.countDocuments({});
+		const totalPages = Math.ceil(totalItems / limit);
+
+		return res.json({
+			message: "Popular Products fetched successfully!",
+			status: 200,
+			data: products,
+			pagination: {
+				totalItems,
+				currentPage: page,
+				totalPages,
+				limit,
+			},
+		});
+	} catch (error) {
+		return res.status(500).send(error);
+	}
+};
+
 exports.createProduct = async (req, res) => {
 	try {
 		const newProduct = await Products.create(req.body);
