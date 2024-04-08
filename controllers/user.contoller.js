@@ -46,6 +46,12 @@ exports.postUserEdit = async (req, res) => {
 		if (req.body.email) {
 			req.userId.email = req.body.email;
 		}
+		if (req.body.oneSignalId) {
+			req.userId.oneSignalId = req.body.oneSignalId;
+		}
+		if (req.body.deviceId) {
+			req.userId.deviceId = req.body.deviceId;
+		}
 		if (req.body.photo_url) {
 			req.userId.photo_url = req.body.photo_url;
 		}

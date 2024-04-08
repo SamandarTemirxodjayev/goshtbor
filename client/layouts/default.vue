@@ -33,6 +33,11 @@ const links = [
     to: "/banners",
   },
   {
+    label: "Xabarnomalar",
+    icon: "i-heroicons-bell-alert",
+    to: "/notifications",
+  },
+  {
     label: "Kategoriyalar",
     icon: "i-heroicons-bars-4",
     to: "/categories",

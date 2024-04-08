@@ -16,6 +16,12 @@ const userSchema = new Schema({
 	phone: {
 		type: String,
 	},
+	oneSignalId: {
+		type: String,
+	},
+	deviceId: {
+		type: String,
+	},
 	isBan: {
 		type: Boolean,
 		default: false,

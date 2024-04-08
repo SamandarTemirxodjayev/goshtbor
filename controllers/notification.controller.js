@@ -1,4 +1,5 @@
 const Notification = require("../models/Notification");
+const oneSignalClient = require("../utils/oneSignalclient.js");
 
 exports.createNotification = async (req, res) => {
 	try {
@@ -10,10 +11,30 @@ exports.createNotification = async (req, res) => {
 		}
 		const notifications = new Notification({
 			photo_url: req.body.photo_url,
-			title: req.body.title,
-			content: req.body.content,
+			title_uz: req.body.title_uz,
+			title_ru: req.body.title_ru,
+			title_en: req.body.title_en,
+			content_uz: req.body.content_uz,
+			content_ru: req.body.content_ru,
+			content_en: req.body.content_en,
 		});
 		await notifications.save();
+
+		const notificationPayload = {
+			contents: {
+				en: req.body.content_uz,
+			},
+			headings: {
+				en: req.body.title_uz,
+			},
+			included_segments: ["Subscribed Users"],
+		};
+
+		oneSignalClient
+			.createNotification(notificationPayload)
+			.then((response) => console.log(response))
+			.catch((e) => console.error(e));
+
 		return res.json({
 			status: 200,
 			message: "Notification created",

@@ -5,11 +5,27 @@ const notificationSchema = new mongoose.Schema({
 		type: String,
 		required: true,
 	},
-	title: {
+	title_uz: {
 		type: String,
 		required: true,
 	},
-	content: {
+	content_uz: {
+		type: String,
+		required: true,
+	},
+	title_ru: {
+		type: String,
+		required: true,
+	},
+	content_ru: {
+		type: String,
+		required: true,
+	},
+	title_en: {
+		type: String,
+		required: true,
+	},
+	content_en: {
 		type: String,
 		required: true,
 	},
