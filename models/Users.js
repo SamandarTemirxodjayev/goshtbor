@@ -16,6 +16,23 @@ const userSchema = new Schema({
 	phone: {
 		type: String,
 	},
+	google: {
+		token: String,
+		code: String,
+		id: String,
+		email: String,
+	},
+	apple_id: {
+		token: String,
+		code: String,
+		id: String,
+		email: String,
+	},
+	telegram: {
+		id: String,
+		auth_date: String,
+		hash: String,
+	},
 	oneSignalId: {
 		type: String,
 	},

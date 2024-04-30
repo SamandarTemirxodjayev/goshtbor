@@ -10,40 +10,39 @@ exports.login = async (req, res) => {
 	try {
 		const {type, data} = req.body;
 
-		const user = await Users.findOne({
-			$or: [{email: data}, {phone: data}],
-		});
-		if (!user) {
-			return res.status(400).json({
-				status: "error",
-				message: "Foydalanuvchi Tizimda Mavjud Emas",
-			});
-		}
-		let confirmationw = await Confirmations.findOne({data});
-
-		if (confirmationw) {
-			let {expired, confirmation} = await Confirmations.checkAndDeleteExpired(
-				confirmationw.uuid,
-			);
-			if (!expired) {
-				return res.status(400).json({
-					status: "waiting",
-					message: "OTP kod oldindan jo'natilgan",
-					data: {
-						id: confirmation._id,
-						uuid: confirmation.uuid,
-						type: confirmation.type,
-						createdAt: confirmation.createdAt,
-						expiredAt: confirmation.expiredAt,
-					},
-				});
-			}
-		}
-
 		const id = uuidv4();
 		let code = Math.floor(1000 + Math.random() * 9000);
 
 		if (type == "email") {
+			const user = await Users.findOne({
+				email: data,
+			});
+			if (!user) {
+				return res.status(400).json({
+					status: "error",
+					message: "Foydalanuvchi Tizimda Mavjud Emas",
+				});
+			}
+			let confirmationw = await Confirmations.findOne({data});
+
+			if (confirmationw) {
+				let {expired, confirmation} = await Confirmations.checkAndDeleteExpired(
+					confirmationw.uuid,
+				);
+				if (!expired) {
+					return res.status(400).json({
+						status: "waiting",
+						message: "OTP kod oldindan jo'natilgan",
+						data: {
+							id: confirmation._id,
+							uuid: confirmation.uuid,
+							type: confirmation.type,
+							createdAt: confirmation.createdAt,
+							expiredAt: confirmation.expiredAt,
+						},
+					});
+				}
+			}
 			await sendEmail(data, code);
 			let hashedCode = await bcrypt.hash(code.toString(), 13);
 			const newConfirmation = new Confirmations({
@@ -67,6 +66,35 @@ exports.login = async (req, res) => {
 				},
 			});
 		} else if (type == "phone") {
+			const user = await Users.findOne({
+				phone: data,
+			});
+			if (!user) {
+				return res.status(400).json({
+					status: "error",
+					message: "Foydalanuvchi Tizimda Mavjud Emas",
+				});
+			}
+			let confirmationw = await Confirmations.findOne({data});
+
+			if (confirmationw) {
+				let {expired, confirmation} = await Confirmations.checkAndDeleteExpired(
+					confirmationw.uuid,
+				);
+				if (!expired) {
+					return res.status(400).json({
+						status: "waiting",
+						message: "OTP kod oldindan jo'natilgan",
+						data: {
+							id: confirmation._id,
+							uuid: confirmation.uuid,
+							type: confirmation.type,
+							createdAt: confirmation.createdAt,
+							expiredAt: confirmation.expiredAt,
+						},
+					});
+				}
+			}
 			await sendSMS(data, code);
 			let hashedCode = await bcrypt.hash(code.toString(), 13);
 
@@ -88,6 +116,80 @@ exports.login = async (req, res) => {
 					type: "phone",
 					createdAt: newConfirmation.createdAt,
 					expiredAt: newConfirmation.expiredAt,
+				},
+			});
+		} else if (type == "google") {
+			const user = await Users.findOne({
+				"google.token": data.token,
+				"google.email": data.email,
+			});
+
+			if (!user) {
+				return res.status(400).json({
+					status: "error",
+					message: "User is non-exists",
+				});
+			}
+
+			const token = await createToken(user._id);
+
+			return res.json({
+				status: 200,
+				message: "Confirmed",
+				data: {
+					auth_token: token,
+					token_type: "bearer",
+					createdAt: new Date(),
+					expiredAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+				},
+			});
+		} else if (type == "apple_id") {
+			const user = await Users.findOne({
+				"apple_id.token": data.token,
+				"apple_id.email": data.email,
+			});
+
+			if (!user) {
+				return res.status(400).json({
+					status: "error",
+					message: "User is non-exists",
+				});
+			}
+
+			const token = await createToken(user._id);
+
+			return res.json({
+				status: 200,
+				message: "Confirmed",
+				data: {
+					auth_token: token,
+					token_type: "bearer",
+					createdAt: new Date(),
+					expiredAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+				},
+			});
+		} else if (type == "telegram") {
+			const user = await Users.findOne({
+				"telegram.id": data.id,
+			});
+
+			if (!user) {
+				return res.status(400).json({
+					status: "error",
+					message: "User is non-exists",
+				});
+			}
+
+			const token = await createToken(user._id);
+
+			return res.json({
+				status: 200,
+				message: "Confirmed",
+				data: {
+					auth_token: token,
+					token_type: "bearer",
+					createdAt: new Date(),
+					expiredAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
 				},
 			});
 		}

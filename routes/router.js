@@ -1,12 +1,15 @@
 const {Router} = require("express");
-const routerRegister = require("./register.router.js");
-const routerUser = require("./user.router.js");
-const routerCategory = require("./category.router.js");
-const routerLogin = require("./login.router.js");
-const routerNotification = require("./notification.router.js");
-const routerBanner = require("./banners.router.js");
-const routerBrand = require("./brand.router.js");
-const routerProducts = require("./products.router.js");
+const routerRegister = require("./register.routes.js");
+const routerUser = require("./user.routes.js");
+const routerCategory = require("./category.routes.js");
+const routerLogin = require("./login.routes.js");
+const routerNotification = require("./notification.routes.js");
+const routerBanner = require("./banners.routes.js");
+const routerBrand = require("./brand.routes.js");
+const routerProducts = require("./products.routes.js");
+const routerOrders = require("./orders.routes.js");
+const routerOferta = require("./oferta.routes.js");
+const routerBlogs = require("./blogs.routes.js");
 const router = Router();
 
 router.use("/register", routerRegister);
@@ -17,5 +20,8 @@ router.use("/notification", routerNotification);
 router.use("/banners", routerBanner);
 router.use("/brands", routerBrand);
 router.use("/products", routerProducts);
+router.use("/orders", routerOrders);
+router.use("/oferta", routerOferta);
+router.use("/blogs", routerBlogs);
 
 module.exports = router;

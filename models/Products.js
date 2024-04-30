@@ -31,6 +31,9 @@ const productSchema = new Schema({
 		type: String,
 		required: true,
 	},
+	description_photo: {
+		type: String,
+	},
 	weight: {
 		type: Number,
 		required: true,

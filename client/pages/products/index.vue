@@ -9,6 +9,7 @@ let isLoading = ref(true);
 let photo_url1 = ref(null);
 let photo_url2 = ref(null);
 let photo_url3 = ref(null);
+let photo_url4 = ref(null);
 let isEditOpen = ref(false);
 let productId = ref(null);
 let product = reactive({
@@ -18,6 +19,7 @@ let product = reactive({
   description_uz: "",
   description_ru: "",
   description_en: "",
+  description_photo: "",
   weight: 0,
   sale: {
     isSale: false,
@@ -149,6 +151,11 @@ function handleFileChange3(event) {
     photo_url3.value = event.target.files[0];
   }
 }
+function handleFileChange4(event) {
+  if (event.target.files.length > 0) {
+    photo_url4.value = event.target.files[0];
+  }
+}
 const addProduct = async () => {
   isLoading.value = true;
   if (
@@ -229,6 +236,15 @@ const addProduct = async () => {
         body: formdata,
       });
       product.photo_urls.push(data.data.fileUrl);
+    }
+    if (photo_url4.value) {
+      formdata = new FormData();
+      formdata.append("file", photo_url4.value);
+      data = await $fetch(CDN_URL + "/upload", {
+        method: "POST",
+        body: formdata,
+      });
+      product.description_photo = data.data.fileUrl;
     }
     await $fetch(BASE_URL + "/products", {
       method: "POST",
@@ -613,6 +629,14 @@ defineShortcuts({
             required
           >
             <UTextarea type="text" size="lg" v-model="product.description_en" />
+          </UFormGroup>
+          <UFormGroup
+            class="my-[2%]"
+            label="Mahsulot Haqida Rasm"
+            name="photo"
+            size="lg"
+          >
+            <UInput type="file" size="lg" @change="handleFileChange4" />
           </UFormGroup>
           <UFormGroup
             class="my-[2%]"

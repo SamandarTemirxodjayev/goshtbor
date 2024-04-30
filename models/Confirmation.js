@@ -13,6 +13,9 @@ const confirmSchema = new Schema({
 		type: String,
 		required: true,
 	},
+	oldData: {
+		type: String,
+	},
 	data: {
 		type: String,
 		required: true,
