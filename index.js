@@ -2,12 +2,12 @@ require("dotenv").config();
 const cors = require("cors");
 const express = require("express");
 const mongoose = require("mongoose");
-const YAML = require("js-yaml");
-const fs = require("fs");
-const path = require("path");
 const cron = require("node-cron");
 const router = require("./routes/router.js");
+const WebSocket = require("ws");
+
 const app = express();
+const wss = new WebSocket.Server({port: process.env.WSPORT});
 
 app.use(express.json());
 const corsOptions = {
@@ -34,3 +34,30 @@ cron.schedule("0 */1 * * *", async () => {
 });
 
 app.use("/api", router);
+
+wss.on("connection", (ws) => {
+	clients.add(ws);
+	console.log("A new client connected");
+
+	ws.on("message", (message) => {
+		let data = JSON.parse(message.toString());
+
+		console.log("ChatId: " + data.chatId);
+		console.log("Message: " + data.message);
+	});
+
+	ws.on("close", () => {
+		clients.delete(ws);
+		console.log("A client disconnected");
+	});
+	process.stdin.on("data", (data) => {
+		ws.send(
+			JSON.stringify({
+				chatId: data.toString().trim().split(" ")[0],
+				message: data.toString().trim().split(" ")[1],
+			}),
+		);
+	});
+});
+
+console.log(`Websocket server is run on PORT ${process.env.WSPORT}`);

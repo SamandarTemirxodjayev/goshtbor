@@ -33,6 +33,10 @@ const userSchema = new Schema({
 		auth_date: String,
 		hash: String,
 	},
+	facebook: {
+		email: String,
+		id: String,
+	},
 	oneSignalId: {
 		type: String,
 	},

@@ -208,7 +208,40 @@ exports.postRegister = async (req, res) => {
 				},
 				name: data.first_name,
 				surname: data.last_name,
-				photo_url: data.photo_url,	
+				photo_url: data.photo_url,
+			});
+			await newUser.save();
+			const token = await createToken(newUser._id);
+
+			return res.json({
+				status: 200,
+				message: "Confirmed",
+				data: {
+					auth_token: token,
+					token_type: "bearer",
+					createdAt: new Date(),
+					expiredAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+				},
+			});
+		} else if (type == "facebook") {
+			const user = await Users.findOne({
+				"facebook.id": data.id,
+				"facebook.email": data.email,
+			});
+
+			if (user) {
+				return res.status(400).json({
+					status: "error",
+					message: "User already exists",
+				});
+			}
+			const newUser = new Users({
+				facebook: {
+					email: data.email,
+					id: data.id,
+				},
+				name: data.first_name,
+				surname: data.last_name,
 			});
 			await newUser.save();
 			const token = await createToken(newUser._id);

@@ -192,6 +192,31 @@ exports.login = async (req, res) => {
 					expiredAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
 				},
 			});
+		} else if (type == "facebook") {
+			const user = await Users.findOne({
+				"facebook.id": data.id,
+				"facebook.email": data.email,
+			});
+
+			if (!user) {
+				return res.status(400).json({
+					status: "error",
+					message: "User is non-exists",
+				});
+			}
+
+			const token = await createToken(user._id);
+
+			return res.json({
+				status: 200,
+				message: "Confirmed",
+				data: {
+					auth_token: token,
+					token_type: "bearer",
+					createdAt: new Date(),
+					expiredAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+				},
+			});
 		}
 		return res.json({message: "Invalid request"});
 	} catch (error) {

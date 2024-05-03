@@ -8,13 +8,61 @@ const {sendSMS} = require("../utils/SMS");
 
 exports.getUser = async (req, res) => {
 	try {
-		return res.status(200).json({
-			status: 200,
+		let user;
+		let data;
+
+		if (req.userId.email) {
+			user = await Users.findOne({email: req.userId.email});
+			data = user;
+		} else if (req.userId.phone) {
+			user = await Users.findOne({phone: req.userId.phone});
+			data = user;
+		} else if (req.userId.google && req.userId.google.email) {
+			user = await Users.findOne({"google.email": req.userId.google.email});
+			data = {
+				...user._doc,
+				...(user.google &&
+					Object.keys(user.google).length > 0 && {...user.google}),
+			};
+			delete data.google;
+		} else if (req.userId.apple_id && req.userId.apple_id.email) {
+			user = await Users.findOne({"apple_id.email": req.userId.apple_id.email});
+			data = {
+				...user._doc,
+				...(user.apple_id &&
+					Object.keys(user.apple_id).length > 0 && {...user.apple_id}),
+			};
+			delete data.apple_id;
+		} else if (req.userId.telegram && req.userId.telegram.id) {
+			user = await Users.findOne({"telegram.id": req.userId.telegram.id});
+			data = {
+				...user._doc,
+				...(user.telegram &&
+					Object.keys(user.telegram).length > 0 && {...user.telegram}),
+			};
+			delete data.telegram;
+		} else if (req.userId.facebook && req.userId.facebook.id) {
+			user = await Users.findOne({"facebook.id": req.userId.facebook.id});
+			data = {
+				...user._doc,
+				...(user.facebook &&
+					Object.keys(user.facebook).length > 0 && {...user.facebook}),
+			};
+			delete data.facebook;
+		}
+
+		if (!user) {
+			return res.status(404).json({message: "User not found", status: 404});
+		}
+
+		res.status(200).json({
+			data,
 			message: "Foydalanuvchi Tizimdan Yuklab Olindi",
-			data: req.userId,
+			status: 200,
 		});
-	} catch (error) {
-		return res.status(500).send(error);
+	} catch (err) {
+		console.error(err);
+		res.status(500).json({message: "Internal Server Error", status: 500});
 	}
 };
 exports.postUser = async (req, res) => {
