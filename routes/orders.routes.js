@@ -5,5 +5,8 @@ const controller = require("../controllers/orders.controller.js");
 const router = Router();
 
 router.get("/", userMiddleware, controller.getAllOrders);
+router.post("/create", userMiddleware, controller.createOrder);
+router.post("/code", userMiddleware, controller.confirmationCode);
+router.put("/code/:uuid", userMiddleware, controller.confirmationCodeUUID)
 
 module.exports = router;

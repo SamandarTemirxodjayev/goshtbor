@@ -61,8 +61,18 @@ exports.getUser = async (req, res) => {
 			status: 200,
 		});
 	} catch (err) {
-		console.error(err);
 		res.status(500).json({message: "Internal Server Error", status: 500});
+	}
+};
+exports.getFullUserInformation = async (req, res) => {
+	try {
+		return res.json({
+			status: "success",
+			data: req.userId,
+			message: "Success",
+		});
+	} catch (error) {
+		return res.status(500).json({error});
 	}
 };
 exports.postUser = async (req, res) => {
@@ -190,7 +200,7 @@ exports.postUserEditPhone = async (req, res) => {
 				code: hashedCode,
 				uuid: id,
 				data,
-				oldData: req.user.data,
+				oldData: req.userId.phone,
 				expiredAt: new Date(Date.now() + 1000 * 2 * 60),
 			});
 			await newConfirmation.save();
@@ -209,7 +219,6 @@ exports.postUserEditPhone = async (req, res) => {
 		}
 		return res.json({message: "Invalid request"});
 	} catch (error) {
-		console.log(error);
 		return res.status(500).json(error);
 	}
 };

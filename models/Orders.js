@@ -24,6 +24,9 @@ const orderSchema = new Schema(
 			type: {
 				type: String,
 			},
+			card: {
+				number: String,
+			},
 			created_date: {
 				type: Date,
 				default: Date.now,
@@ -31,7 +34,7 @@ const orderSchema = new Schema(
 			pay_date: {
 				type: Date,
 			},
-			id: {
+			uuid: {
 				type: String,
 			},
 			status: {
@@ -42,21 +45,36 @@ const orderSchema = new Schema(
 		comment: {
 			type: String,
 		},
+		phone: {
+			number: {
+				type: Number,
+				required: true,
+			},
+			created_at: {
+				type: Date,
+				default: Date.now,
+			},
+		},
 		delivery: {
 			address: {
 				longitude: {
 					type: Number,
+					required: true,
 				},
 				latitude: {
 					type: Number,
-				},
-				name: {
-					type: String,
+					required: true,
 				},
 			},
 			date: {
-				type: Date,
-				required: true,
+				from: {
+					type: Date,
+					required: true,
+				},
+				to: {
+					type: Date,
+					required: true,
+				},
 			},
 			courier: {
 				type: Types.ObjectId,
