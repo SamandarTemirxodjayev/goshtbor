@@ -27,7 +27,7 @@ server.addMethod("CreateTransaction", async (params) => {
 	};
 });
 server.addMethod("CheckTransaction", async (params) => {
-	const order = await Orders.findById(params.account.order_id);
+	const order = await Orders.findById(params.id);
 	if (!order) {
 		return {
 			error: -31003,
