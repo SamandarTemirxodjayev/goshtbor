@@ -32,7 +32,7 @@ server.addMethod("CreateTransaction", async (params) => {
 });
 server.addMethod("CheckTransaction", async (params) => {
 	const order = await Orders.findOne({
-		"pay.payme.id": params.account.order_id,
+		"pay.payme.id": params.id,
 	});
 	if (!order) {
 		return {
