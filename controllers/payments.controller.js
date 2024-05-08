@@ -1,13 +1,12 @@
 const {JSONRPCServer} = require("json-rpc-2.0");
+const RpcError = require("json-rpc-error");
 const Orders = require("../models/Orders");
 const server = new JSONRPCServer();
 
 server.addMethod("CheckPerformTransaction", async (params) => {
 	const order = await Orders.findById(params.account.order_id);
 	if (!order) {
-		return {
-			error: -31003,
-		};
+		throw new RpcError(-31003, "Order not found");
 	}
 	return {
 		allow: true,
@@ -16,9 +15,7 @@ server.addMethod("CheckPerformTransaction", async (params) => {
 server.addMethod("CreateTransaction", async (params) => {
 	const order = await Orders.findById(params.account.order_id);
 	if (!order) {
-		return {
-			error: -31003,
-		};
+		throw new RpcError(-31003, "Order not found");
 	}
 	order.pay.payme.create_time = params.time;
 	order.pay.payme.id = params.id;
@@ -36,9 +33,7 @@ server.addMethod("CheckTransaction", async (params) => {
 		"pay.payme.id": params.id,
 	});
 	if (!order) {
-		return {
-			error: -31003,
-		};
+		throw new RpcError(-31003, "Order not found");
 	}
 	return {
 		create_time: order.pay.payme.create_time,
