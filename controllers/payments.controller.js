@@ -1,6 +1,12 @@
 const {JSONRPCServer} = require("json-rpc-2.0");
 const server = new JSONRPCServer();
 
+server.addMethod("CheckPerformTransaction", (params) => {
+	console.log(params);
+});
+server.addMethod("CreateTransaction", (params) => {
+	console.log(params);
+});
 server.addMethod("CheckTransaction", (params) => {
 	console.log(params);
 });
