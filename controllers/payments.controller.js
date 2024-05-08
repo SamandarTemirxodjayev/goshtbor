@@ -3,12 +3,15 @@ const server = new JSONRPCServer();
 
 server.addMethod("CheckPerformTransaction", (params) => {
 	console.log(params);
+	return true;
 });
 server.addMethod("CreateTransaction", (params) => {
 	console.log(params);
+	return true;
 });
 server.addMethod("CheckTransaction", (params) => {
 	console.log(params);
+	return true;
 });
 
 exports.test = async (req, res) => {
