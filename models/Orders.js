@@ -55,7 +55,7 @@ const orderSchema = new Schema(
 					type: Number,
 					default: 0,
 				},
-				create_time: {
+				cancel_time: {
 					type: Number,
 					default: 0,
 				},
