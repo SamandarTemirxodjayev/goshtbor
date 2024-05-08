@@ -3,7 +3,9 @@ const server = new JSONRPCServer();
 
 server.addMethod("CheckPerformTransaction", (params) => {
 	console.log(params);
-	return true;
+	return {
+		allow: true,
+	};
 });
 server.addMethod("CreateTransaction", (params) => {
 	console.log(params);
