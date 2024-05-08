@@ -53,19 +53,21 @@ server.addMethod("CheckTransaction", async (params) => {
 exports.test = async (req, res) => {
 	try {
 		const jsonRPCRequest = req.body;
-		// server.receive takes a JSON-RPC request and returns a promise of a JSON-RPC response.
-		// It can also receive an array of requests, in which case it may return an array of responses.
-		// Alternatively, you can use server.receiveJSON, which takes JSON string as is (in this case req.body).
-		server.receive(jsonRPCRequest).then((jsonRPCResponse) => {
-			if (jsonRPCResponse) {
-				res.json(jsonRPCResponse);
-			} else {
-				// If response is absent, it was a JSON-RPC notification method.
-				// Respond with no content status (204).
-				res.sendStatus(204);
-			}
-		});
+		const jsonRPCResponse = await server.receive(jsonRPCRequest);
+		if (jsonRPCResponse) {
+			res.json(jsonRPCResponse);
+		} else {
+			res.sendStatus(204);
+		}
 	} catch (error) {
-		return res.status(500).json({message: error.message});
+		if (error instanceof RpcError) {
+			res.status(200).json({
+				jsonrpc: "2.0",
+				id: jsonRPCRequest.id,
+				error: error.message,
+			});
+		} else {
+			res.status(500).json({message: error.message});
+		}
 	}
 };
