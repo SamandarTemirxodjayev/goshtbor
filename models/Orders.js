@@ -41,6 +41,33 @@ const orderSchema = new Schema(
 					type: Number,
 				},
 			},
+			payme: {
+				id: {
+					type: Types.ObjectId,
+				},
+				amount: {
+					type: Number,
+				},
+				create_time: {
+					type: Number,
+				},
+				perform_time: {
+					type: Number,
+					default: 0,
+				},
+				create_time: {
+					type: Number,
+					default: 0,
+				},
+				state: {
+					type: Number,
+					default: 1,
+				},
+				reason: {
+					type: String,
+					default: null,
+				},
+			},
 			created_date: {
 				type: Date,
 				default: Date.now,

@@ -26,9 +26,21 @@ server.addMethod("CreateTransaction", async (params) => {
 		state: 1,
 	};
 });
-server.addMethod("CheckTransaction", (params) => {
-	console.log(params);
-	return true;
+server.addMethod("CheckTransaction", async (params) => {
+	const order = await Orders.findById(params.account.order_id);
+	if (!order) {
+		return {
+			error: -31003,
+		};
+	}
+	return {
+		create_time: order.pay.payme.create_time,
+		perform_time: order.pay.payme.perform_time,
+		cancel_time: order.pay.payme.cancel_time,
+		transaction: order._id,
+		state: 1,
+		reason: order.pay.payme.reason,
+	};
 });
 
 exports.test = async (req, res) => {
