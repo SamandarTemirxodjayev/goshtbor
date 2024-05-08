@@ -21,18 +21,18 @@ server.addMethod("CheckPerformTransaction", async (params) => {
 server.addMethod("CreateTransaction", async (params) => {
 	const order = await Orders.findById(params.account.order_id);
 	if (!order) {
-		throw new RpcError("Order not found", -31003, [
+		throw new RpcError("Order not found", -31060, [
 			{
-				code: -31003,
+				code: -31060,
 				message: "Order not found",
 			},
 		]);
 	}
 	if (order.pay.payme.id) {
 		if (order.pay.payme.id != params.id) {
-			throw new RpcError("Order not found", -31003, [
+			throw new RpcError("Order not found", -31060, [
 				{
-					code: -31003,
+					code: -31060,
 					message: "Order not found",
 				},
 			]);
@@ -55,9 +55,9 @@ server.addMethod("CheckTransaction", async (params) => {
 		"pay.payme.id": params.id,
 	});
 	if (!order) {
-		throw new RpcError("Order not found", -31003, [
+		throw new RpcError("Order not found", -31060, [
 			{
-				code: -31003,
+				code: -31060,
 				message: "Order not found",
 			},
 		]);
