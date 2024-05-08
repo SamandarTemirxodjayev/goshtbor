@@ -17,6 +17,9 @@ server.addMethod("CreateTransaction", async (params) => {
 	if (!order) {
 		throw new RpcError(-31003, -31003);
 	}
+	if (order.pay.payme.id != params.id) {
+		throw new RpcError(-31003, -31003);
+	}
 	order.pay.payme.create_time = params.time;
 	order.pay.payme.id = params.id;
 	order.pay.payme.amount = params.amount;
