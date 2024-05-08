@@ -23,6 +23,7 @@ server.addMethod("CreateTransaction", async (params) => {
 	order.pay.payme.create_time = params.time;
 	order.pay.payme.id = params.id;
 	order.pay.payme.amount = params.amount;
+	await order.save();
 
 	return {
 		create_time: params.time,
