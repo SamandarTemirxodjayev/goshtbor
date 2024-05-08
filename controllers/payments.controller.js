@@ -20,6 +20,10 @@ server.addMethod("CreateTransaction", async (params) => {
 			error: -31003,
 		};
 	}
+	order.pay.payme.create_time = params.time;
+	order.pay.payme.id = params.id;
+	order.pay.payme.amount = params.amount;
+
 	return {
 		create_time: params.time,
 		transaction: order._id,
@@ -27,7 +31,9 @@ server.addMethod("CreateTransaction", async (params) => {
 	};
 });
 server.addMethod("CheckTransaction", async (params) => {
-	const order = await Orders.findById(params.id);
+	const order = await Orders.findOne({
+		"pay.payme.id": params.account.order_id,
+	});
 	if (!order) {
 		return {
 			error: -31003,
