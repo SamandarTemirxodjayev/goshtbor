@@ -7,6 +7,7 @@ const router = require("./routes/router.js");
 const WebSocket = require("ws");
 
 const app = express();
+
 const wss = new WebSocket.Server({port: process.env.WSPORT});
 
 app.use(express.json());
