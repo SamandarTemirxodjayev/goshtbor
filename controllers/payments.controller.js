@@ -1,15 +1,30 @@
 const {JSONRPCServer} = require("json-rpc-2.0");
+const Orders = require("../models/Orders");
 const server = new JSONRPCServer();
 
 server.addMethod("CheckPerformTransaction", (params) => {
-	console.log(params);
+	const order = Orders.findById(params.account.order_id);
+	if (!order) {
+		return {
+			error: -31003,
+		};
+	}
 	return {
 		allow: true,
 	};
 });
 server.addMethod("CreateTransaction", (params) => {
-	console.log(params);
-	return true;
+	const order = Orders.findById(params.account.order_id);
+	if (!order) {
+		return {
+			error: -31003,
+		};
+	}
+	return {
+		create_time: params.time,
+    transaction: order._id,
+    state: 1
+	};
 });
 server.addMethod("CheckTransaction", (params) => {
 	console.log(params);
