@@ -10,6 +10,8 @@ const routerProducts = require("./products.routes.js");
 const routerOrders = require("./orders.routes.js");
 const routerOferta = require("./oferta.routes.js");
 const routerBlogs = require("./blogs.routes.js");
+const routerInfos = require("./infos.routes.js");
+const routerPayments = require("./payments.routes.js");
 const router = Router();
 
 router.use("/register", routerRegister);
@@ -23,5 +25,7 @@ router.use("/products", routerProducts);
 router.use("/orders", routerOrders);
 router.use("/oferta", routerOferta);
 router.use("/blogs", routerBlogs);
+router.use("/infos", routerInfos);
+router.use("/payments", routerPayments);
 
 module.exports = router;

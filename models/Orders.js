@@ -25,7 +25,21 @@ const orderSchema = new Schema(
 				type: String,
 			},
 			card: {
-				number: String,
+				uuid: {
+					type: String,
+				},
+				card_pan: {
+					type: String,
+				},
+				payment_amount: {
+					type: Number,
+				},
+				total_amount: {
+					type: Number,
+				},
+				commission_amount: {
+					type: Number,
+				},
 			},
 			created_date: {
 				type: Date,

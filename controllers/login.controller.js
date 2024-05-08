@@ -120,7 +120,7 @@ exports.login = async (req, res) => {
 			});
 		} else if (type == "google") {
 			const user = await Users.findOne({
-				"google.token": data.token,
+				"google.id": data.id,
 				"google.email": data.email,
 			});
 
@@ -131,7 +131,11 @@ exports.login = async (req, res) => {
 				});
 			}
 
-			const token = await createToken(user._id);
+			user.code = data.code;
+			user.token = data.token;
+			await user.save();
+
+			const token = createToken(user._id);
 
 			return res.json({
 				status: 200,
@@ -145,7 +149,7 @@ exports.login = async (req, res) => {
 			});
 		} else if (type == "apple_id") {
 			const user = await Users.findOne({
-				"apple_id.token": data.token,
+				"apple_id.id": data.id,
 				"apple_id.email": data.email,
 			});
 
@@ -156,7 +160,11 @@ exports.login = async (req, res) => {
 				});
 			}
 
-			const token = await createToken(user._id);
+			user.code = data.code;
+			user.token = data.token;
+			await user.save();
+
+			const token = createToken(user._id);
 
 			return res.json({
 				status: 200,
@@ -180,7 +188,7 @@ exports.login = async (req, res) => {
 				});
 			}
 
-			const token = await createToken(user._id);
+			const token = createToken(user._id);
 
 			return res.json({
 				status: 200,
@@ -205,7 +213,7 @@ exports.login = async (req, res) => {
 				});
 			}
 
-			const token = await createToken(user._id);
+			const token = createToken(user._id);
 
 			return res.json({
 				status: 200,
@@ -259,7 +267,7 @@ exports.postUUIDConfirm = async (req, res) => {
 			$or: [{email: confirmation.data}, {phone: confirmation.data}],
 		});
 
-		const token = await createToken(user._id);
+		const token = createToken(user._id);
 
 		return res.json({
 			status: 200,

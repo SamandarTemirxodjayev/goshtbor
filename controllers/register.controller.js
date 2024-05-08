@@ -123,8 +123,8 @@ exports.postRegister = async (req, res) => {
 			});
 		} else if (type == "google") {
 			const user = await Users.findOne({
-				"google.token": data.token,
 				"google.email": data.email,
+				"google.id": data.id,
 			});
 
 			if (user) {
@@ -143,7 +143,7 @@ exports.postRegister = async (req, res) => {
 				name: data.name,
 			});
 			await newUser.save();
-			const token = await createToken(newUser._id);
+			const token = createToken(newUser._id);
 
 			return res.json({
 				status: 200,
@@ -157,7 +157,7 @@ exports.postRegister = async (req, res) => {
 			});
 		} else if (type == "apple_id") {
 			const user = await Users.findOne({
-				"apple_id.token": data.token,
+				"apple_id.id": data.token,
 				"apple_id.email": data.email,
 			});
 
@@ -177,7 +177,7 @@ exports.postRegister = async (req, res) => {
 				name: data.name,
 			});
 			await newUser.save();
-			const token = await createToken(newUser._id);
+			const token = createToken(newUser._id);
 
 			return res.json({
 				status: 200,
@@ -211,7 +211,7 @@ exports.postRegister = async (req, res) => {
 				photo_url: data.photo_url,
 			});
 			await newUser.save();
-			const token = await createToken(newUser._id);
+			const token = createToken(newUser._id);
 
 			return res.json({
 				status: 200,
@@ -244,7 +244,7 @@ exports.postRegister = async (req, res) => {
 				surname: data.last_name,
 			});
 			await newUser.save();
-			const token = await createToken(newUser._id);
+			const token = createToken(newUser._id);
 
 			return res.json({
 				status: 200,
@@ -307,7 +307,7 @@ exports.postUUIDConfirm = async (req, res) => {
 		await Confirmations.findOneAndDelete({uuid});
 		await newUser.save();
 
-		const token = await createToken(newUser._id);
+		const token = createToken(newUser._id);
 
 		return res.json({
 			status: 200,
