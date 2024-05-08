@@ -6,20 +6,21 @@ const server = new JSONRPCServer();
 server.addMethod("CheckPerformTransaction", async (params) => {
 	const order = await Orders.findById(params.account.order_id);
 	if (!order) {
-		throw new RpcError(-31003, -31003);
+		throw new RpcError(-31003, "Order not found");
 	}
 	return {
 		allow: true,
 	};
 });
+
 server.addMethod("CreateTransaction", async (params) => {
 	const order = await Orders.findById(params.account.order_id);
 	if (!order) {
-		throw new RpcError(-31003, -31003);
+		throw new RpcError(-31003, "Order not found");
 	}
 	if (order.pay.payme.id) {
 		if (order.pay.payme.id != params.id) {
-			throw new RpcError(-31003, -31003);
+			throw new RpcError(-31003, "Invalid ID");
 		}
 	}
 	order.pay.payme.create_time = params.time;
@@ -33,12 +34,13 @@ server.addMethod("CreateTransaction", async (params) => {
 		state: 1,
 	};
 });
+
 server.addMethod("CheckTransaction", async (params) => {
 	const order = await Orders.findOne({
 		"pay.payme.id": params.id,
 	});
 	if (!order) {
-		throw new RpcError(-31003, -31003);
+		throw new RpcError(-31003, "Order not found");
 	}
 	return {
 		create_time: order.pay.payme.create_time,
@@ -64,7 +66,10 @@ exports.test = async (req, res) => {
 			res.status(200).json({
 				jsonrpc: "2.0",
 				id: jsonRPCRequest.id,
-				error: error.message,
+				error: {
+					code: error.code,
+					message: error.message,
+				},
 			});
 		} else {
 			res.status(500).json({message: error.message});
