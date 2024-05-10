@@ -57,6 +57,7 @@ exports.test = async (req, res) => {
 		const jsonRPCRequest = req.body;
 		const jsonRPCResponse = await server.receive(jsonRPCRequest);
 		if (jsonRPCResponse) {
+			console.loog(jsonRPCResponse);
 			res.json(jsonRPCResponse);
 		} else {
 			res.sendStatus(204);
