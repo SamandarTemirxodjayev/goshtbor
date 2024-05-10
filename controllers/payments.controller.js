@@ -19,9 +19,12 @@ server.addMethod("CancelTransaction", async (params) => {
 	if (!order) {
 		throw new RpcError(-31060, "Order not found");
 	}
-	order.pay.payme.cancel_time = +new Date();
-	order.pay.payme.state = -2;
-	await order.save();
+	if (order.pay.payme.cancel_time == 0) {
+		order.pay.payme.cancel_time = +new Date();
+		order.pay.payme.state = -2;
+		await order.save();
+	}
+
 	return {
 		transaction: order._id,
 		cancel_time: order.pay.payme.cancel_time,
