@@ -76,7 +76,7 @@ exports.test = async (req, res) => {
 				jsonrpc: "2.0",
 				id: jsonRPCRequest.id,
 				error: {
-					code: error.code,
+					code: error.message.code,
 					message: error.message,
 				},
 			});
