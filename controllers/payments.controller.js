@@ -19,6 +19,7 @@ server.addMethod("GetStatement", async (params) => {
 			$lte: params.to,
 		},
 	});
+	console.log(orders);
 	return {
 		transactions: orders,
 	};
