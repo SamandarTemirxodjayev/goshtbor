@@ -7,7 +7,7 @@ const server = new JSONRPCServer();
 server.addMethod("CheckPerformTransaction", async (params) => {
 	const order = await Orders.findById(params.account.order_id);
 	if (!order) {
-		throw new RpcError(-31060, "Order not found");
+		throw new RpcError(-32504, "Order not found");
 	}
 	let totalAmount = 0;
 	for (const product of order.products) {
@@ -110,7 +110,7 @@ server.addMethod("CreateTransaction", async (params) => {
 	}
 
 	if (totalAmount != params.amount) {
-		throw new RpcError(-31001, "Order not found");
+		throw new RpcError(-31002, "Order not found");
 	}
 
 	order.pay.payme.create_time = params.time;
