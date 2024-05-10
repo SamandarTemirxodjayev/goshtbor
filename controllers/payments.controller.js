@@ -13,7 +13,7 @@ server.addMethod("CheckPerformTransaction", async (params) => {
 	for (const product of order.products) {
 		const productDoc = await Products.findById(product.product);
 		if (!productDoc) {
-			throw new RpcError(-31001, "Order not found");
+			throw new RpcError(-32504, "Order not found");
 		}
 
 		const price = productDoc.sale.isSale
@@ -23,7 +23,7 @@ server.addMethod("CheckPerformTransaction", async (params) => {
 		totalAmount += subtotal;
 	}
 	if (totalAmount != params.amount) {
-		throw new RpcError(-31001, "Order not found");
+		throw new RpcError(-32504, "Order not found");
 	}
 
 	return {
@@ -47,7 +47,7 @@ server.addMethod("CancelTransaction", async (params) => {
 		"pay.payme.id": params.id,
 	});
 	if (!order) {
-		throw new RpcError(-31060, "Order not found");
+		throw new RpcError(-32504, "Order not found");
 	}
 	if (order.pay.payme.cancel_time == 0) {
 		order.pay.payme.cancel_time = +new Date();
@@ -67,7 +67,7 @@ server.addMethod("PerformTransaction", async (params) => {
 		"pay.payme.id": params.id,
 	});
 	if (!order) {
-		throw new RpcError(-31060, "Order not found");
+		throw new RpcError(-32504, "Order not found");
 	}
 	if (order.pay.payme.perform_time == 0) {
 		order.pay.payme.state = 2;
@@ -89,17 +89,17 @@ server.addMethod("PerformTransaction", async (params) => {
 server.addMethod("CreateTransaction", async (params) => {
 	const order = await Orders.findById(params.account.order_id);
 	if (!order) {
-		throw new RpcError(-31060, "Order not found");
+		throw new RpcError(-32504, "Order not found");
 	}
 	if (order.pay.payme.id && order.pay.payme.id != params.id) {
-		throw new RpcError(-31060, "Incorrect order ID");
+		throw new RpcError(-32504, "Incorrect order ID");
 	}
 
 	let totalAmount = 0;
 	for (const product of order.products) {
 		const productDoc = await Products.findById(product.product);
 		if (!productDoc) {
-			throw new RpcError(-31001, "Order not found");
+			throw new RpcError(-32504, "Order not found");
 		}
 
 		const price = productDoc.sale.isSale
@@ -110,7 +110,7 @@ server.addMethod("CreateTransaction", async (params) => {
 	}
 
 	if (totalAmount != params.amount) {
-		throw new RpcError(-31002, "Order not found");
+		throw new RpcError(-32504, "Order not found");
 	}
 
 	order.pay.payme.create_time = params.time;
