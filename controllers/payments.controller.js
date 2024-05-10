@@ -13,7 +13,7 @@ server.addMethod("CheckPerformTransaction", async (params) => {
 	};
 });
 server.addMethod("GetStatement", async (params) => {
-	const orders = await Orders.findById({
+	const orders = await Orders.find({
 		"pay.payme.create_time": {
 			$gte: params.from,
 			$lte: params.to,
