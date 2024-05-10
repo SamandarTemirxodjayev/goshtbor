@@ -64,7 +64,7 @@ const orderSchema = new Schema(
 					default: 1,
 				},
 				reason: {
-					type: String,
+					type: Number,
 					default: null,
 				},
 			},
