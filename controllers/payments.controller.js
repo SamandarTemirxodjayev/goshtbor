@@ -19,10 +19,12 @@ server.addMethod("PerformTransaction", async (params) => {
 	if (!order) {
 		throw new RpcError(-31060, "Order not found");
 	}
-	order.pay.payme.state = 2;
-	order.pay.payme.perform_time = +new Date();
+	if (order.pay.payme.perform_time == 0) {
+		order.pay.payme.state = 2;
+		order.pay.payme.perform_time = +new Date();
 
-	await order.save();
+		await order.save();
+	}
 
 	return {
 		transaction: order._id,
@@ -65,7 +67,7 @@ server.addMethod("CheckTransaction", async (params) => {
 		perform_time: order.pay.payme.perform_time,
 		cancel_time: order.pay.payme.cancel_time,
 		transaction: order._id,
-		state: 1,
+		state: order.pay.payme.state,
 		reason: order.pay.payme.reason,
 	};
 });
