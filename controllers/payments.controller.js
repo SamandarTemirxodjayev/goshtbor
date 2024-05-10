@@ -1,16 +1,12 @@
 const {JSONRPCServer} = require("json-rpc-2.0");
 const RpcError = require("json-rpc-error");
-var JsonRpcResponse = require("json-rpc-response");
 const Orders = require("../models/Orders");
 const server = new JSONRPCServer();
 
 server.addMethod("CheckPerformTransaction", async (params) => {
 	const order = await Orders.findById(params.account.order_id);
 	if (!order) {
-		return new JsonRpcResponse(
-			params.id,
-			new RpcError.ServerError(-31060, "Order not found"),
-		);
+		return new JsonRpcResponse(1, {code: -1, message: "some error"});
 	}
 	return {
 		allow: true,
@@ -20,22 +16,16 @@ server.addMethod("CheckPerformTransaction", async (params) => {
 server.addMethod("CreateTransaction", async (params) => {
 	const order = await Orders.findById(params.account.order_id);
 	if (!order) {
-		return new JsonRpcResponse(
-			params.id,
-			new RpcError.ServerError(-31060, "Order not found"),
-		);
+		throw new RpcError(-31060, "Order not found");
 	}
-	if (order.pay.payme.id) {
-		if (order.pay.payme.id != params.id) {
-			return new JsonRpcResponse(
-				params.id,
-				new RpcError.ServerError(-31060, "Order not found"),
-			);
-		}
+	if (order.pay.payme.id && order.pay.payme.id !== params.id) {
+		throw new RpcError(-31060, "Incorrect order ID");
 	}
+
 	order.pay.payme.create_time = params.time;
 	order.pay.payme.id = params.id;
 	order.pay.payme.amount = params.amount;
+
 	await order.save();
 
 	return {
@@ -50,7 +40,7 @@ server.addMethod("CheckTransaction", async (params) => {
 		"pay.payme.id": params.id,
 	});
 	if (!order) {
-		throw new Error(-31060);
+		throw new RpcError(-31060, "Transaction not found");
 	}
 	return {
 		create_time: order.pay.payme.create_time,
@@ -74,12 +64,14 @@ exports.test = async (req, res) => {
 	} catch (error) {
 		console.log(error);
 		if (error instanceof RpcError) {
+			console.log(error.message);
+			console.log(error.code);
 			console.log(error);
 			res.status(200).json({
 				jsonrpc: "2.0",
 				id: jsonRPCRequest.id,
 				error: {
-					code: error.message.code,
+					code: error.code,
 					message: error.message,
 				},
 			});
