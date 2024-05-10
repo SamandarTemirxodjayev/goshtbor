@@ -6,10 +6,7 @@ const server = new JSONRPCServer();
 server.addMethod("CheckPerformTransaction", async (params) => {
 	const order = await Orders.findById(params.account.order_id);
 	if (!order) {
-		throw new RpcError({
-			code: -31060,
-			message: "Order not found",
-		});
+		return new RpcError.ServerError(-31060);
 	}
 	return {
 		allow: true,
@@ -19,17 +16,11 @@ server.addMethod("CheckPerformTransaction", async (params) => {
 server.addMethod("CreateTransaction", async (params) => {
 	const order = await Orders.findById(params.account.order_id);
 	if (!order) {
-		throw new RpcError({
-			code: -31060,
-			message: "Order not found",
-		});
+		return new RpcError.ServerError(-31060);
 	}
 	if (order.pay.payme.id) {
 		if (order.pay.payme.id != params.id) {
-			throw new RpcError({
-				code: -31060,
-				message: "Order not found",
-			});
+			return new RpcError.ServerError(-31060);
 		}
 	}
 	order.pay.payme.create_time = params.time;
