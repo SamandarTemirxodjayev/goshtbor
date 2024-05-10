@@ -57,6 +57,10 @@ exports.test = async (req, res) => {
 		const jsonRPCRequest = req.body;
 		const jsonRPCResponse = await server.receive(jsonRPCRequest);
 		if (jsonRPCResponse) {
+			if (jsonRPCResponse.error) {
+				jsonRPCResponse.error.code = jsonRPCResponse.error.message;
+				return res.json(jsonRPCResponse);
+			}
 			console.log(jsonRPCResponse);
 			res.json(jsonRPCResponse);
 		} else {
@@ -65,9 +69,6 @@ exports.test = async (req, res) => {
 	} catch (error) {
 		console.log(error);
 		if (error instanceof RpcError) {
-			console.log(error.message);
-			console.log(error.code);
-			console.log(error);
 			res.status(200).json({
 				jsonrpc: "2.0",
 				id: jsonRPCRequest.id,
