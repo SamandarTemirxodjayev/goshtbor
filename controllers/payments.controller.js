@@ -22,6 +22,9 @@ server.addMethod("CheckPerformTransaction", async (params) => {
 		const subtotal = price * product.quantity;
 		totalAmount += subtotal;
 	}
+	if (totalAmount != params.amount) {
+		throw new RpcError(-31001, "Order not found");
+	}
 
 	return {
 		allow: true,
@@ -104,6 +107,10 @@ server.addMethod("CreateTransaction", async (params) => {
 			: productDoc.price;
 		const subtotal = price * product.quantity;
 		totalAmount += subtotal;
+	}
+
+	if (totalAmount != params.amount) {
+		throw new RpcError(-31001, "Order not found");
 	}
 
 	order.pay.payme.create_time = params.time;
