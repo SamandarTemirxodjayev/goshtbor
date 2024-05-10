@@ -59,9 +59,9 @@ exports.test = async (req, res) => {
 		if (jsonRPCResponse) {
 			if (jsonRPCResponse.error) {
 				jsonRPCResponse.error.code = jsonRPCResponse.error.message;
+				jsonRPCResponse.error.message = "Order not found";
 				return res.json(jsonRPCResponse);
 			}
-			console.log(jsonRPCResponse);
 			res.json(jsonRPCResponse);
 		} else {
 			res.sendStatus(204);
