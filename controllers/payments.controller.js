@@ -71,7 +71,9 @@ exports.test = async (req, res) => {
 			res.sendStatus(204);
 		}
 	} catch (error) {
+		console.log(error);
 		if (error instanceof RpcError) {
+			console.log(error);
 			res.status(200).json({
 				jsonrpc: "2.0",
 				id: jsonRPCRequest.id,
