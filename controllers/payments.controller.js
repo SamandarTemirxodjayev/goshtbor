@@ -19,17 +19,11 @@ server.addMethod("CheckPerformTransaction", async (params) => {
 server.addMethod("CreateTransaction", async (params) => {
 	const order = await Orders.findById(params.account.order_id);
 	if (!order) {
-		throw new RpcError({
-			code: -31060,
-			message: "Order not found",
-		});
+		throw new Error(-31060);
 	}
 	if (order.pay.payme.id) {
 		if (order.pay.payme.id != params.id) {
-			throw new RpcError({
-				code: -31060,
-				message: "Order not found",
-			});
+			throw new Error(-31060);
 		}
 	}
 	order.pay.payme.create_time = params.time;
@@ -49,12 +43,7 @@ server.addMethod("CheckTransaction", async (params) => {
 		"pay.payme.id": params.id,
 	});
 	if (!order) {
-		throw new RpcError("Order not found", -31060, [
-			{
-				code: -31060,
-				message: "Order not found",
-			},
-		]);
+		throw new Error(-31060);
 	}
 	return {
 		create_time: order.pay.payme.create_time,
