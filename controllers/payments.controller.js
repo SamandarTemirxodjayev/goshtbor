@@ -19,7 +19,7 @@ server.addMethod("CreateTransaction", async (params) => {
 	if (!order) {
 		throw new RpcError(-31060, "Order not found");
 	}
-	if (order.pay.payme.id && order.pay.payme.id !== params.id) {
+	if (order.pay.payme.id && order.pay.payme.id != params.id) {
 		throw new RpcError(-31060, "Incorrect order ID");
 	}
 
@@ -32,7 +32,7 @@ server.addMethod("CreateTransaction", async (params) => {
 	return {
 		create_time: params.time,
 		transaction: order._id,
-		state: 1,
+		state: order.pay.payme.state,
 	};
 });
 
