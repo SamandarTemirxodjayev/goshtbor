@@ -15,6 +15,7 @@ server.addMethod("CheckPerformTransaction", async (params) => {
 
 server.addMethod("CreateTransaction", async (params) => {
 	const order = await Orders.findById(params.account.order_id);
+	console.log(order);
 	if (!order) {
 		throw new RpcError(-31060, "Order not found");
 	}
@@ -67,18 +68,6 @@ exports.test = async (req, res) => {
 			res.sendStatus(204);
 		}
 	} catch (error) {
-		console.log(error);
-		if (error instanceof RpcError) {
-			res.status(200).json({
-				jsonrpc: "2.0",
-				id: jsonRPCRequest.id,
-				error: {
-					code: error.code,
-					message: error.message,
-				},
-			});
-		} else {
-			res.status(500).json({message: error.message});
-		}
+		res.status(500).json({message: error.message});
 	}
 };
