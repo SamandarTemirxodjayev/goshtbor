@@ -1,6 +1,7 @@
 const {JSONRPCServer} = require("json-rpc-2.0");
 const RpcError = require("json-rpc-error");
 const Orders = require("../models/Orders");
+const Products = require("../models/Products");
 const server = new JSONRPCServer();
 
 server.addMethod("CheckPerformTransaction", async (params) => {
@@ -8,6 +9,20 @@ server.addMethod("CheckPerformTransaction", async (params) => {
 	if (!order) {
 		throw new RpcError(-31060, "Order not found");
 	}
+	let totalAmount = 0;
+	for (const product of order.products) {
+		const productDoc = await Products.findById(product.product);
+		if (!productDoc) {
+			throw new RpcError(-31001, "Order not found");
+		}
+
+		const price = productDoc.sale.isSale
+			? productDoc.sale.price
+			: productDoc.price;
+		const subtotal = price * product.quantity;
+		totalAmount += subtotal;
+	}
+
 	return {
 		allow: true,
 	};
@@ -75,6 +90,20 @@ server.addMethod("CreateTransaction", async (params) => {
 	}
 	if (order.pay.payme.id && order.pay.payme.id != params.id) {
 		throw new RpcError(-31060, "Incorrect order ID");
+	}
+
+	let totalAmount = 0;
+	for (const product of order.products) {
+		const productDoc = await Products.findById(product.product);
+		if (!productDoc) {
+			throw new RpcError(-31001, "Order not found");
+		}
+
+		const price = productDoc.sale.isSale
+			? productDoc.sale.price
+			: productDoc.price;
+		const subtotal = price * product.quantity;
+		totalAmount += subtotal;
 	}
 
 	order.pay.payme.create_time = params.time;
