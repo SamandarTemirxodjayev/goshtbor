@@ -147,16 +147,26 @@ server.addMethod("CheckTransaction", async (params) => {
 exports.test = async (req, res) => {
 	const authorizationHeader = req.headers.authorization;
 	if (!authorizationHeader) {
-		return res.json(
-			new RpcError(-32504, "Not Authorized! Invalid credentials 1"),
-		);
+		return res.json({
+			jsonrpc: "2.0",
+			id: req.body.id,
+			error: {
+				code: -32504,
+				message: "Not Authorized! Invalid credentials 1",
+			},
+		});
 	}
 
 	const accessToken = authorizationHeader.split(" ")[1];
 	if (!accessToken) {
-		return res.json(
-			new RpcError(-32504, "Not Authorized! Invalid credentials 2"),
-		);
+		return res.json({
+			jsonrpc: "2.0",
+			id: req.body.id,
+			error: {
+				code: -32504,
+				message: "Not Authorized! Invalid credentials 2",
+			},
+		});
 	}
 
 	try {
@@ -181,7 +191,7 @@ exports.test = async (req, res) => {
 					id: req.body.id,
 					error: {
 						code: -32504,
-						message: "Not Authorized! Invalid credentials 3",
+						message: "Not Authorized! Invalid credentials 4",
 					},
 				});
 			}
