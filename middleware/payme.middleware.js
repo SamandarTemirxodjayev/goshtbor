@@ -29,6 +29,9 @@ async function PaymeMiddleware(req, res, next) {
 			const decode = Buffer.from(accessToken, "base64")
 				.toString("ascii")
 				.split(":");
+			console.log(decode);
+			console.log(file);
+			console.log(accessToken);
 			if (file.password != decode[1] || file.login != decode[0]) {
 				return res.status(500).json({error: "Failed to"});
 			}
