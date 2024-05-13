@@ -147,28 +147,25 @@ server.addMethod("CheckTransaction", async (params) => {
 exports.test = async (req, res) => {
 	const authorizationHeader = req.headers.authorization;
 	if (!authorizationHeader) {
-		return res.status(401).json({
-			error: "Not Authorized!",
-			message: "Missing authorization header",
-		});
+		throw new RpcError(-32504, "Not Authorized! Invalid credentials 4");
 	}
 
 	const accessToken = authorizationHeader.split(" ")[1];
 	if (!accessToken) {
-		throw new RpcError(-32504, "Not Authorized! Invalid credentials");
+		throw new RpcError(-32504, "Not Authorized! Invalid credentials 1");
 	}
 
 	try {
 		fs.readFile("./db/payme.json", "utf8", async (err, data) => {
 			if (err) {
-				throw new RpcError(-32504, "Not Authorized! Invalid credentials");
+				throw new RpcError(-32504, "Not Authorized! Invalid credentials 2");
 			}
 			const file = JSON.parse(data);
 			const decode = Buffer.from(accessToken, "base64")
 				.toString("ascii")
 				.split(":");
 			if (file.password != decode[1] || file.login != decode[0]) {
-				throw new RpcError(-32504, "Not Authorized! Invalid credentials");
+				throw new RpcError(-32504, "Not Authorized! Invalid credentials 3");
 			}
 			const jsonRPCResponse = await server.receive(req.body);
 			if (jsonRPCResponse) {
