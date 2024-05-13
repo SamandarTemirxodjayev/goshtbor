@@ -3,6 +3,7 @@ const RpcError = require("json-rpc-error");
 const Orders = require("../models/Orders");
 const Products = require("../models/Products");
 const server = new JSONRPCServer();
+const fs = require("fs");
 
 server.addMethod("CheckPerformTransaction", async (params) => {
 	const order = await Orders.findById(params.account.order_id);
@@ -195,6 +196,7 @@ exports.test = async (req, res) => {
 			}
 		});
 	} catch (error) {
+		console.log(error);
 		return res.json(new RpcError(-31003, "Internal Server Error"));
 	}
 
