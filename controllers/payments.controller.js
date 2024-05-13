@@ -172,9 +172,15 @@ exports.test = async (req, res) => {
 				.toString("ascii")
 				.split(":");
 			if (file.password != decode[1] || file.login != decode[0]) {
-				return res.json(
-					new RpcError(-32504, "Not Authorized! Invalid credentials"),
+				const error = new RpcError(
+					-32504,
+					"Not Authorized! Invalid credentials",
 				);
+				if (error.error) {
+					error.error.code = -32504;
+					error.error.message = "Not Authorized! Invalid credentials";
+					return res.json(error);
+				}
 			}
 			const jsonRPCResponse = await server.receive(req.body);
 			if (jsonRPCResponse) {
@@ -189,8 +195,7 @@ exports.test = async (req, res) => {
 			}
 		});
 	} catch (error) {
-		const rpcError = new RpcError(-31003, "Internal Server Error");
-		return res.json(rpcError);
+		return res.json(new RpcError(-31003, "Internal Server Error"));
 	}
 
 	// try {
