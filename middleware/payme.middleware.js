@@ -15,7 +15,7 @@ async function PaymeMiddleware(req, res, next) {
 	}
 
 	try {
-		console.log(Buffer.from("SGVsbG8gV29ybGQ=", "base64").toString("ascii"));
+		console.log(Buffer.from(accessToken, "base64").toString("ascii"));
 		return next();
 	} catch (error) {
 		return res
@@ -24,4 +24,4 @@ async function PaymeMiddleware(req, res, next) {
 	}
 }
 
-module.exports = UserMiddleware;
+module.exports = PaymeMiddleware;
