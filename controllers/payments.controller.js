@@ -144,19 +144,68 @@ server.addMethod("CheckTransaction", async (params) => {
 });
 
 exports.test = async (req, res) => {
-	try {
-		const jsonRPCResponse = await server.receive(req.body);
-		if (jsonRPCResponse) {
-			if (jsonRPCResponse.error) {
-				jsonRPCResponse.error.code = jsonRPCResponse.error.message;
-				jsonRPCResponse.error.message = "Order not found";
-				return res.json(jsonRPCResponse);
-			}
-			res.json(jsonRPCResponse);
-		} else {
-			res.sendStatus(204);
-		}
-	} catch (error) {
-		res.status(500).json({message: error.message});
+	const authorizationHeader = req.headers.authorization;
+	if (!authorizationHeader) {
+		return res.status(401).json({
+			error: "Not Authorized!",
+			message: "Missing authorization header",
+		});
 	}
+
+	const accessToken = authorizationHeader.split(" ")[1];
+	if (!accessToken) {
+		return res.json(
+			new RpcError(-32504, "Not Authorized! Invalid credentials"),
+		);
+	}
+
+	try {
+		fs.readFile("./db/payme.json", "utf8", async (err, data) => {
+			if (err) {
+				console.error(err);
+				return res.json(
+					new RpcError(-32504, "Not Authorized! Invalid credentials"),
+				);
+			}
+			const file = JSON.parse(data);
+			const decode = Buffer.from(accessToken, "base64")
+				.toString("ascii")
+				.split(":");
+			if (file.password != decode[1] || file.login != decode[0]) {
+				return res.json(
+					new RpcError(-32504, "Not Authorized! Invalid credentials"),
+				);
+			}
+			const jsonRPCResponse = await server.receive(req.body);
+			if (jsonRPCResponse) {
+				if (jsonRPCResponse.error) {
+					jsonRPCResponse.error.code = jsonRPCResponse.error.message;
+					jsonRPCResponse.error.message = "Order not found";
+					return res.json(jsonRPCResponse);
+				}
+				res.json(jsonRPCResponse);
+			} else {
+				res.sendStatus(204);
+			}
+		});
+	} catch (error) {
+		const rpcError = new RpcError(-31003, "Internal Server Error");
+		return res.json(rpcError);
+	}
+
+	// try {
+	// 	const jsonRPCResponse = await server.receive(req.body);
+	// 	if (jsonRPCResponse) {
+	// 		if (jsonRPCResponse.error) {
+	// 			jsonRPCResponse.error.code = jsonRPCResponse.error.message;
+	// 			jsonRPCResponse.error.message = "Order not found";
+	// 			return res.json(jsonRPCResponse);
+	// 		}
+	// 		res.json(jsonRPCResponse);
+	// 	} else {
+	// 		res.sendStatus(204);
+	// 	}
+	// } catch (error) {
+	// 	res.status(500).json({message: error.message});
+	// }
 };
