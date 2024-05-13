@@ -131,7 +131,7 @@ server.addMethod("CheckTransaction", async (params) => {
 		"pay.payme.id": params.id,
 	});
 	if (!order) {
-		throw new RpcError(-31060, "Transaction not found");
+		throw new RpcError(-32504, "Transaction not found");
 	}
 	return {
 		create_time: order.pay.payme.create_time,
