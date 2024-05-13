@@ -4,6 +4,6 @@ const paymeMiddleware = require("../middleware/payme.middleware.js");
 
 const router = Router();
 
-router.post("/payme", paymeMiddleware, controller.test);
+router.post("/payme", controller.test);
 
 module.exports = router;
