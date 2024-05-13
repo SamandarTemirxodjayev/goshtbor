@@ -30,14 +30,17 @@ async function PaymeMiddleware(req, res, next) {
 				.toString("ascii")
 				.split(":");
 			if (file.password != decode[1] || file.login != decode[0]) {
-				return res.status(500).json({error: "Failed to"});
+				const error = new RpcError(
+					-32504,
+					"Not Authorized! Invalid credentials",
+				);
+				throw error;
 			}
 			return next();
 		});
 	} catch (error) {
-		return res
-			.status(500)
-			.json({error: "Internal Server Error", message: "An error occurred"});
+		const rpcError = new RpcError(-31003, "Internal Server Error");
+		throw rpcError;
 	}
 }
 
