@@ -145,8 +145,7 @@ server.addMethod("CheckTransaction", async (params) => {
 
 exports.test = async (req, res) => {
 	try {
-		const jsonRPCRequest = req.body;
-		const jsonRPCResponse = await server.receive(jsonRPCRequest);
+		const jsonRPCResponse = await server.receive(req.body);
 		if (jsonRPCResponse) {
 			if (jsonRPCResponse.error) {
 				jsonRPCResponse.error.code = jsonRPCResponse.error.message;

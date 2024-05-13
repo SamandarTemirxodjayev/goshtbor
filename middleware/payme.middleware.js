@@ -20,7 +20,7 @@ async function PaymeMiddleware(req, res, next) {
 	}
 
 	try {
-		fs.readFile("./db/payme.json", "utf8", (err, data) => {
+		fs.readFile("./db/payme.json", "utf8", async (err, data) => {
 			if (err) {
 				console.error(err);
 				return res.status(500).json({error: "Failed to read file"});
@@ -30,11 +30,23 @@ async function PaymeMiddleware(req, res, next) {
 				.toString("ascii")
 				.split(":");
 			if (file.password != decode[1] || file.login != decode[0]) {
+				const jsonRPCResponse = await server.receive(req.body);
+				if (jsonRPCResponse) {
+					if (jsonRPCResponse.error) {
+						jsonRPCResponse.error.code = jsonRPCResponse.error.message;
+						jsonRPCResponse.error.message =
+							"Not Authorized! Invalid credentials";
+						return res.json(jsonRPCResponse);
+					}
+					return next();
+				} else {
+					res.sendStatus(204);
+				}
 				const error = new RpcError(
 					-32504,
 					"Not Authorized! Invalid credentials",
 				);
-				throw error;
+				res.json(error);
 			}
 			return next();
 		});
