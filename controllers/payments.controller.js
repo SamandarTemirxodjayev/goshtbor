@@ -162,18 +162,28 @@ exports.test = async (req, res) => {
 	try {
 		fs.readFile("./db/payme.json", "utf8", async (err, data) => {
 			if (err) {
-				return res.json(
-					new RpcError(-32504, "Not Authorized! Invalid credentials 3"),
-				);
+				return res.json({
+					jsonrpc: "2.0",
+					id: req.body.id,
+					error: {
+						code: -32504,
+						message: "Not Authorized! Invalid credentials 3",
+					},
+				});
 			}
 			const file = JSON.parse(data);
 			const decode = Buffer.from(accessToken, "base64")
 				.toString("ascii")
 				.split(":");
 			if (file.password != decode[1] || file.login != decode[0]) {
-				return res.json(
-					new RpcError(-32504, "Not Authorized! Invalid credentials 4"),
-				);
+				return res.json({
+					jsonrpc: "2.0",
+					id: req.body.id,
+					error: {
+						code: -32504,
+						message: "Not Authorized! Invalid credentials 3",
+					},
+				});
 			}
 			const jsonRPCResponse = await server.receive(req.body);
 			if (jsonRPCResponse) {
