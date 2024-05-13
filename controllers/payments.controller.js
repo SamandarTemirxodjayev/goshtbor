@@ -90,7 +90,7 @@ server.addMethod("PerformTransaction", async (params) => {
 server.addMethod("CreateTransaction", async (params) => {
 	const order = await Orders.findById(params.account.order_id);
 	if (!order) {
-		throw new RpcError(-32504, "Order not found");
+		throw new RpcError(-31060, "Order not found");
 	}
 	if (order.pay.payme.id && order.pay.payme.id != params.id) {
 		throw new RpcError(-31060, "Incorrect order ID");
@@ -100,7 +100,7 @@ server.addMethod("CreateTransaction", async (params) => {
 	for (const product of order.products) {
 		const productDoc = await Products.findById(product.product);
 		if (!productDoc) {
-			throw new RpcError(-32504, "Order not found");
+			throw new RpcError(-31060, "Order not found");
 		}
 
 		const price = productDoc.sale.isSale
