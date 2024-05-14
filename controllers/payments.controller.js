@@ -11,6 +11,7 @@ server.addMethod("CheckPerformTransaction", async (params) => {
 	try {
 		orderId = mongoose.Types.ObjectId(params.account.order_id);
 	} catch (error) {
+		console.log(error);
 		throw new RpcError(-31060, "Invalid order ID format");
 	}
 
