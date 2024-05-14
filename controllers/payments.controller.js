@@ -6,30 +6,36 @@ const server = new JSONRPCServer();
 const fs = require("fs");
 
 server.addMethod("CheckPerformTransaction", async (params) => {
-	const order = await Orders.findById(params.account.order_id);
-	if (!order) {
-		throw new RpcError(-31060, "Order not found");
-	}
-	let totalAmount = 0;
-	for (const product of order.products) {
-		const productDoc = await Products.findById(product.product);
-		if (!productDoc) {
-			throw new RpcError(-31060, "Order not found");
+	let orderId;
+	try {
+		orderId = mongoose.Types.ObjectId(params.account.order_id);
+		const order = await Orders.findById(orderId);
+		if (!order) {
+			throw new RpcError(-31001, "Order not found");
+		}
+		let totalAmount = 0;
+		for (const product of order.products) {
+			const productDoc = await Products.findById(product.product);
+			if (!productDoc) {
+				throw new RpcError(-31060, "Order not found");
+			}
+
+			const price = productDoc.sale.isSale
+				? productDoc.sale.price
+				: productDoc.price;
+			const subtotal = price * product.quantity;
+			totalAmount += subtotal;
+		}
+		if (totalAmount != params.amount) {
+			throw new RpcError(-31001, "Order not found");
 		}
 
-		const price = productDoc.sale.isSale
-			? productDoc.sale.price
-			: productDoc.price;
-		const subtotal = price * product.quantity;
-		totalAmount += subtotal;
+		return {
+			allow: true,
+		};
+	} catch (error) {
+		throw new RpcError(-31001, "Invalid order ID format");
 	}
-	if (totalAmount != params.amount) {
-		throw new RpcError(-31001, "Order not found");
-	}
-
-	return {
-		allow: true,
-	};
 });
 server.addMethod("GetStatement", async (params) => {
 	const orders = await Orders.find({
@@ -88,45 +94,50 @@ server.addMethod("PerformTransaction", async (params) => {
 });
 
 server.addMethod("CreateTransaction", async (params) => {
-	const order = await Orders.findOne({
-		_id: params.account.order_id,
-	});
-	if (!order) {
-		throw new RpcError(-31060, "Order not found");
-	}
-	if (order.pay.payme.id && order.pay.payme.id != params.id) {
-		throw new RpcError(-31060, "Incorrect order ID");
-	}
+	let orderId;
+	try {
+		orderId = mongoose.Types.ObjectId(params.account.order_id);
 
-	let totalAmount = 0;
-	for (const product of order.products) {
-		const productDoc = await Products.findById(product.product);
-		if (!productDoc) {
+		const order = await Orders.findById(orderId);
+		if (!order) {
 			throw new RpcError(-31060, "Order not found");
 		}
+		if (order.pay.payme.id && order.pay.payme.id != params.id) {
+			throw new RpcError(-31060, "Incorrect order ID");
+		}
 
-		const price = productDoc.sale.isSale
-			? productDoc.sale.price
-			: productDoc.price;
-		const subtotal = price * product.quantity;
-		totalAmount += subtotal;
+		let totalAmount = 0;
+		for (const product of order.products) {
+			const productDoc = await Products.findById(product.product);
+			if (!productDoc) {
+				throw new RpcError(-31060, "Order not found");
+			}
+
+			const price = productDoc.sale.isSale
+				? productDoc.sale.price
+				: productDoc.price;
+			const subtotal = price * product.quantity;
+			totalAmount += subtotal;
+		}
+
+		if (totalAmount != params.amount) {
+			throw new RpcError(-31001, "Order not found");
+		}
+
+		order.pay.payme.create_time = params.time;
+		order.pay.payme.id = params.id;
+		order.pay.payme.amount = params.amount;
+
+		await order.save();
+
+		return {
+			create_time: params.time,
+			transaction: order._id,
+			state: order.pay.payme.state,
+		};
+	} catch (error) {
+		throw new RpcError(-31001, "Invalid order ID format");
 	}
-
-	if (totalAmount != params.amount) {
-		throw new RpcError(-31001, "Order not found");
-	}
-
-	order.pay.payme.create_time = params.time;
-	order.pay.payme.id = params.id;
-	order.pay.payme.amount = params.amount;
-
-	await order.save();
-
-	return {
-		create_time: params.time,
-		transaction: order._id,
-		state: order.pay.payme.state,
-	};
 });
 
 server.addMethod("CheckTransaction", async (params) => {
