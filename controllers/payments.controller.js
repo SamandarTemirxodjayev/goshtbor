@@ -14,12 +14,14 @@ server.addMethod("CheckPerformTransaction", async (params) => {
 		throw new RpcError(-31060, "Invalid order ID format");
 	}
 
-	const order = await Orders.findById(orderId);
+	let order = await Orders.findById(orderId);
 	if (!order) {
 		throw new RpcError(-31061, "Order not found");
 	}
 
 	let totalAmount = 0;
+	let receiptItems = [];
+
 	for (const product of order.products) {
 		const productDoc = await Products.findById(product.product);
 		if (!productDoc) {
@@ -31,13 +33,27 @@ server.addMethod("CheckPerformTransaction", async (params) => {
 			: productDoc.price;
 		const subtotal = price * product.quantity;
 		totalAmount += subtotal;
+
+		receiptItems.push({
+			title: productDoc.name_uz,
+			price: productDoc.sale.isSale ? productDoc.sale.price : productDoc.price,
+			count: product.quantity,
+			code: productDoc.MXIK.code,
+			package_code: productDoc.MXIK.package_code,
+			vat_percent: 0,
+		});
 	}
+
 	if (totalAmount !== params.amount) {
 		throw new RpcError(-31001, "Incorrect total amount");
 	}
 
 	return {
 		allow: true,
+		detail: {
+			receipt_type: 0,
+			items: receiptItems,
+		},
 	};
 });
 
@@ -229,20 +245,4 @@ exports.test = async (req, res) => {
 		console.log(error);
 		return res.json(new RpcError(-31003, "Internal Server Error"));
 	}
-
-	// try {
-	// 	const jsonRPCResponse = await server.receive(req.body);
-	// 	if (jsonRPCResponse) {
-	// 		if (jsonRPCResponse.error) {
-	// 			jsonRPCResponse.error.code = jsonRPCResponse.error.message;
-	// 			jsonRPCResponse.error.message = "Order not found";
-	// 			return res.json(jsonRPCResponse);
-	// 		}
-	// 		res.json(jsonRPCResponse);
-	// 	} else {
-	// 		res.sendStatus(204);
-	// 	}
-	// } catch (error) {
-	// 	res.status(500).json({message: error.message});
-	// }
 };

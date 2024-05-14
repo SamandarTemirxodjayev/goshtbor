@@ -74,6 +74,16 @@ const productSchema = new Schema({
 		type: Number,
 		default: 0,
 	},
+	MXIK: {
+		code: {
+			type: String,
+			required: true,
+		},
+		package_code: {
+			type: String,
+			required: true,
+		},
+	},
 });
 
 productSchema.set("timestamps", true);
