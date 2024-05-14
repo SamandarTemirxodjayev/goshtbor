@@ -11,7 +11,6 @@ server.addMethod("CheckPerformTransaction", async (params) => {
 	try {
 		orderId = new mongoose.Types.ObjectId(params.account.order_id);
 	} catch (error) {
-		console.log(error);
 		throw new RpcError(-31060, "Invalid order ID format");
 	}
 
@@ -101,7 +100,7 @@ server.addMethod("PerformTransaction", async (params) => {
 server.addMethod("CreateTransaction", async (params) => {
 	let orderId;
 	try {
-		orderId = mongoose.Types.ObjectId(params.account.order_id);
+		orderId = new mongoose.Types.ObjectId(params.account.order_id);
 
 		const order = await Orders.findById(orderId);
 		if (!order) {
