@@ -114,7 +114,7 @@ server.addMethod("CreateTransaction", async (params) => {
 		for (const product of order.products) {
 			const productDoc = await Products.findById(product.product);
 			if (!productDoc) {
-				throw new RpcError(-31060, "Order not found");
+				throw new RpcError(-31060, "Product not found in order");
 			}
 
 			const price = productDoc.sale.isSale
@@ -124,8 +124,8 @@ server.addMethod("CreateTransaction", async (params) => {
 			totalAmount += subtotal;
 		}
 
-		if (totalAmount != params.amount) {
-			throw new RpcError(-31001, "Order not found");
+		if (totalAmount !== params.amount) {
+			throw new RpcError(-31001, "Incorrect total amount");
 		}
 
 		order.pay.payme.create_time = params.time;
