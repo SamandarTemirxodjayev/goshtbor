@@ -88,7 +88,9 @@ server.addMethod("PerformTransaction", async (params) => {
 });
 
 server.addMethod("CreateTransaction", async (params) => {
-	const order = await Orders.findById(params.account.order_id);
+	const order = await Orders.findOne({
+		_id: params.account.order_id,
+	});
 	if (!order) {
 		throw new RpcError(-31060, "Order not found");
 	}
