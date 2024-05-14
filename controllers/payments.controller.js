@@ -11,7 +11,7 @@ server.addMethod("CheckPerformTransaction", async (params) => {
 		orderId = mongoose.Types.ObjectId(params.account.order_id);
 		const order = await Orders.findById(orderId);
 		if (!order) {
-			throw new RpcError(-31001, "Order not found");
+			throw new RpcError(-31060, "Order not found");
 		}
 		let totalAmount = 0;
 		for (const product of order.products) {
@@ -136,7 +136,7 @@ server.addMethod("CreateTransaction", async (params) => {
 			state: order.pay.payme.state,
 		};
 	} catch (error) {
-		throw new RpcError(-31001, "Invalid order ID format");
+		throw new RpcError(-31060, "Invalid order ID format");
 	}
 });
 
