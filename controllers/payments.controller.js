@@ -34,7 +34,7 @@ server.addMethod("CheckPerformTransaction", async (params) => {
 			allow: true,
 		};
 	} catch (error) {
-		throw new RpcError(-31001, "Invalid order ID format");
+		throw new RpcError(-31060, "Invalid order ID format");
 	}
 });
 server.addMethod("GetStatement", async (params) => {
