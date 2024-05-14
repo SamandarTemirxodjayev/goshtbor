@@ -101,47 +101,47 @@ server.addMethod("CreateTransaction", async (params) => {
 	let orderId;
 	try {
 		orderId = new mongoose.Types.ObjectId(params.account.order_id);
-
-		const order = await Orders.findById(orderId);
-		if (!order) {
-			throw new RpcError(-31060, "Order not found");
-		}
-		if (order.pay.payme.id && order.pay.payme.id != params.id) {
-			throw new RpcError(-31060, "Incorrect order ID");
-		}
-
-		let totalAmount = 0;
-		for (const product of order.products) {
-			const productDoc = await Products.findById(product.product);
-			if (!productDoc) {
-				throw new RpcError(-31060, "Product not found in order");
-			}
-
-			const price = productDoc.sale.isSale
-				? productDoc.sale.price
-				: productDoc.price;
-			const subtotal = price * product.quantity;
-			totalAmount += subtotal;
-		}
-
-		if (totalAmount !== params.amount) {
-			throw new RpcError(-31001, "Incorrect total amount");
-		}
-
-		order.pay.payme.create_time = params.time;
-		order.pay.payme.id = params.id;
-		order.pay.payme.amount = params.amount;
-
-		await order.save();
-
-		return {
-			create_time: params.time,
-			transaction: order._id,
-			state: order.pay.payme.state,
-		};
 	} catch (error) {
 		throw new RpcError(-31060, "Invalid order ID format");
 	}
+	const order = await Orders.findById(orderId);
+	if (!order) {
+		throw new RpcError(-31060, "Order not found");
+	}
+	if (order.pay.payme.id && order.pay.payme.id != params.id) {
+		throw new RpcError(-31060, "Incorrect order ID");
+	}
+
+	let totalAmount = 0;
+	for (const product of order.products) {
+		const productDoc = await Products.findById(product.product);
+		if (!productDoc) {
+			throw new RpcError(-31060, "Product not found in order");
+		}
+
+		const price = productDoc.sale.isSale
+			? productDoc.sale.price
+			: productDoc.price;
+		const subtotal = price * product.quantity;
+		totalAmount += subtotal;
+	}
+	console.log(totalAmount);
+	console.log(params);
+	if (totalAmount !== params.amount) {
+		throw new RpcError(-31001, "Incorrect total amount");
+	}
+
+	order.pay.payme.create_time = params.time;
+	order.pay.payme.id = params.id;
+	order.pay.payme.amount = params.amount;
+
+	await order.save();
+
+	return {
+		create_time: params.time,
+		transaction: order._id,
+		state: order.pay.payme.state,
+	};
 });
 
 server.addMethod("CheckTransaction", async (params) => {
