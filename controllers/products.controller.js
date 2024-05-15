@@ -155,7 +155,9 @@ exports.searchProduct = async (req, res) => {
 		if (req.body.brand) {
 			search.brand = req.body.brand;
 		}
-		const products = await Products.find(search);
+		const products = await Products.find(search)
+			.populate("brand")
+			.populate("category");
 		console.log(products);
 		return res.status(200).json({
 			message: "Mahsulotlar Yuklandi",
