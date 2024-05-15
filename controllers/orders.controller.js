@@ -20,6 +20,21 @@ exports.getAllOrders = async (req, res) => {
 		return res.status(500).json({error: error});
 	}
 };
+exports.getOrderById = async (req, res) => {
+	try {
+		let order = await Orders.findOne({
+			userId: req.userId._id,
+			_id: req.params.id,
+		});
+		if (!order) return res.status(404).json({status: "not found"});
+		return res.json({
+			status: "success",
+			data: order,
+		});
+	} catch (error) {
+		return res.status(500).json({error: error});
+	}
+};
 exports.createOrder = async (req, res) => {
 	try {
 		if (req.body.pay.type == "card") {
