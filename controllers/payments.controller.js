@@ -49,7 +49,7 @@ server.addMethod("CheckPerformTransaction", async (params) => {
 		});
 	}
 
-	if (totalAmount !== params.amount * 100) {
+	if (totalAmount * 100 !== params.amount) {
 		error = "Buyurtma Summasida Xatolik. Buyurtmani To'liq summasini kiriting";
 		throw new RpcError(-31001, "Incorrect total amount");
 	}
@@ -154,16 +154,14 @@ server.addMethod("CreateTransaction", async (params) => {
 		const subtotal = price * product.quantity;
 		totalAmount += subtotal;
 	}
-	console.log(totalAmount);
-	console.log(params);
-	if (totalAmount !== params.amount * 100) {
+	if (totalAmount * 100 !== params.amount) {
 		error = "Buyurtma Summasida Xatolik. Buyurtmani To'liq summasini kiriting";
 		throw new RpcError(-31001, "Incorrect total amount");
 	}
 
 	order.pay.payme.create_time = params.time;
 	order.pay.payme.id = params.id;
-	order.pay.payme.amount = params.amount * 100;
+	order.pay.payme.amount = params.amount;
 
 	await order.save();
 
