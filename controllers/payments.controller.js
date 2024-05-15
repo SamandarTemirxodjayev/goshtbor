@@ -6,16 +6,20 @@ const server = new JSONRPCServer();
 const fs = require("fs");
 const mongoose = require("mongoose");
 
+let error = "";
+
 server.addMethod("CheckPerformTransaction", async (params) => {
 	let orderId;
 	try {
 		orderId = new mongoose.Types.ObjectId(params.account.order_id);
 	} catch (error) {
+		error = "Buyurtma Topilmadi";
 		throw new RpcError(-31060, "Invalid order ID format");
 	}
 
 	let order = await Orders.findById(orderId);
 	if (!order) {
+		error = "Buyurtma Topilmadi";
 		throw new RpcError(-31061, "Order not found");
 	}
 
@@ -25,6 +29,7 @@ server.addMethod("CheckPerformTransaction", async (params) => {
 	for (const product of order.products) {
 		const productDoc = await Products.findById(product.product);
 		if (!productDoc) {
+			error = "Mahsulot Topilmadi";
 			throw new RpcError(-31062, "Product not found in order");
 		}
 
@@ -44,7 +49,8 @@ server.addMethod("CheckPerformTransaction", async (params) => {
 		});
 	}
 
-	if (totalAmount !== params.amount) {
+	if (totalAmount !== params.amount * 100) {
+		error = "Buyurtma Summasida Xatolik. Buyurtmani To'liq summasini kiriting";
 		throw new RpcError(-31001, "Incorrect total amount");
 	}
 
@@ -74,6 +80,7 @@ server.addMethod("CancelTransaction", async (params) => {
 		"pay.payme.id": params.id,
 	});
 	if (!order) {
+		error = "Buyurtma Topilmadi";
 		throw new RpcError(-32504, "Order not found");
 	}
 	if (order.pay.payme.cancel_time == 0) {
@@ -95,6 +102,7 @@ server.addMethod("PerformTransaction", async (params) => {
 		"pay.payme.id": params.id,
 	});
 	if (!order) {
+		error = "Buyurtma Topilmadi";
 		throw new RpcError(-32504, "Order not found");
 	}
 	if (order.pay.payme.perform_time == 0) {
@@ -119,13 +127,16 @@ server.addMethod("CreateTransaction", async (params) => {
 	try {
 		orderId = new mongoose.Types.ObjectId(params.account.order_id);
 	} catch (error) {
+		error = "Buyurtma Topilmadi";
 		throw new RpcError(-31060, "Invalid order ID format");
 	}
 	const order = await Orders.findById(orderId);
 	if (!order) {
+		error = "Buyurtma Topilmadi";
 		throw new RpcError(-31060, "Order not found");
 	}
 	if (order.pay.payme.id && order.pay.payme.id != params.id) {
+		error = "Buyurtma Topilmadi";
 		throw new RpcError(-31060, "Incorrect order ID");
 	}
 
@@ -133,6 +144,7 @@ server.addMethod("CreateTransaction", async (params) => {
 	for (const product of order.products) {
 		const productDoc = await Products.findById(product.product);
 		if (!productDoc) {
+			error = "Mahsulot Topilmadi";
 			throw new RpcError(-31060, "Product not found in order");
 		}
 
@@ -144,13 +156,14 @@ server.addMethod("CreateTransaction", async (params) => {
 	}
 	console.log(totalAmount);
 	console.log(params);
-	if (totalAmount !== params.amount) {
+	if (totalAmount !== params.amount * 100) {
+		error = "Buyurtma Summasida Xatolik. Buyurtmani To'liq summasini kiriting";
 		throw new RpcError(-31001, "Incorrect total amount");
 	}
 
 	order.pay.payme.create_time = params.time;
 	order.pay.payme.id = params.id;
-	order.pay.payme.amount = params.amount;
+	order.pay.payme.amount = params.amount * 100;
 
 	await order.save();
 
@@ -166,6 +179,7 @@ server.addMethod("CheckTransaction", async (params) => {
 		"pay.payme.id": params.id,
 	});
 	if (!order) {
+		error = "Buyurtma Topilmadi";
 		throw new RpcError(-32504, "Transaction not found");
 	}
 	return {
@@ -233,7 +247,7 @@ exports.test = async (req, res) => {
 			if (jsonRPCResponse) {
 				if (jsonRPCResponse.error) {
 					jsonRPCResponse.error.code = jsonRPCResponse.error.message;
-					jsonRPCResponse.error.message = "Order not found";
+					jsonRPCResponse.error.message = error;
 					return res.json(jsonRPCResponse);
 				}
 				res.json(jsonRPCResponse);
