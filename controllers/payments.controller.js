@@ -191,7 +191,7 @@ server.addMethod("CheckTransaction", async (params) => {
 	};
 });
 
-exports.test = async (req, res) => {
+exports.paymeHandler = async (req, res) => {
 	const authorizationHeader = req.headers.authorization;
 	if (!authorizationHeader) {
 		return res.json({
@@ -257,5 +257,133 @@ exports.test = async (req, res) => {
 	} catch (error) {
 		console.log(error);
 		return res.json(new RpcError(-31003, "Internal Server Error"));
+	}
+};
+exports.clickGetInfo = async (req, res) => {
+	try {
+		if (req.body.params.order_id) {
+			return res.json({
+				error: -8,
+				error_note: "Ошибка в запросе от CLICK ",
+			});
+		}
+		const order = await Orders.findById(req.body.params.order_id);
+		if (!order) {
+			return res.json({
+				error: -5,
+				error_note:
+					"Не найден пользователь/заказ исходя из присланных данных платежа",
+			});
+		}
+		if (order.pay.status == "payed") {
+			return res.json({
+				error: -4,
+				error_note: "Транзакция ранее была подтверждена",
+			});
+		}
+		if (order.pay.status == "cancelled") {
+			return res.json({
+				error: -9,
+				error_note: "Транзакция ранее была отменена",
+			});
+		}
+		let totalAmount = 0;
+		for (const product of order.products) {
+			const productDoc = await Products.findById(product.product);
+			if (!productDoc) {
+				error = "Mahsulot Topilmadi";
+				throw new RpcError(-31060, "Product not found in order");
+			}
+
+			const price = productDoc.sale.isSale
+				? productDoc.sale.price
+				: productDoc.price;
+			const subtotal = price * product.quantity;
+			totalAmount += subtotal;
+		}
+		return res.json({
+			error: 0,
+			error_note: "Успешно",
+			params: {
+				amount: totalAmount,
+				caller_id: order.userId,
+				phone_num: order.phone.number,
+			},
+		});
+	} catch (error) {
+		return res.status(500).json({error: error});
+	}
+};
+exports.clickPrepare = async (req, res) => {
+	try {
+		if (req.body.error != 0) {
+			return res.json({
+				error: -8,
+				error_note: "Ошибка в запросе от CLICK ",
+			});
+		}
+		const id = +new Date();
+		const order = await Orders.findById(req.body.params.merchant_trans_id);
+		if (!order) {
+			return res.json({
+				error: -5,
+				error_note:
+					"Не найден пользователь/заказ исходя из присланных данных платежа",
+			});
+		}
+		order.pay.click.click_trans_id = req.body.params.click_trans_id;
+		order.pay.click.service_id = req.body.params.service_id;
+		order.pay.click.click_paydoc_id = req.body.params.click_paydoc_id;
+		order.pay.click.merchant_trans_id = req.body.params.merchant_trans_id;
+		order.pay.click.amount = req.body.params.amount;
+		order.pay.click.merchant_prepare_id = id;
+		await order.save();
+		return res.json({
+			error: 0,
+			error_note: "",
+			params: {
+				click_trans_id: order.pay.click.click_trans_id,
+				merchant_trans_id: order.pay.click.merchant_trans_id,
+				merchant_prepare_id: id,
+			},
+		});
+	} catch (error) {
+		return res.status(500).json({error: error});
+	}
+};
+exports.clickComplete = async (req, res) => {
+	try {
+		if (req.body.error != 0) {
+			return res.json({
+				error: -8,
+				error_note: "Ошибка в запросе от CLICK ",
+			});
+		}
+		const order = await Orders.findOne({
+			click_trans_id: req.body.params.click_trans_id,
+		});
+		if (!order) {
+			return res.json({
+				error: -5,
+				error_note:
+					"Не найден пользователь/заказ исходя из присланных данных платежа",
+			});
+		}
+		console.log(req.body);
+		order.pay.status = "payed";
+		order.pay.click.action = req.body.params.action;
+		const id = +new Date();
+		await order.save();
+		return res.json({
+			error: 0,
+			error_note: "",
+			params: {
+				click_trans_id: order.pay.click.click_trans_id,
+				merchant_trans_id: order.pay.click.merchant_trans_id,
+				merchant_confirm_id: id,
+			},
+		});
+	} catch (error) {
+		return res.status(500).json({error: error});
 	}
 };

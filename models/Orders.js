@@ -68,6 +68,33 @@ const orderSchema = new Schema(
 					default: null,
 				},
 			},
+			click: {
+				click_trans_id: {
+					type: String,
+				},
+				service_id: {
+					type: Number,
+				},
+				click_paydoc_id: {
+					type: String,
+				},
+				merchant_trans_id: {
+					type: String,
+				},
+				merchant_prepare_id: {
+					type: Number,
+				},
+				merchant_confirm_id: {
+					type: Number,
+				},
+				amount: {
+					type: Number,
+				},
+				action: {
+					type: Number,
+					default: 0,
+				},
+			},
 			created_date: {
 				type: Date,
 				default: Date.now,
