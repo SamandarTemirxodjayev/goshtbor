@@ -87,6 +87,7 @@ server.addMethod("CancelTransaction", async (params) => {
 		order.pay.payme.cancel_time = +new Date();
 		if (order.pay.payme.state == 2) order.pay.payme.state = -2;
 		if (order.pay.payme.state == 1) order.pay.payme.state = -1;
+		order.pay.status = "canceled";
 		order.pay.payme.reason = params.reason;
 		await order.save();
 	}

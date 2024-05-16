@@ -15,12 +15,6 @@ exports.getAllCategories = async (req, res) => {
 exports.createCategory = async (req, res) => {
 	const {name_uz, name_ru, name_en, photo_url} = req.body;
 	try {
-		if (req.userId.user_level === 0) {
-			return res.status(400).json({
-				status: "error",
-				message: "You are not authorized to perform this action",
-			});
-		}
 		const category = new Category({
 			name_uz,
 			name_ru,
@@ -39,12 +33,6 @@ exports.createCategory = async (req, res) => {
 };
 exports.deleteCategory = async (req, res) => {
 	try {
-		if (req.userId.user_level === 0) {
-			return res.status(400).json({
-				status: "error",
-				message: "You are not authorized to perform this action",
-			});
-		}
 		const category = await Category.findByIdAndDelete(req.params.id);
 		return res.status(200).json({
 			status: 200,
@@ -57,12 +45,6 @@ exports.deleteCategory = async (req, res) => {
 };
 exports.updateCategory = async (req, res) => {
 	try {
-		if (req.userId.user_level === 0) {
-			return res.status(400).json({
-				status: "error",
-				message: "You are not authorized to perform this action",
-			});
-		}
 		const category = await Category.findByIdAndUpdate(
 			req.params.id,
 			{

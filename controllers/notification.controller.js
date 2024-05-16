@@ -3,12 +3,6 @@ const oneSignalClient = require("../utils/oneSignalclient.js");
 
 exports.createNotification = async (req, res) => {
 	try {
-		if (req.userId.user_level === 0) {
-			return res.status(400).json({
-				status: "error",
-				message: "You are not authorized to perform this action",
-			});
-		}
 		const notifications = new Notification({
 			photo_url: req.body.photo_url,
 			title_uz: req.body.title_uz,
@@ -114,12 +108,6 @@ exports.markAsReadAllNotifications = async (req, res) => {
 };
 exports.deleteNotification = async (req, res) => {
 	try {
-		if (req.userId.user_level === 0) {
-			return res.status(400).json({
-				status: "error",
-				message: "You are not authorized to perform this action",
-			});
-		}
 		await Notification.findByIdAndDelete(req.params.id);
 		return res.status(200).send({
 			status: 200,
@@ -131,12 +119,6 @@ exports.deleteNotification = async (req, res) => {
 };
 exports.upadateNotification = async (req, res) => {
 	try {
-		if (req.userId.user_level === 0) {
-			return res.status(400).json({
-				status: "error",
-				message: "You are not authorized to perform this action",
-			});
-		}
 		await Notification.findByIdAndUpdate(req.params.id, {
 			photo_url: req.body.photo_url,
 			title: req.body.title,

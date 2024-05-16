@@ -62,6 +62,10 @@ const productSchema = new Schema({
 		type: Types.ObjectId,
 		ref: "categories",
 	},
+	subcategory: {
+		type: Types.ObjectId,
+		ref: "subcategories",
+	},
 	brand: {
 		type: Types.ObjectId,
 		ref: "brands",
@@ -87,6 +91,20 @@ const productSchema = new Schema({
 });
 
 productSchema.set("timestamps", true);
+
+productSchema.statics.searchByName = async function (name) {
+	return this.model("products")
+		.find({
+			$or: [
+				{name_uz: {$regex: name, $options: "i"}}, // Case-insensitive search
+				{name_ru: {$regex: name, $options: "i"}},
+				{name_en: {$regex: name, $options: "i"}},
+			],
+		})
+		.populate("brand")
+		.populate("category")
+		.populate("subcategory");
+};
 
 const Products = model("products", productSchema);
 

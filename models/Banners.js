@@ -1,12 +1,12 @@
-const mongoose = require("mongoose");
+const {Schema, model, Types} = require("mongoose");
 
-const bannerSchema = new mongoose.Schema({
+const bannerSchema = new Schema({
 	photo_url: {
 		type: String,
 		required: true,
 	},
 	brand: {
-		type: mongoose.Schema.Types.ObjectId,
+		type: Types.ObjectId,
 		ref: "brands",
 	},
 	title_uz: {
@@ -37,10 +37,20 @@ const bannerSchema = new mongoose.Schema({
 		type: String,
 		required: true,
 	},
+	connect_item: {
+		category: {
+			type: Types.ObjectId,
+			ref: "categories",
+		},
+		product: {
+			type: Types.ObjectId,
+			ref: "products",
+		},
+	},
 });
 
 bannerSchema.set("timestamps", true);
 
-const Banners = mongoose.model("banners", bannerSchema);
+const Banners = model("banners", bannerSchema);
 
 module.exports = Banners;

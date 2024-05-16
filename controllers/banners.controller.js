@@ -2,7 +2,7 @@ const Banners = require("../models/Banners");
 
 exports.getBanners = async (req, res) => {
 	try {
-		const banners = await Banners.find().populate("brand");
+		const banners = await Banners.find().populate("brand").populate("connect_item.category").populate("connect_item.product");
 		return res.status(200).json({
 			status: 200,
 			message: "Banners fetched successfully",
@@ -14,12 +14,6 @@ exports.getBanners = async (req, res) => {
 };
 exports.createBanner = async (req, res) => {
 	try {
-		if (req.userId.user_level === 0) {
-			return res.status(400).json({
-				status: "error",
-				message: "You are not authorized to perform this action",
-			});
-		}
 		if (!req.body.photo_url) {
 			return res.status(400).json({
 				status: "error",
@@ -39,12 +33,6 @@ exports.createBanner = async (req, res) => {
 };
 exports.updateBanner = async (req, res) => {
 	try {
-		if (req.userId.user_level === 0) {
-			return res.status(400).json({
-				status: "error",
-				message: "You are not authorized to perform this action",
-			});
-		}
 		const banner = await Banners.findByIdAndUpdate(req.params.id, req.body, {
 			new: true,
 		});
@@ -59,12 +47,6 @@ exports.updateBanner = async (req, res) => {
 };
 exports.deleteBanner = async (req, res) => {
 	try {
-		if (req.userId.user_level === 0) {
-			return res.status(400).json({
-				status: "error",
-				message: "You are not authorized to perform this action",
-			});
-		}
 		const banner = await Banners.findByIdAndDelete(req.params.id);
 		return res.status(200).json({
 			status: 200,

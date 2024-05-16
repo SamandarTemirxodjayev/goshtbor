@@ -9,6 +9,7 @@ exports.getProducts = async (req, res) => {
 		const products = await Products.find()
 			.populate("category")
 			.populate("brand")
+			.populate("subcategory")
 			.skip(skip)
 			.limit(limit);
 
@@ -157,11 +158,39 @@ exports.searchProduct = async (req, res) => {
 		}
 		const products = await Products.find(search)
 			.populate("brand")
-			.populate("category");
-		console.log(products);
+			.populate("category")
+			.populate("subcategory");
 		return res.status(200).json({
 			message: "Mahsulotlar Yuklandi",
 			status: 200,
+			data: products,
+		});
+	} catch (error) {
+		return res.status(500).json({message: error.message});
+	}
+};
+exports.searchProductByName = async (req, res) => {
+	try {
+		const products = await Products.searchByName(req.body.name);
+		return res.json({
+			status: "success",
+			data: products,
+		});
+	} catch (error) {
+		return res.status(500).json({message: error.message});
+	}
+};
+exports.searchProductBySubCategories = async (req, res) => {
+	try {
+		const products = await Products.find({
+			category: req.body.category,
+			subcategory: req.body.subcategory,
+		})
+			.populate("brand")
+			.populate("category")
+			.populate("subcategory");
+		return res.json({
+			status: "success",
 			data: products,
 		});
 	} catch (error) {

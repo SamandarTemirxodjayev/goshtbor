@@ -11,5 +11,7 @@ router.post("/", adminMiddleware, controller.createProduct);
 router.delete("/:id", adminMiddleware, controller.deleteProduct);
 router.put("/:id", adminMiddleware, controller.updateProduct);
 router.post("/search", controller.searchProduct);
+router.post("/search/byname", controller.searchProductByName);
+router.post("/search/bysubcategory", controller.searchProductBySubCategories);
 
 module.exports = router;
