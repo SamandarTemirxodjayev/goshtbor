@@ -308,6 +308,7 @@ exports.clickGetInfo = async (req, res) => {
 				amount: totalAmount,
 				caller_id: order.userId,
 				phone_num: order.phone.number,
+				order_num: order._id,
 			},
 		});
 	} catch (error) {
@@ -382,6 +383,98 @@ exports.clickComplete = async (req, res) => {
 				merchant_trans_id: order.pay.click.merchant_trans_id,
 				merchant_confirm_id: id,
 			},
+		});
+	} catch (error) {
+		return res.status(500).json({error: error});
+	}
+};
+exports.uzumCheck = async (req, res) => {
+	try {
+		const order = await Orders.findById(req.body.params.order_id);
+		if (!order) {
+			return res.status(400).json({
+				serviceId: req.body.serviceId,
+				timestamp: +new Date(),
+				status: "FAILED",
+				errorCode: "10003",
+			});
+		}
+		let totalAmount = 0;
+		for (const product of order.products) {
+			const productDoc = await Products.findById(product.product);
+			if (!productDoc) {
+				error = "Mahsulot Topilmadi";
+				throw new RpcError(-31060, "Product not found in order");
+			}
+
+			const price = productDoc.sale.isSale
+				? productDoc.sale.price
+				: productDoc.price;
+			const subtotal = price * product.quantity;
+			totalAmount += subtotal;
+		}
+		return res.json({
+			serviceId: req.body.serviceId,
+			timestamp: +new Date(),
+			status: "OK",
+			data: {
+				amount: totalAmount,
+				phone_number: order.phone.number,
+				user_id: order.userId,
+			},
+		});
+	} catch (error) {
+		return res.status(500).json({error: error});
+	}
+};
+exports.uzumCreate = async (req, res) => {
+	try {
+		const order = await Orders.findById(req.body.params.order_id);
+		if (!order) {
+			return res.status(400).json({
+				serviceId: req.body.serviceId,
+				timestamp: +new Date(),
+				status: "FAILED",
+				errorCode: "10003",
+			});
+		}
+		order.pay.uzum.serviceId = req.body.serviceId;
+		order.pay.uzum.transId = req.body.transId;
+		await order.save();
+		let totalAmount = 0;
+		for (const product of order.products) {
+			const productDoc = await Products.findById(product.product);
+			if (!productDoc) {
+				error = "Mahsulot Topilmadi";
+				throw new RpcError(-31060, "Product not found in order");
+			}
+
+			const price = productDoc.sale.isSale
+				? productDoc.sale.price
+				: productDoc.price;
+			const subtotal = price * product.quantity;
+			totalAmount += subtotal;
+		}
+		if (totalAmount * 100 != req.body.amount) {
+			return res.status(400).json({
+				serviceId: req.body.serviceId,
+				transId: req.body.transId,
+				transTime: +new Date(),
+				status: "FAILED",
+				errorCode: "10011",
+			});
+		}
+		return res.json({
+			serviceId: req.body.serviceId,
+			transId: req.body.transId,
+			status: "CREATED",
+			transTime: +new Date(),
+			data: {
+				amount: totalAmount,
+				phone_number: order.phone.number,
+				user_id: order.userId,
+			},
+			amount: totalAmount * 100,
 		});
 	} catch (error) {
 		return res.status(500).json({error: error});

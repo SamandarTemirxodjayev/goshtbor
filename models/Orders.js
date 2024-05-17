@@ -95,6 +95,17 @@ const orderSchema = new Schema(
 					default: 0,
 				},
 			},
+			uzum: {
+				serviceId: {
+					type: Number,
+				},
+				transId: {
+					type: String,
+				},
+				amount: {
+					type: Number,
+				},
+			},
 			created_date: {
 				type: Date,
 				default: Date.now,
