@@ -261,7 +261,7 @@ exports.paymeHandler = async (req, res) => {
 };
 exports.clickGetInfo = async (req, res) => {
 	try {
-		if (req.body.params.order_id) {
+		if (!req.body.params.order_id) {
 			return res.json({
 				error: -8,
 				error_note: "Ошибка в запросе от CLICK ",
