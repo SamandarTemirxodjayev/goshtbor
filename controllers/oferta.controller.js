@@ -37,7 +37,6 @@ exports.getOfertaHelp = async (req, res) => {
 exports.putOferta = async (req, res) => {
 	try {
 		const oferta = req.body;
-		console.log(oferta);
 		fs.writeFile(
 			"./db/oferta.json",
 			JSON.stringify(oferta, null, 2),
@@ -54,14 +53,12 @@ exports.putOferta = async (req, res) => {
 			},
 		);
 	} catch (error) {
-		console.log(error);
 		return res.status(error);
 	}
 };
 exports.putOfertaHelp = async (req, res) => {
 	try {
 		const oferta = req.body;
-		console.log(oferta);
 		fs.writeFile(
 			"./db/phones.json",
 			JSON.stringify(oferta, null, 2),
@@ -78,7 +75,6 @@ exports.putOfertaHelp = async (req, res) => {
 			},
 		);
 	} catch (error) {
-		console.log(error);
 		return res.status(error);
 	}
 };

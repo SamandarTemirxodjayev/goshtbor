@@ -6,6 +6,7 @@ const Confirmations = require("../models/Confirmation");
 const {getMulticardToken} = require("../utils/authTokenMulticard");
 const axios = require("axios");
 const https = require("https");
+const Products = require("../models/Products");
 
 exports.getAllOrders = async (req, res) => {
 	try {
@@ -43,24 +44,33 @@ exports.getOrderById = async (req, res) => {
 };
 exports.createOrder = async (req, res) => {
 	try {
+		const newOrder = new Orders({
+			userId: req.userId._id,
+			delivery: {
+				date: req.body.delivery.date,
+				address: {
+					longitude: req.body.delivery.address.longitude,
+					latitude: req.body.delivery.address.latitude,
+				},
+			},
+			pay: {
+				type: req.body.pay.type,
+			},
+			"phone.number": req.body.phone.number,
+			products: req.body.products,
+			comment: req.body.comment || "",
+		});
+		await newOrder.save();
 		if (req.body.pay.type == "card") {
-			const newOrder = new Orders({
-				userId: req.userId._id,
-				delivery: {
-					date: req.body.delivery.date,
-					address: {
-						longitude: req.body.delivery.address.longitude,
-						latitude: req.body.delivery.address.latitude,
-					},
-				},
-				pay: {
-					type: req.body.pay.type,
-				},
-				"phone.number": req.body.phone.number,
-				products: req.body.products,
-				comment: req.body.comment || "",
-			});
-			await newOrder.save();
+			let totalAmount = 0;
+			for (const product of newOrder.products) {
+				const productDoc = await Products.findById(product.product);
+				const price = productDoc.sale.isSale
+					? productDoc.sale.price
+					: productDoc.price;
+				const subtotal = price * product.quantity;
+				totalAmount += subtotal;
+			}
 			const {token} = await getMulticardToken();
 			const agent = new https.Agent({
 				rejectUnauthorized: false,
@@ -72,7 +82,7 @@ exports.createOrder = async (req, res) => {
 						pan: req.body.pay.card.pan,
 						expiry: req.body.pay.card.expiry,
 					},
-					amount: 100 * 100,
+					amount: totalAmount * 100,
 					store_id: process.env.MULTICARD_STORE_ID,
 					invoice_id: newOrder._id,
 					details: "",
@@ -97,26 +107,11 @@ exports.createOrder = async (req, res) => {
 				data: newOrder,
 			});
 		}
-		const newOrder = new Orders({
-			userId: req.userId._id,
-			delivery: {
-				date: req.body.delivery.date,
-				address: {
-					longitude: req.body.delivery.address.longitude,
-					latitude: req.body.delivery.address.latitude,
-				},
-			},
-			"phone.number": req.body.phone.number,
-			products: req.body.products,
-			comment: req.body.comment || "",
-		});
-		await newOrder.save();
 		return res.json({
 			status: "success",
 			data: newOrder,
 		});
 	} catch (error) {
-		console.log(error);
 		return res.status(500).json({error: error});
 	}
 };
@@ -179,7 +174,6 @@ exports.orderConfirmByCard = async (req, res) => {
 			});
 		}
 	} catch (error) {
-		console.log(error);
 		return res.status(500).json({
 			message: "error",
 			success: false,
