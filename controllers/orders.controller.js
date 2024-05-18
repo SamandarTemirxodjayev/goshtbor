@@ -51,6 +51,7 @@ exports.createOrder = async (req, res) => {
 				address: {
 					longitude: req.body.delivery.address.longitude,
 					latitude: req.body.delivery.address.latitude,
+					name: req.body.delivery.address.name,
 				},
 			},
 			pay: {
