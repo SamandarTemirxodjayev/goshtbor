@@ -11,7 +11,10 @@ exports.getAllOrders = async (req, res) => {
 	try {
 		const orders = await Orders.find({
 			userId: req.userId._id,
-		}).populate("products.product");
+		}).populate({
+			path: "products.product",
+			populate: [{path: "brand"}, {path: "category"}, {path: "subcategory"}],
+		});
 		return res.json({
 			status: "success",
 			data: orders,
@@ -25,10 +28,10 @@ exports.getOrderById = async (req, res) => {
 		let order = await Orders.findOne({
 			userId: req.userId._id,
 			_id: req.params.id,
-		})
-			.populate("brand")
-			.populate("category")
-			.populate("subcategory");
+		}).populate({
+			path: "products.product",
+			populate: [{path: "brand"}, {path: "category"}, {path: "subcategory"}],
+		});
 		if (!order) return res.status(404).json({status: "not found"});
 		return res.json({
 			status: "success",

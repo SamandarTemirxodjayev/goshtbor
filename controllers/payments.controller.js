@@ -4,22 +4,22 @@ const Orders = require("../models/Orders");
 const Products = require("../models/Products");
 const server = new JSONRPCServer();
 const fs = require("fs");
-const mongoose = require("mongoose");
+const {Types} = require("mongoose");
 
-let error = "";
+let error_message = "";
 
 server.addMethod("CheckPerformTransaction", async (params) => {
 	let orderId;
 	try {
-		orderId = new mongoose.Types.ObjectId(params.account.order_id);
+		orderId = new Types.ObjectId(params.account.order_id);
 	} catch (error) {
-		error = "Buyurtma Topilmadi";
+		error_message = "Buyurtma Topilmadi";
 		throw new RpcError(-31060, "Invalid order ID format");
 	}
 
 	let order = await Orders.findById(orderId);
 	if (!order) {
-		error = "Buyurtma Topilmadi";
+		error_message = "Buyurtma Topilmadi";
 		throw new RpcError(-31061, "Order not found");
 	}
 
@@ -29,7 +29,7 @@ server.addMethod("CheckPerformTransaction", async (params) => {
 	for (const product of order.products) {
 		const productDoc = await Products.findById(product.product);
 		if (!productDoc) {
-			error = "Mahsulot Topilmadi";
+			error_message = "Mahsulot Topilmadi";
 			throw new RpcError(-31062, "Product not found in order");
 		}
 
@@ -50,7 +50,8 @@ server.addMethod("CheckPerformTransaction", async (params) => {
 	}
 
 	if (totalAmount * 100 !== params.amount) {
-		error = "Buyurtma Summasida Xatolik. Buyurtmani To'liq summasini kiriting";
+		error_message =
+			"Buyurtma Summasida Xatolik. Buyurtmani To'liq summasini kiriting";
 		throw new RpcError(-31001, "Incorrect total amount");
 	}
 
@@ -70,7 +71,6 @@ server.addMethod("GetStatement", async (params) => {
 			$lte: params.to,
 		},
 	});
-	console.log(orders);
 	return {
 		transactions: orders,
 	};
@@ -80,7 +80,7 @@ server.addMethod("CancelTransaction", async (params) => {
 		"pay.payme.id": params.id,
 	});
 	if (!order) {
-		error = "Buyurtma Topilmadi";
+		error_message = "Buyurtma Topilmadi";
 		throw new RpcError(-32504, "Order not found");
 	}
 	if (order.pay.payme.cancel_time == 0) {
@@ -103,7 +103,7 @@ server.addMethod("PerformTransaction", async (params) => {
 		"pay.payme.id": params.id,
 	});
 	if (!order) {
-		error = "Buyurtma Topilmadi";
+		error_message = "Buyurtma Topilmadi";
 		throw new RpcError(-32504, "Order not found");
 	}
 	if (order.pay.payme.perform_time == 0) {
@@ -126,18 +126,18 @@ server.addMethod("PerformTransaction", async (params) => {
 server.addMethod("CreateTransaction", async (params) => {
 	let orderId;
 	try {
-		orderId = new mongoose.Types.ObjectId(params.account.order_id);
+		orderId = new Types.ObjectId(params.account.order_id);
 	} catch (error) {
-		error = "Buyurtma Topilmadi";
+		error_message = "Buyurtma Topilmadi";
 		throw new RpcError(-31060, "Invalid order ID format");
 	}
 	const order = await Orders.findById(orderId);
 	if (!order) {
-		error = "Buyurtma Topilmadi";
+		error_message = "Buyurtma Topilmadi";
 		throw new RpcError(-31060, "Order not found");
 	}
 	if (order.pay.payme.id && order.pay.payme.id != params.id) {
-		error = "Buyurtma Topilmadi";
+		error_message = "Buyurtma Topilmadi";
 		throw new RpcError(-31060, "Incorrect order ID");
 	}
 
@@ -145,7 +145,7 @@ server.addMethod("CreateTransaction", async (params) => {
 	for (const product of order.products) {
 		const productDoc = await Products.findById(product.product);
 		if (!productDoc) {
-			error = "Mahsulot Topilmadi";
+			error_message = "Mahsulot Topilmadi";
 			throw new RpcError(-31060, "Product not found in order");
 		}
 
@@ -156,7 +156,8 @@ server.addMethod("CreateTransaction", async (params) => {
 		totalAmount += subtotal;
 	}
 	if (totalAmount * 100 !== params.amount) {
-		error = "Buyurtma Summasida Xatolik. Buyurtmani To'liq summasini kiriting";
+		error_message =
+			"Buyurtma Summasida Xatolik. Buyurtmani To'liq summasini kiriting";
 		throw new RpcError(-31001, "Incorrect total amount");
 	}
 
@@ -178,7 +179,7 @@ server.addMethod("CheckTransaction", async (params) => {
 		"pay.payme.id": params.id,
 	});
 	if (!order) {
-		error = "Buyurtma Topilmadi";
+		error_message = "Buyurtma Topilmadi";
 		throw new RpcError(-32504, "Transaction not found");
 	}
 	return {
@@ -255,7 +256,6 @@ exports.paymeHandler = async (req, res) => {
 			}
 		});
 	} catch (error) {
-		console.log(error);
 		return res.json(new RpcError(-31003, "Internal Server Error"));
 	}
 };
