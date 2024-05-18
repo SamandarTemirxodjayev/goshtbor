@@ -8,6 +8,7 @@ const bannerSchema = new Schema({
 	brand: {
 		type: Types.ObjectId,
 		ref: "brands",
+		required: true,
 	},
 	title_uz: {
 		type: String,

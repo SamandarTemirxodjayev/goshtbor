@@ -3,9 +3,11 @@ const {Schema, model} = require("mongoose");
 const userSchema = new Schema({
 	name: {
 		type: String,
+		default: "Mehmon",
 	},
 	surname: {
 		type: String,
+		default: "Foydalanuvchi",
 	},
 	photo_url: {
 		type: String,

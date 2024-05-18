@@ -27,29 +27,37 @@ const orderSchema = new Schema(
 			card: {
 				uuid: {
 					type: String,
+					default: null,
 				},
 				card_pan: {
 					type: String,
+					default: null,
 				},
 				payment_amount: {
 					type: Number,
+					default: null,
 				},
 				total_amount: {
 					type: Number,
+					default: null,
 				},
 				commission_amount: {
 					type: Number,
+					default: null,
 				},
 			},
 			payme: {
 				id: {
 					type: Types.ObjectId,
+					default: null,
 				},
 				amount: {
 					type: Number,
+					default: null,
 				},
 				create_time: {
 					type: Number,
+					default: null,
 				},
 				perform_time: {
 					type: Number,
@@ -71,24 +79,31 @@ const orderSchema = new Schema(
 			click: {
 				click_trans_id: {
 					type: String,
+					default: null,
 				},
 				service_id: {
 					type: Number,
+					default: null,
 				},
 				click_paydoc_id: {
 					type: String,
+					default: null,
 				},
 				merchant_trans_id: {
 					type: String,
+					default: null,
 				},
 				merchant_prepare_id: {
 					type: Number,
+					default: null,
 				},
 				merchant_confirm_id: {
 					type: Number,
+					default: null,
 				},
 				amount: {
 					type: Number,
+					default: null,
 				},
 				action: {
 					type: Number,
@@ -98,15 +113,19 @@ const orderSchema = new Schema(
 			uzum: {
 				serviceId: {
 					type: Number,
+					default: null,
 				},
 				transId: {
 					type: String,
+					default: null,
 				},
 				amount: {
 					type: Number,
+					default: null,
 				},
 				paymentSource: {
 					type: String,
+					default: null,
 				},
 				tariff: {
 					type: String,
@@ -131,9 +150,11 @@ const orderSchema = new Schema(
 			},
 			pay_date: {
 				type: Date,
+				default: null,
 			},
 			uuid: {
 				type: String,
+				default: null,
 			},
 			status: {
 				type: String,
@@ -142,6 +163,7 @@ const orderSchema = new Schema(
 		},
 		comment: {
 			type: String,
+			default: null,
 		},
 		phone: {
 			number: {
@@ -176,6 +198,7 @@ const orderSchema = new Schema(
 			},
 			courier: {
 				type: Types.ObjectId,
+				default: null,
 			},
 		},
 	},

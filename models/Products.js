@@ -33,6 +33,7 @@ const productSchema = new Schema({
 	},
 	description_photo: {
 		type: String,
+		default: null,
 	},
 	weight: {
 		type: Number,
@@ -45,9 +46,11 @@ const productSchema = new Schema({
 		},
 		discount: {
 			type: Number,
+			default: null,
 		},
 		price: {
 			type: Number,
+			default: null,
 		},
 	},
 	price: {
@@ -61,14 +64,17 @@ const productSchema = new Schema({
 	category: {
 		type: Types.ObjectId,
 		ref: "categories",
+		required: true,
 	},
 	subcategory: {
 		type: Types.ObjectId,
 		ref: "subcategories",
+		required: true,
 	},
 	brand: {
 		type: Types.ObjectId,
 		ref: "brands",
+		required: true,
 	},
 	saleds: {
 		type: Number,
