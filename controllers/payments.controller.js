@@ -290,11 +290,6 @@ exports.clickGetInfo = async (req, res) => {
 		let totalAmount = 0;
 		for (const product of order.products) {
 			const productDoc = await Products.findById(product.product);
-			if (!productDoc) {
-				error = "Mahsulot Topilmadi";
-				throw new RpcError(-31060, "Product not found in order");
-			}
-
 			const price = productDoc.sale.isSale
 				? productDoc.sale.price
 				: productDoc.price;
@@ -402,11 +397,6 @@ exports.uzumCheck = async (req, res) => {
 		let totalAmount = 0;
 		for (const product of order.products) {
 			const productDoc = await Products.findById(product.product);
-			if (!productDoc) {
-				error = "Mahsulot Topilmadi";
-				throw new RpcError(-31060, "Product not found in order");
-			}
-
 			const price = productDoc.sale.isSale
 				? productDoc.sale.price
 				: productDoc.price;
@@ -418,7 +408,7 @@ exports.uzumCheck = async (req, res) => {
 			timestamp: +new Date(),
 			status: "OK",
 			data: {
-				amount: totalAmount,
+				amount: totalAmount * 100,
 				phone_number: order.phone.number,
 				user_id: order.userId,
 			},
@@ -444,11 +434,6 @@ exports.uzumCreate = async (req, res) => {
 		let totalAmount = 0;
 		for (const product of order.products) {
 			const productDoc = await Products.findById(product.product);
-			if (!productDoc) {
-				error = "Mahsulot Topilmadi";
-				throw new RpcError(-31060, "Product not found in order");
-			}
-
 			const price = productDoc.sale.isSale
 				? productDoc.sale.price
 				: productDoc.price;
@@ -475,6 +460,103 @@ exports.uzumCreate = async (req, res) => {
 				user_id: order.userId,
 			},
 			amount: totalAmount * 100,
+		});
+	} catch (error) {
+		return res.status(500).json({error: error});
+	}
+};
+exports.uzumConfirm = async (req, res) => {
+	try {
+		const order = await Orders.find({
+			"pay.uzum.transId": req.body.transId,
+		});
+		order.pay.status = "payed";
+		order.pay.uzum.serviceId = req.body.serviceId;
+		order.pay.uzum.transId = req.body.transId;
+		order.pay.uzum.confirmTime = req.body.timestamp;
+		order.pay.uzum.status = "CONFIRMED";
+		order.pay.uzum.paymentSource = req.body.paymentSource;
+		await order.save();
+		let totalAmount = 0;
+		for (const product of order.products) {
+			const productDoc = await Products.findById(product.product);
+			const price = productDoc.sale.isSale
+				? productDoc.sale.price
+				: productDoc.price;
+			const subtotal = price * product.quantity;
+			totalAmount += subtotal;
+		}
+		return res.json({
+			serviceId: req.body.serviceId,
+			transId: req.body.transId,
+			status: "CONFIRMED",
+			confirmTime: +new Date(),
+			amount: totalAmount * 100,
+		});
+	} catch (error) {
+		return res.status(500).json({error: error});
+	}
+};
+exports.uzumReverse = async (req, res) => {
+	try {
+		const order = await Orders.find({
+			"pay.uzum.transId": req.body.transId,
+		});
+		if (!order) {
+			return res.status(400).json({
+				serviceId: req.body.serviceId,
+				transId: req.body.transId,
+				status: "FAILED",
+				reverseTime: +new Date(),
+				errorCode: "10014",
+			});
+		}
+		order.pay.status = "cancelled";
+		order.pay.uzum.status = "REVERSED";
+		order.pay.uzum.reverseTime = req.body.timestamp;
+		await order.save();
+		let totalAmount = 0;
+		for (const product of order.products) {
+			const productDoc = await Products.findById(product.product);
+			const price = productDoc.sale.isSale
+				? productDoc.sale.price
+				: productDoc.price;
+			const subtotal = price * product.quantity;
+			totalAmount += subtotal;
+		}
+		return res.json({
+			serviceId: req.body.serviceId,
+			transId: req.body.transId,
+			status: "REVERSED",
+			reverseTime: +new Date(),
+			amount: totalAmount * 100,
+		});
+	} catch (error) {
+		return res.status(500).json({error: error});
+	}
+};
+exports.uzumStatus = async (req, res) => {
+	try {
+		const order = await Orders.find({
+			"pay.uzum.transId": req.body.transId,
+		});
+		if (!order) {
+			return res.status(400).json({
+				serviceId: req.body.serviceId,
+				transId: req.body.transId,
+				status: "FAILED",
+				reverseTime: +new Date(),
+				errorCode: "10014",
+			});
+		}
+		return res.json({
+			serviceId: req.body.serviceId,
+			transId: order.pay.uzum.transId,
+			status: order.pay.uzum.status,
+			transTime: order.pay.uzum.transTime,
+			confirmTime: order.pay.uzum.confirmTime,
+			reverseTime: order.pay.uzum.reverseTime,
+			amount: order.pay.uzum.amount * 100,
 		});
 	} catch (error) {
 		return res.status(500).json({error: error});

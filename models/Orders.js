@@ -105,6 +105,25 @@ const orderSchema = new Schema(
 				amount: {
 					type: Number,
 				},
+				paymentSource: {
+					type: String,
+				},
+				tariff: {
+					type: String,
+					default: null,
+				},
+				confirmTime: {
+					type: Number,
+					default: null,
+				},
+				reverseTime: {
+					type: Number,
+					default: null,
+				},
+				status: {
+					type: String,
+					default: "CREATED",
+				},
 			},
 			created_date: {
 				type: Date,

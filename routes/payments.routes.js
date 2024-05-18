@@ -11,5 +11,8 @@ router.post("/click/complete", controller.clickComplete);
 
 router.post("/uzum/check", UzumMiddleware, controller.uzumCheck);
 router.post("/uzum/create", UzumMiddleware, controller.uzumCreate);
+router.post("/uzum/confirm", UzumMiddleware, controller.uzumConfirm);
+router.post("/uzum/reverse", UzumMiddleware, controller.uzumReverse);
+router.post("/uzum/status", UzumMiddleware, controller.uzumStatus);
 
 module.exports = router;
