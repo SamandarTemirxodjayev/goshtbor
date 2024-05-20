@@ -349,12 +349,6 @@ exports.clickPrepare = async (req, res) => {
 };
 exports.clickComplete = async (req, res) => {
 	try {
-		if (req.body.error != 0) {
-			return res.json({
-				error: -8,
-				error_note: "Ошибка в запросе от CLICK ",
-			});
-		}
 		const order = await Orders.findOne({
 			click_trans_id: req.body.params.click_trans_id,
 		});
