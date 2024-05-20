@@ -261,6 +261,7 @@ exports.paymeHandler = async (req, res) => {
 };
 exports.clickGetInfo = async (req, res) => {
 	try {
+		console.log(req.body);
 		if (!req.body.params.order_id) {
 			return res.json({
 				error: -8,
@@ -313,33 +314,61 @@ exports.clickGetInfo = async (req, res) => {
 exports.clickPrepare = async (req, res) => {
 	try {
 		console.log(req.body);
-		const id = +new Date();
-		const order = await Orders.findById(req.body.params.merchant_trans_id);
+
+		const {params} = req.body;
+		if (
+			!params ||
+			!params.merchant_trans_id ||
+			!params.click_trans_id ||
+			!params.service_id ||
+			!params.click_paydoc_id ||
+			!params.amount
+		) {
+			return res.status(400).json({
+				error: -8,
+				error_note: "Invalid request parameters",
+			});
+		}
+
+		const id = +Date.now(); // Use Date.now() instead of +new Date()
+
+		// Find the order by merchant_trans_id
+		const order = await Orders.findById(params.merchant_trans_id);
 		if (!order) {
 			return res.json({
 				error: -5,
-				error_note:
-					"Не найден пользователь/заказ исходя из присланных данных платежа",
+				error_note: "Order not found based on the provided payment data",
 			});
 		}
-		order.pay.click.click_trans_id = req.body.params.click_trans_id;
-		order.pay.click.service_id = req.body.params.service_id;
-		order.pay.click.click_paydoc_id = req.body.params.click_paydoc_id;
-		order.pay.click.merchant_trans_id = req.body.params.merchant_trans_id;
-		order.pay.click.amount = req.body.params.amount;
-		order.pay.click.merchant_prepare_id = id;
+
+		// Update order payment details
+		order.pay.click = {
+			click_trans_id: params.click_trans_id,
+			service_id: params.service_id,
+			click_paydoc_id: params.click_paydoc_id,
+			merchant_trans_id: params.merchant_trans_id,
+			amount: params.amount,
+			merchant_prepare_id: id,
+		};
+
+		// Save the updated order
 		await order.save();
+
+		// Return success response
 		return res.json({
 			error: 0,
 			error_note: "",
 			params: {
-				click_trans_id: order.pay.click.click_trans_id,
-				merchant_trans_id: order.pay.click.merchant_trans_id,
+				click_trans_id: params.click_trans_id,
+				merchant_trans_id: params.merchant_trans_id,
 				merchant_prepare_id: id,
 			},
 		});
 	} catch (error) {
-		return res.status(500).json({error: error});
+		console.error(error); // Log the error for debugging purposes
+		return res
+			.status(500)
+			.json({error: -9, error_note: "Internal server error"});
 	}
 };
 exports.clickComplete = async (req, res) => {
