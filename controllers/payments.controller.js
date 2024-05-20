@@ -461,7 +461,7 @@ exports.uzumCreate = async (req, res) => {
 			status: "CREATED",
 			transTime: +new Date(),
 			data: {
-				amount: totalAmount,
+				amount: totalAmount * 100,
 				phone_number: order.phone.number,
 				user_id: order.userId,
 			},
@@ -473,7 +473,7 @@ exports.uzumCreate = async (req, res) => {
 };
 exports.uzumConfirm = async (req, res) => {
 	try {
-		const order = await Orders.find({
+		const order = await Orders.findOne({
 			"pay.uzum.transId": req.body.transId,
 		});
 		order.pay.status = "payed";
@@ -500,6 +500,7 @@ exports.uzumConfirm = async (req, res) => {
 			amount: totalAmount * 100,
 		});
 	} catch (error) {
+		console.log(error);
 		return res.status(500).json({error: error});
 	}
 };
