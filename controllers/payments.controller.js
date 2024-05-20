@@ -320,7 +320,8 @@ exports.clickPrepare = async (req, res) => {
 		const {params} = req.body;
 
 		const id = +Date.now();
-		console.log(params.merchant_trans_id);
+		console.log(req.body);
+		console.log(params);
 
 		const order = await Orders.findById(params.merchant_trans_id);
 		if (!order) {
