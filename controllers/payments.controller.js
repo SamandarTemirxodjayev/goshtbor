@@ -406,7 +406,7 @@ exports.uzumCheck = async (req, res) => {
 			status: "OK",
 			data: {
 				amount: {
-					value: totalAmount * 100,
+					value: totalAmount,
 				},
 				phone_number: {
 					value: order.phone.number,
