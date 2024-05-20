@@ -4,13 +4,14 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cron = require("node-cron");
 const router = require("./routes/router.js");
+const bodyParser = require("body-parser");
 const WebSocket = require("ws");
 
 const app = express();
-
 const wss = new WebSocket.Server({port: process.env.WSPORT});
 
 app.use(express.json());
+app.use(bodyParser.urlencoded({extended: true}));
 const corsOptions = {
 	origin: "*",
 };
