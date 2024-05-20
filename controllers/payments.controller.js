@@ -341,11 +341,9 @@ exports.clickPrepare = async (req, res) => {
 		return res.json({
 			error: 0,
 			error_note: "",
-			params: {
-				click_trans_id: req.body.click_trans_id,
-				merchant_trans_id: req.body.merchant_trans_id,
-				merchant_prepare_id: id,
-			},
+			click_trans_id: req.body.click_trans_id,
+			merchant_trans_id: req.body.merchant_trans_id,
+			merchant_prepare_id: id,
 		});
 	} catch (error) {
 		console.error(error);
@@ -356,8 +354,9 @@ exports.clickPrepare = async (req, res) => {
 };
 exports.clickComplete = async (req, res) => {
 	try {
+		console.log(req.body);
 		const order = await Orders.findOne({
-			click_trans_id: req.body.params.click_trans_id,
+			click_trans_id: req.body.click_trans_id,
 		});
 		if (!order) {
 			return res.json({
@@ -367,19 +366,15 @@ exports.clickComplete = async (req, res) => {
 			});
 		}
 		order.pay.status = "payed";
-		order.pay.click.action = req.body.params.action;
+		order.pay.click.action = req.body.action;
 		const id = +new Date();
 		await order.save();
 		return res.json({
 			error: 0,
 			error_note: "",
-			params: {
-				click_trans_id: order.pay.click.click_trans_id,
-				merchant_trans_id: new Types.ObjectId(
-					order.pay.click.merchant_trans_id,
-				),
-				merchant_confirm_id: id,
-			},
+			click_trans_id: order.pay.click.click_trans_id,
+			merchant_trans_id: order.pay.click.merchant_trans_id,
+			merchant_confirm_id: id,
 		});
 	} catch (error) {
 		return res.status(500).json({error: error});
