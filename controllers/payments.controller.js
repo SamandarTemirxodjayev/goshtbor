@@ -8,6 +8,10 @@ const {Types} = require("mongoose");
 
 let error_message = "";
 
+function logRequest(req) {
+	console.log("Received Request:", JSON.stringify(req.body, null, 2));
+}
+
 server.addMethod("CheckPerformTransaction", async (params) => {
 	let orderId;
 	try {
@@ -261,7 +265,7 @@ exports.paymeHandler = async (req, res) => {
 };
 exports.clickGetInfo = async (req, res) => {
 	try {
-		console.log(req.body);
+		logRequest(req);
 		if (!req.body.params.order_id) {
 			return res.json({
 				error: -8,
@@ -313,9 +317,8 @@ exports.clickGetInfo = async (req, res) => {
 };
 exports.clickPrepare = async (req, res) => {
 	try {
-		console.log(req);
+		logRequest(req);
 
-		// Ensure the required properties exist in req.body.params
 		const {params} = req.body;
 		if (
 			!params ||
@@ -331,9 +334,8 @@ exports.clickPrepare = async (req, res) => {
 			});
 		}
 
-		const id = +Date.now(); // Use Date.now() instead of +new Date()
+		const id = +Date.now();
 
-		// Find the order by merchant_trans_id
 		const order = await Orders.findById(params.merchant_trans_id);
 		if (!order) {
 			return res.json({
@@ -342,7 +344,6 @@ exports.clickPrepare = async (req, res) => {
 			});
 		}
 
-		// Update order payment details
 		order.pay.click = {
 			click_trans_id: params.click_trans_id,
 			service_id: params.service_id,
@@ -352,10 +353,8 @@ exports.clickPrepare = async (req, res) => {
 			merchant_prepare_id: id,
 		};
 
-		// Save the updated order
 		await order.save();
 
-		// Return success response
 		return res.json({
 			error: 0,
 			error_note: "",
@@ -366,7 +365,7 @@ exports.clickPrepare = async (req, res) => {
 			},
 		});
 	} catch (error) {
-		console.error(error); // Log the error for debugging purposes
+		console.error(error);
 		return res
 			.status(500)
 			.json({error: -9, error_note: "Internal server error"});
@@ -374,7 +373,7 @@ exports.clickPrepare = async (req, res) => {
 };
 exports.clickComplete = async (req, res) => {
 	try {
-		console.log(req.body);
+		logRequest(req);
 		const order = await Orders.findOne({
 			click_trans_id: req.body.params.click_trans_id,
 		});
