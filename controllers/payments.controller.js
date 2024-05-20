@@ -312,12 +312,7 @@ exports.clickGetInfo = async (req, res) => {
 };
 exports.clickPrepare = async (req, res) => {
 	try {
-		if (req.body.error != 0) {
-			return res.json({
-				error: -8,
-				error_note: "Ошибка в запросе от CLICK ",
-			});
-		}
+		console.log(req.body);
 		const id = +new Date();
 		const order = await Orders.findById(req.body.params.merchant_trans_id);
 		if (!order) {
@@ -349,6 +344,7 @@ exports.clickPrepare = async (req, res) => {
 };
 exports.clickComplete = async (req, res) => {
 	try {
+		console.log(req.body);
 		const order = await Orders.findOne({
 			click_trans_id: req.body.params.click_trans_id,
 		});
