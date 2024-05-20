@@ -320,19 +320,6 @@ exports.clickPrepare = async (req, res) => {
 		logRequest(req);
 
 		const {params} = req.body;
-		if (
-			!params ||
-			!params.merchant_trans_id ||
-			!params.click_trans_id ||
-			!params.service_id ||
-			!params.click_paydoc_id ||
-			!params.amount
-		) {
-			return res.status(400).json({
-				error: -8,
-				error_note: "Invalid request parameters",
-			});
-		}
 
 		const id = +Date.now();
 
