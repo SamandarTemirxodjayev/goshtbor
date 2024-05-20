@@ -90,7 +90,7 @@ const orderSchema = new Schema(
 					default: null,
 				},
 				merchant_trans_id: {
-					type: String,
+					type: Types.ObjectId,
 					default: null,
 				},
 				merchant_prepare_id: {

@@ -360,7 +360,6 @@ exports.clickPrepare = async (req, res) => {
 };
 exports.clickComplete = async (req, res) => {
 	try {
-		logRequest(req);
 		const order = await Orders.findOne({
 			click_trans_id: req.body.params.click_trans_id,
 		});
@@ -371,7 +370,6 @@ exports.clickComplete = async (req, res) => {
 					"Не найден пользователь/заказ исходя из присланных данных платежа",
 			});
 		}
-		console.log(req.body);
 		order.pay.status = "payed";
 		order.pay.click.action = req.body.params.action;
 		const id = +new Date();
@@ -381,7 +379,9 @@ exports.clickComplete = async (req, res) => {
 			error_note: "",
 			params: {
 				click_trans_id: order.pay.click.click_trans_id,
-				merchant_trans_id: order.pay.click.merchant_trans_id,
+				merchant_trans_id: new Types.ObjectId(
+					order.pay.click.merchant_trans_id,
+				),
 				merchant_confirm_id: id,
 			},
 		});
@@ -414,9 +414,15 @@ exports.uzumCheck = async (req, res) => {
 			timestamp: +new Date(),
 			status: "OK",
 			data: {
-				amount: totalAmount * 100,
-				phone_number: order.phone.number,
-				user_id: order.userId,
+				amount: {
+					value: totalAmount * 100,
+				},
+				phone_number: {
+					value: order.phone.number,
+				},
+				user_id: {
+					value: order.userId,
+				},
 			},
 		});
 	} catch (error) {
@@ -461,9 +467,15 @@ exports.uzumCreate = async (req, res) => {
 			status: "CREATED",
 			transTime: +new Date(),
 			data: {
-				amount: totalAmount * 100,
-				phone_number: order.phone.number,
-				user_id: order.userId,
+				amount: {
+					value: totalAmount * 100,
+				},
+				phone_number: {
+					value: order.phone.number,
+				},
+				user_id: {
+					value: order.userId,
+				},
 			},
 			amount: totalAmount * 100,
 		});
