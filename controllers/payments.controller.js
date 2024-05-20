@@ -506,7 +506,7 @@ exports.uzumConfirm = async (req, res) => {
 };
 exports.uzumReverse = async (req, res) => {
 	try {
-		const order = await Orders.find({
+		const order = await Orders.findOne({
 			"pay.uzum.transId": req.body.transId,
 		});
 		if (!order) {
@@ -544,7 +544,7 @@ exports.uzumReverse = async (req, res) => {
 };
 exports.uzumStatus = async (req, res) => {
 	try {
-		const order = await Orders.find({
+		const order = await Orders.findOne({
 			"pay.uzum.transId": req.body.transId,
 		});
 		if (!order) {
