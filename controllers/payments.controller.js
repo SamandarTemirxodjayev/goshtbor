@@ -317,13 +317,9 @@ exports.clickGetInfo = async (req, res) => {
 };
 exports.clickPrepare = async (req, res) => {
 	try {
-		const {params} = req.body;
-
 		const id = +Date.now();
-		console.log(req.body);
-		console.log(params);
 
-		const order = await Orders.findById(params.merchant_trans_id);
+		const order = await Orders.findById(req.body.merchant_trans_id);
 		if (!order) {
 			return res.json({
 				error: -5,
@@ -332,11 +328,11 @@ exports.clickPrepare = async (req, res) => {
 		}
 
 		order.pay.click = {
-			click_trans_id: params.click_trans_id,
-			service_id: params.service_id,
-			click_paydoc_id: params.click_paydoc_id,
-			merchant_trans_id: new Types.ObjectId(params.merchant_trans_id),
-			amount: params.amount,
+			click_trans_id: req.body.click_trans_id,
+			service_id: req.body.service_id,
+			click_paydoc_id: req.body.click_paydoc_id,
+			merchant_trans_id: new Types.ObjectId(req.body.merchant_trans_id),
+			amount: req.body.amount,
 			merchant_prepare_id: id,
 		};
 
@@ -346,8 +342,8 @@ exports.clickPrepare = async (req, res) => {
 			error: 0,
 			error_note: "",
 			params: {
-				click_trans_id: params.click_trans_id,
-				merchant_trans_id: params.merchant_trans_id,
+				click_trans_id: req.body.click_trans_id,
+				merchant_trans_id: req.body.merchant_trans_id,
 				merchant_prepare_id: id,
 			},
 		});
