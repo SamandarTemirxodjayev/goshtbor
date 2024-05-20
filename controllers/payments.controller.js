@@ -313,7 +313,7 @@ exports.clickGetInfo = async (req, res) => {
 };
 exports.clickPrepare = async (req, res) => {
 	try {
-		console.log(req.body.params);
+		console.log(req);
 
 		// Ensure the required properties exist in req.body.params
 		const {params} = req.body;
