@@ -27,6 +27,11 @@ server.addMethod("CheckPerformTransaction", async (params) => {
 		throw new RpcError(-31061, "Order not found");
 	}
 
+	if (order.pay.status == "payed" || order.pay.status == "cancelled") {
+		error_message = "Buyurtma Topilmadi";
+		throw new RpcError(-31061, "Order not found");
+	}
+
 	let totalAmount = 0;
 	let receiptItems = [];
 
@@ -109,6 +114,10 @@ server.addMethod("PerformTransaction", async (params) => {
 	if (!order) {
 		error_message = "Buyurtma Topilmadi";
 		throw new RpcError(-32504, "Order not found");
+	}
+	if (order.pay.status == "payed" || order.pay.status == "cancelled") {
+		error_message = "Buyurtma Topilmadi";
+		throw new RpcError(-31061, "Order not found");
 	}
 	if (order.pay.payme.perform_time == 0) {
 		order.pay.payme.state = 2;
@@ -265,7 +274,6 @@ exports.paymeHandler = async (req, res) => {
 };
 exports.clickGetInfo = async (req, res) => {
 	try {
-		logRequest(req);
 		if (!req.body.params.order_id) {
 			return res.json({
 				error: -8,
@@ -321,6 +329,12 @@ exports.clickPrepare = async (req, res) => {
 
 		const order = await Orders.findById(req.body.merchant_trans_id);
 		if (!order) {
+			return res.json({
+				error: -5,
+				error_note: "Order not found based on the provided payment data",
+			});
+		}
+		if (order.pay.status == "payed" || order.pay.status == "cancelled") {
 			return res.json({
 				error: -5,
 				error_note: "Order not found based on the provided payment data",
@@ -431,6 +445,14 @@ exports.uzumCreate = async (req, res) => {
 				errorCode: "10003",
 			});
 		}
+		if (order.pay.status == "payed" || order.pay.status == "cancelled") {
+			return res.status(400).json({
+				serviceId: req.body.serviceId,
+				timestamp: +new Date(),
+				status: "FAILED",
+				errorCode: "10003",
+			});
+		}
 		order.pay.uzum.serviceId = req.body.serviceId;
 		order.pay.uzum.transId = req.body.transId;
 		await order.save();
@@ -479,6 +501,22 @@ exports.uzumConfirm = async (req, res) => {
 		const order = await Orders.findOne({
 			"pay.uzum.transId": req.body.transId,
 		});
+		if (!order) {
+			return res.status(400).json({
+				serviceId: req.body.serviceId,
+				timestamp: +new Date(),
+				status: "FAILED",
+				errorCode: "10003",
+			});
+		}
+		if (order.pay.status == "payed" || order.pay.status == "cancelled") {
+			return res.status(400).json({
+				serviceId: req.body.serviceId,
+				timestamp: +new Date(),
+				status: "FAILED",
+				errorCode: "10003",
+			});
+		}
 		order.pay.status = "payed";
 		order.pay.uzum.serviceId = req.body.serviceId;
 		order.pay.uzum.transId = req.body.transId;
