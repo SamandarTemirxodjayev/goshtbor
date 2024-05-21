@@ -8,10 +8,6 @@ const {Types} = require("mongoose");
 
 let error_message = "";
 
-function logRequest(req) {
-	console.log("Received Request:", JSON.stringify(req.body, null, 2));
-}
-
 server.addMethod("CheckPerformTransaction", async (params) => {
 	let orderId;
 	try {
@@ -260,7 +256,7 @@ exports.paymeHandler = async (req, res) => {
 			if (jsonRPCResponse) {
 				if (jsonRPCResponse.error) {
 					jsonRPCResponse.error.code = jsonRPCResponse.error.message;
-					jsonRPCResponse.error.message = error;
+					jsonRPCResponse.error.message = error_message;
 					return res.json(jsonRPCResponse);
 				}
 				res.json(jsonRPCResponse);
