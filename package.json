@@ -4,8 +4,10 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"dev": "nodemon index.js",
-		"prod": "node index.js"
+		"dev:app": "nodemon index.js",
+		"dev:cdn": "nodemon ./cdn/index.js",
+		"prod:app": "node index.js",
+		"prod:cdn": "node ./cdn/index.js"
 	},
 	"keywords": [],
 	"author": "",
