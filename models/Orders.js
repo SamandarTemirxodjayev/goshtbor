@@ -159,6 +159,9 @@ const orderSchema = new Schema({
 			type: String,
 			default: "created",
 		},
+		order_url: {
+			type: String,
+		},
 	},
 	comment: {
 		type: String,
