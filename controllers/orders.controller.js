@@ -12,10 +12,12 @@ exports.getAllOrders = async (req, res) => {
 	try {
 		const orders = await Orders.find({
 			userId: req.userId._id,
-		}).populate({
-			path: "products.product",
-			populate: [{path: "brand"}, {path: "category"}, {path: "subcategory"}],
-		});
+		})
+			.populate({
+				path: "products.product",
+				populate: [{path: "brand"}, {path: "category"}, {path: "subcategory"}],
+			})
+			.populate("delivery.courier");
 		return res.json({
 			status: "success",
 			data: orders,
@@ -113,6 +115,7 @@ exports.createOrder = async (req, res) => {
 			data: newOrder,
 		});
 	} catch (error) {
+		console.log(error);
 		return res.status(500).json({error: error});
 	}
 };

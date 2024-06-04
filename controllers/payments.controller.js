@@ -121,6 +121,7 @@ server.addMethod("PerformTransaction", async (params) => {
 		order.status = 1;
 		order.pay.status = "payed";
 		order.pay.pay_date = new Date().toISOString();
+		order.pay.type = "payme";
 
 		await order.save();
 	}
@@ -377,6 +378,7 @@ exports.clickComplete = async (req, res) => {
 		order.pay.status = "payed";
 		order.pay.click.action = req.body.action;
 		order.pay.click.merchant_confirm_id = req.body.merchant_confirm_id;
+		order.pay.type = "click";
 		const id = +new Date();
 		await order.save();
 		return res.json({
@@ -519,6 +521,7 @@ exports.uzumConfirm = async (req, res) => {
 		order.pay.uzum.confirmTime = req.body.timestamp;
 		order.pay.uzum.status = "CONFIRMED";
 		order.pay.uzum.paymentSource = req.body.paymentSource;
+		order.pay.type = "uzum";
 		await order.save();
 		let totalAmount = 0;
 		for (const product of order.products) {

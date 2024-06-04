@@ -1,4 +1,4 @@
-const {Schema, model} = require("mongoose");
+const {Schema, model, Types} = require("mongoose");
 
 const userSchema = new Schema({
 	name: {
@@ -52,6 +52,10 @@ const userSchema = new Schema({
 	user_level: {
 		type: Number,
 		default: 0,
+	},
+	stars: {
+		type: Types.Decimal128,
+		default: 5,
 	},
 });
 

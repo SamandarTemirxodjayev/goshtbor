@@ -1,4 +1,5 @@
 const Notification = require("../models/Notification");
+const Users = require("../models/Users.js");
 const oneSignalClient = require("../utils/oneSignalclient.js");
 
 exports.createNotification = async (req, res) => {
@@ -14,20 +15,31 @@ exports.createNotification = async (req, res) => {
 		});
 		await notifications.save();
 
-		const notificationPayload = {
-			contents: {
-				en: req.body.content_uz,
-			},
-			headings: {
-				en: req.body.title_uz,
-			},
-			included_segments: ["Subscribed Users"],
-		};
+		const users = await Users.find().select("oneSignalId");
+		const oneSignalIds = users
+			.map((user) => user.oneSignalId)
+			.filter((id) => id);
 
-		oneSignalClient
-			.createNotification(notificationPayload)
-			.then((response) => console.log(response))
-			.catch((e) => console.error(e));
+		if (oneSignalIds.length > 0) {
+			const notificationPayload = {
+				contents: {
+					en: req.body.content_en,
+					uz: req.body.content_uz,
+					ru: req.body.content_ru,
+				},
+				headings: {
+					en: req.body.title_en,
+					uz: req.body.title_uz,
+					ru: req.body.title_ru,
+				},
+				include_player_ids: oneSignalIds,
+			};
+
+			oneSignalClient
+				.createNotification(notificationPayload)
+				.then((response) => console.log(response))
+				.catch((e) => console.error(e));
+		}
 
 		return res.json({
 			status: 200,

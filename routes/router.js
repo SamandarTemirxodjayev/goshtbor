@@ -13,6 +13,7 @@ const routerBlogs = require("./blogs.routes.js");
 const routerInfos = require("./infos.routes.js");
 const routerPayments = require("./payments.routes.js");
 const routerSubCategory = require("./subcategory.routes.js");
+const routerCourier = require("./courier.routes.js");
 const router = Router();
 
 router.use("/register", routerRegister);
@@ -29,5 +30,6 @@ router.use("/blogs", routerBlogs);
 router.use("/infos", routerInfos);
 router.use("/payments", routerPayments);
 router.use("/subcategory", routerSubCategory);
+router.use("/courier", routerCourier);
 
 module.exports = router;
