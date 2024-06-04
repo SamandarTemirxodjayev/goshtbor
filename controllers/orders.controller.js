@@ -128,7 +128,9 @@ exports.createOrder = async (req, res) => {
 				const subtotal = price * product.quantity;
 				totalAmount += subtotal;
 			}
-			const stringToEncode = `m=663b1ac0fe41a3907df8f595;ac.order_id=${newOrder._id};a=${totalAmount}`;
+			const stringToEncode = `m=663b1ac0fe41a3907df8f595;ac.order_id=${
+				newOrder._id
+			};a=${totalAmount * 100}`;
 
 			const base64EncodedString =
 				Buffer.from(stringToEncode).toString("base64");
@@ -150,6 +152,7 @@ exports.createOrder = async (req, res) => {
 			}
 			newOrder.pay.order_url = `https://my.click.uz/services/pay?service_id=33923&merchant_id=25959&amount=${totalAmount}&transaction_param=${newOrder._id}`;
 		}
+		await newOrder.save();
 		return res.json({
 			status: "success",
 			data: newOrder,
