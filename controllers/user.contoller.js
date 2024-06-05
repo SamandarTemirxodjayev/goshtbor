@@ -25,8 +25,8 @@ exports.getUser = async (req, res) => {
 					Object.keys(user.google).length > 0 && {...user.google}),
 			};
 			delete data.google;
-		} else if (req.userId.apple_id && req.userId.apple_id.email) {
-			user = await Users.findOne({"apple_id.email": req.userId.apple_id.email});
+		} else if (req.userId.apple_id && req.userId.apple_id.id) {
+			user = await Users.findOne({"apple_id.id": req.userId.apple_id.id});
 			data = {
 				...user._doc,
 				...(user.apple_id &&
