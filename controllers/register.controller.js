@@ -157,8 +157,7 @@ exports.postRegister = async (req, res) => {
 			});
 		} else if (type == "apple_id") {
 			const user = await Users.findOne({
-				"apple_id.id": data.token,
-				"apple_id.email": data.email,
+				"apple_id.id": data.id,
 			});
 
 			if (user) {

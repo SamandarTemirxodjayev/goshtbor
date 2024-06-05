@@ -150,7 +150,6 @@ exports.login = async (req, res) => {
 		} else if (type == "apple_id") {
 			const user = await Users.findOne({
 				"apple_id.id": data.id,
-				"apple_id.email": data.email,
 			});
 
 			if (!user) {
