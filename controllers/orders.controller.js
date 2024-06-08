@@ -153,6 +153,7 @@ exports.createOrder = async (req, res) => {
 			newOrder.pay.order_url = `https://my.click.uz/services/pay?service_id=33923&merchant_id=25959&amount=${totalAmount}&transaction_param=${newOrder._id}`;
 		}
 		await newOrder.save();
+
 		return res.json({
 			status: "success",
 			data: newOrder,

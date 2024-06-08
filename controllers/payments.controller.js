@@ -5,6 +5,7 @@ const Products = require("../models/Products");
 const server = new JSONRPCServer();
 const fs = require("fs");
 const {Types} = require("mongoose");
+const {wsSendMessage} = require("../ws/server");
 
 let error_message = "";
 
@@ -106,7 +107,7 @@ server.addMethod("CancelTransaction", async (params) => {
 server.addMethod("PerformTransaction", async (params) => {
 	const order = await Orders.findOne({
 		"pay.payme.id": params.id,
-	});
+	}).populate("userId");
 	if (!order) {
 		error_message = "Buyurtma Topilmadi";
 		throw new RpcError(-32504, "Order not found");
@@ -122,6 +123,7 @@ server.addMethod("PerformTransaction", async (params) => {
 		order.pay.status = "payed";
 		order.pay.pay_date = new Date().toISOString();
 		order.pay.type = "payme";
+		wsSendMessage(order);
 
 		await order.save();
 	}
@@ -381,6 +383,7 @@ exports.clickComplete = async (req, res) => {
 		order.pay.type = "click";
 		const id = +new Date();
 		await order.save();
+		wsSendMessage(order);
 		return res.json({
 			error: 0,
 			error_note: "Успешно",
@@ -523,6 +526,7 @@ exports.uzumConfirm = async (req, res) => {
 		order.pay.uzum.paymentSource = req.body.paymentSource;
 		order.pay.type = "uzum";
 		await order.save();
+		wsSendMessage(order);
 		let totalAmount = 0;
 		for (const product of order.products) {
 			const productDoc = await Products.findById(product.product);
