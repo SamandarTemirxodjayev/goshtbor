@@ -107,7 +107,12 @@ server.addMethod("CancelTransaction", async (params) => {
 server.addMethod("PerformTransaction", async (params) => {
 	const order = await Orders.findOne({
 		"pay.payme.id": params.id,
-	}).populate("userId");
+	})
+		.populate("userId")
+		.populate({
+			path: "products.product",
+			populate: [{path: "brand"}, {path: "category"}, {path: "subcategory"}],
+		});
 	if (!order) {
 		error_message = "Buyurtma Topilmadi";
 		throw new RpcError(-32504, "Order not found");
@@ -369,7 +374,12 @@ exports.clickComplete = async (req, res) => {
 	try {
 		const order = await Orders.findOne({
 			"pay.click.click_trans_id": req.body.click_trans_id,
-		});
+		})
+			.populate("userId")
+			.populate({
+				path: "products.product",
+				populate: [{path: "brand"}, {path: "category"}, {path: "subcategory"}],
+			});
 		if (!order) {
 			return res.json({
 				error: -5,
@@ -501,7 +511,12 @@ exports.uzumConfirm = async (req, res) => {
 	try {
 		const order = await Orders.findOne({
 			"pay.uzum.transId": req.body.transId,
-		});
+		})
+			.populate("userId")
+			.populate({
+				path: "products.product",
+				populate: [{path: "brand"}, {path: "category"}, {path: "subcategory"}],
+			});
 		if (!order) {
 			return res.status(400).json({
 				serviceId: req.body.serviceId,

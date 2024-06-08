@@ -31,14 +31,14 @@ exports.loginCollector = async (req, res) => {
 		console.log(collector);
 		if (!collector) {
 			return res.status(400).json({
-				message: "Collector not found",
+				message: "Login Xato",
 				status: "error",
 				data: [],
 			});
 		}
 		if (collector.password != req.body.password) {
 			return res.status(400).json({
-				message: "Collector's password is incorrect",
+				message: "Parol Xato",
 				status: "error",
 				data: [],
 			});
