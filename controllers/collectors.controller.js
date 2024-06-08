@@ -1,4 +1,5 @@
 const Collectors = require("../models/Collectors");
+const Orders = require("../models/Orders");
 const {createToken} = require("../utils/token");
 
 exports.createCollector = async (req, res) => {
@@ -53,6 +54,34 @@ exports.loginCollector = async (req, res) => {
 				createdAt: new Date(),
 				expiredAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
 			},
+		});
+	} catch (error) {
+		return res.status(500).json({
+			message: error.message,
+			status: "error",
+			data: error,
+		});
+	}
+};
+exports.getAvailableOrders = async (req, res) => {
+	try {
+		const orders = await Orders.find({
+			status: 1,
+			"pay.status": "payed",
+			"delivery.courier": null,
+		})
+			.populate({
+				path: "products.product",
+				populate: [{path: "brand"}, {path: "category"}, {path: "subcategory"}],
+			})
+			.populate("userId")
+			.sort({
+				_id: -1,
+			});
+		return res.json({
+			message: "success",
+			status: "success",
+			data: orders,
 		});
 	} catch (error) {
 		return res.status(500).json({

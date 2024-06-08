@@ -181,6 +181,7 @@ server.addMethod("CreateTransaction", async (params) => {
 	order.pay.payme.create_time = params.time;
 	order.pay.payme.id = params.id;
 	order.pay.payme.amount = params.amount;
+	order.pay.payme.total_amount = totalAmount;
 
 	await order.save();
 
@@ -351,6 +352,7 @@ exports.clickPrepare = async (req, res) => {
 			click_paydoc_id: req.body.click_paydoc_id,
 			merchant_trans_id: new Types.ObjectId(req.body.merchant_trans_id),
 			amount: req.body.amount,
+			total_amount: req.body.amount,
 			merchant_prepare_id: id,
 		};
 
@@ -466,7 +468,6 @@ exports.uzumCreate = async (req, res) => {
 		}
 		order.pay.uzum.serviceId = req.body.serviceId;
 		order.pay.uzum.transId = req.body.transId;
-		await order.save();
 		let totalAmount = 0;
 		for (const product of order.products) {
 			const productDoc = await Products.findById(product.product);
@@ -476,6 +477,8 @@ exports.uzumCreate = async (req, res) => {
 			const subtotal = price * product.quantity;
 			totalAmount += subtotal;
 		}
+		order.pay.uzum.total_amount = totalAmount;
+		await order.save();
 		if (totalAmount * 100 != req.body.amount) {
 			return res.status(400).json({
 				serviceId: req.body.serviceId,

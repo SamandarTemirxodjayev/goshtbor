@@ -36,6 +36,10 @@ const orderSchema = new Schema({
 				type: Number,
 				default: null,
 			},
+			amount: {
+				type: Number,
+				default: null,
+			},
 			total_amount: {
 				type: Number,
 				default: null,
@@ -51,6 +55,10 @@ const orderSchema = new Schema({
 				default: null,
 			},
 			amount: {
+				type: Number,
+				default: null,
+			},
+			total_amount: {
 				type: Number,
 				default: null,
 			},
@@ -104,6 +112,10 @@ const orderSchema = new Schema({
 				type: Number,
 				default: null,
 			},
+			total_amount: {
+				type: Number,
+				default: null,
+			},
 			action: {
 				type: Number,
 				default: 0,
@@ -119,6 +131,10 @@ const orderSchema = new Schema({
 				default: null,
 			},
 			amount: {
+				type: Number,
+				default: null,
+			},
+			total_amount: {
 				type: Number,
 				default: null,
 			},

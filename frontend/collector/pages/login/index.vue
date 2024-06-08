@@ -70,7 +70,6 @@ const handleLoginCollector = async () => {
     toast.add({ title: "Muvaffaqiyatli Kirildi" });
     navigateTo("/");
   } catch (error) {
-    console.log();
     toast.add({ title: error.data.message });
     pageData.buttonLoading = false;
   }
