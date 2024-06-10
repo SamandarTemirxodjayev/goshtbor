@@ -62,13 +62,15 @@ exports.loginCourier = async (req, res) => {
 exports.getAvailableOrders = async (req, res) => {
 	try {
 		const orders = await Orders.find({
-			status: 1,
+			status: 2,
 			"pay.status": "payed",
 			"delivery.courier": null,
-		}).populate({
-			path: "products.product",
-			populate: [{path: "brand"}, {path: "category"}, {path: "subcategory"}],
-		});
+		})
+			.populate({
+				path: "products.product",
+				populate: [{path: "brand"}, {path: "category"}, {path: "subcategory"}],
+			})
+			.populate("collector.collector_id");
 		return res.json({
 			message: "success",
 			status: "success",
@@ -98,14 +100,8 @@ exports.confirmGettingOrder = async (req, res) => {
 				status: "error",
 			});
 		}
-		if (order.delivery.courier != null || order.status == 2) {
-			return res.status(400).json({
-				message: "not possible",
-				status: "error",
-			});
-		}
 		order.delivery.courier = req.courierId._id;
-		order.status = 2;
+		order.status = 3;
 		await order.save();
 		return res.json({
 			message: "confirmed",
@@ -184,7 +180,7 @@ exports.confirmOrderDeliveryEnd = async (req, res) => {
 				status: "error",
 			});
 		}
-		order.status = 3;
+		order.status = 4;
 		order.delivery.stars = req.body.stars ? req.body.stars : 5;
 		order.delivery.date.end = Date.now();
 		await order.save();

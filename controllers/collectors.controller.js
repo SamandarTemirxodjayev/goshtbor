@@ -29,7 +29,6 @@ exports.loginCollector = async (req, res) => {
 		const collector = await Collectors.findOne({
 			login: req.body.login,
 		});
-		console.log(collector);
 		if (!collector) {
 			return res.status(400).json({
 				message: "Login Xato",
@@ -82,6 +81,26 @@ exports.getAvailableOrders = async (req, res) => {
 			message: "success",
 			status: "success",
 			data: orders,
+		});
+	} catch (error) {
+		return res.status(500).json({
+			message: error.message,
+			status: "error",
+			data: error,
+		});
+	}
+};
+exports.submitOrderById = async (req, res) => {
+	try {
+		const order = await Orders.findById(req.params.id);
+		order.status = 2;
+		order.collector.finish_time = new Date();
+		order.collector.collector_id = req.collectorId._id;
+		order.save();
+		return res.json({
+			message: "success",
+			status: "success",
+			data: order,
 		});
 	} catch (error) {
 		return res.status(500).json({

@@ -8,5 +8,6 @@ const router = Router();
 router.post("/register", adminMiddleware, controller.createCollector);
 router.post("/login", controller.loginCollector);
 router.get("/orders", userMiddleware, controller.getAvailableOrders);
+router.post("/orders/:id", userMiddleware, controller.submitOrderById);
 
 module.exports = router;

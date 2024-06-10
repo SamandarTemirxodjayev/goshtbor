@@ -1,4 +1,6 @@
 const {Schema, model, Types} = require("mongoose");
+const mongoose = require("mongoose");
+const AutoIncrement = require("mongoose-sequence")(mongoose);
 
 const orderSchema = new Schema({
 	userId: {
@@ -193,6 +195,17 @@ const orderSchema = new Schema({
 			default: Date.now,
 		},
 	},
+	collector: {
+		finish_time: {
+			type: Date,
+			default: null,
+		},
+		collector_id: {
+			type: Types.ObjectId,
+			default: null,
+			ref: "collector",
+		},
+	},
 	delivery: {
 		address: {
 			longitude: {
@@ -233,6 +246,7 @@ const orderSchema = new Schema({
 	},
 });
 orderSchema.set("timestamps", true);
+orderSchema.plugin(AutoIncrement, {inc_field: "id", start_seq: 1000});
 const Orders = model("orders", orderSchema);
 
 module.exports = Orders;

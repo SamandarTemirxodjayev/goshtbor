@@ -25,7 +25,7 @@ async function UserMiddleware(req, res, next) {
 				.status(401)
 				.json({error: "Not Authorized!", message: "Invalid access token"});
 		}
-		req.userId = user;
+		req.collectorId = user;
 		return next();
 	} catch (error) {
 		if (error instanceof jwt.JsonWebTokenError) {
