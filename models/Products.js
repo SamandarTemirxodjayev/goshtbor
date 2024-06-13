@@ -1,4 +1,6 @@
 const {Schema, model, Types} = require("mongoose");
+const mongoose = require("mongoose");
+const AutoIncrement = require("mongoose-sequence")(mongoose);
 
 const productSchema = new Schema({
 	name_uz: {
@@ -97,6 +99,7 @@ const productSchema = new Schema({
 });
 
 productSchema.set("timestamps", true);
+productSchema.plugin(AutoIncrement, {inc_field: "product_id", start_seq: 1});
 
 productSchema.statics.searchByName = async function (name) {
 	return this.model("products")

@@ -59,6 +59,19 @@ exports.loginCourier = async (req, res) => {
 		});
 	}
 };
+exports.getMe = async (req, res) => {
+	try {
+		return res.json({
+			status: "success",
+			message: "success",
+			data: req.courierId,
+		});
+	} catch (error) {
+		return res.status(500).json({
+			error: error.message,
+		});
+	}
+};
 exports.getAvailableOrders = async (req, res) => {
 	try {
 		const orders = await Orders.find({

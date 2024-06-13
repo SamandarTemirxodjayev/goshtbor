@@ -246,7 +246,7 @@ const orderSchema = new Schema({
 	},
 });
 orderSchema.set("timestamps", true);
-orderSchema.plugin(AutoIncrement, {inc_field: "id", start_seq: 1000});
+orderSchema.plugin(AutoIncrement, {inc_field: "order_id", start_seq: 1000});
 const Orders = model("orders", orderSchema);
 
 module.exports = Orders;

@@ -17,7 +17,7 @@
   border-radius: 50%;
   width: 48px;
   height: 48px;
-  color: #fff;
+  color: #555;
 }
 .loader:before,
 .loader:after {

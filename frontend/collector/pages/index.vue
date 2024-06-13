@@ -260,8 +260,6 @@ onMounted(async () => {
     ws.onclose = () => {
       console.log("WebSocket connection closed");
     };
-
-    pageData.loading = false;
   } catch (error) {
     console.error("Error during onMounted:", error);
     toast.add({ title: error.message || "An error occurred" });
@@ -269,8 +267,8 @@ onMounted(async () => {
       localStorage.removeItem("token");
       navigateTo("/exit");
     }
-    pageData.loading = false;
   }
+  pageData.loading = false;
 });
 const formattedMessages = computed(() => {
   return messages.value.map((message) => {

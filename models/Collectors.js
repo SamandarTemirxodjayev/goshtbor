@@ -9,9 +9,6 @@ const collectorSchema = new Schema({
 		type: String,
 		required: true,
 	},
-	photo_url: {
-		type: String,
-	},
 	login: {
 		type: String,
 		required: true,
