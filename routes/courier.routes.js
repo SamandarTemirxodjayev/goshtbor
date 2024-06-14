@@ -27,6 +27,11 @@ router.post(
 );
 
 router.get("/orders-history", UserMiddleware, controller.getOrderHistory);
-router.get("/orders-history/:id", UserMiddleware, controller.getOrderHistoryById);
+router.get(
+	"/orders-history/:id",
+	UserMiddleware,
+	controller.getOrderHistoryById,
+);
+router.post("/edit", UserMiddleware, controller.editProfile);
 
 module.exports = router;

@@ -72,6 +72,21 @@ exports.getMe = async (req, res) => {
 		});
 	}
 };
+exports.editProfile = async (req, res) => {
+	try {
+		req.courierId.photo_url = req.body.photo_url;
+		await req.courierId.save();
+		return res.json({
+			status: "success",
+			message: "success",
+			data: req.courierId,
+		});
+	} catch (error) {
+		return res.status(500).json({
+			error: error.message,
+		});
+	}
+};
 exports.getAvailableOrders = async (req, res) => {
 	try {
 		const orders = await Orders.find({
