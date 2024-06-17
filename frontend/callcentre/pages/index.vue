@@ -119,7 +119,8 @@
             <h3
               class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
             >
-              Buyurtma ID: {{ pageData.order.id }}
+              Buyurtma ID: {{ pageData.order.id }} -
+              {{ statusFormat(pageData.order.status) }}
             </h3>
             <UButton
               color="gray"
@@ -131,7 +132,85 @@
           </div>
         </template>
 
-        {{ pageData.order }}
+        <div class="grid grid-cols-5">
+          <div>
+            <div class="text-2xl font-bold">Foydalanuvchi:</div>
+            <div class="font-semibold">Ism Familiyasi:</div>
+            <div>
+              {{ pageData.order.userId.name }}
+              {{ pageData.order.userId.surname }}
+            </div>
+            <div class="font-semibold">Telefon Raqami:</div>
+            <div>+{{ pageData.order.phone.number }}</div>
+            <div class="font-semibold">Ro'yxatdan O'tilgan Sana:</div>
+            <div>
+              {{ dateFormat(pageData.order.userId.createdAt) }}
+            </div>
+          </div>
+          <UDivider label="Goshtbor" orientation="vertical" />
+          <div>
+            <div class="text-2xl font-bold">To'lov Haqida:</div>
+            <div class="font-semibold">To'lov Turi:</div>
+            <div>
+              {{ pageData.order.pay.type }}
+            </div>
+            <div class="font-semibold">Tolov Summasi:</div>
+            <div>
+              {{
+                numberFormat(
+                  pageData.order.pay[pageData.order.pay.type].total_amount
+                )
+              }}
+              so'm
+            </div>
+          </div>
+          <UDivider label="Goshtbor" orientation="vertical" />
+
+          <div>
+            <div class="text-2xl font-bold">Buyurtma Haqida:</div>
+            <div class="font-semibold">Komentariya:</div>
+            <div>
+              {{ pageData.order.comment }}
+            </div>
+            <div class="font-semibold">Yaratilgan Sana:</div>
+            <div>
+              {{ dateFormat(pageData.order.createdAt) }}
+            </div>
+            <div class="font-semibold">Manzil:</div>
+            <div>
+              {{ pageData.order.delivery.address.name }}
+            </div>
+            <div class="font-semibold">Kuryer:</div>
+            <div v-if="pageData.order.delivery.courier">
+              <div>
+                {{ pageData.order.delivery.courier.name }}
+                {{ pageData.order.delivery.courier.surname }}
+              </div>
+              <div>
+                {{ pageData.order.delivery.courier.car.model }}
+                ( {{ pageData.order.delivery.courier.car.number }} )
+              </div>
+              <div>
+                {{ pageData.order.delivery.courier.phone_number }}
+              </div>
+            </div>
+            <div v-else>Kuryer Mavjud Emas</div>
+          </div>
+        </div>
+        <div class="text-2xl font-bold">Mahsulotlar</div>
+        <div v-for="item in pageData.order.products" :key="item._id">
+          {{ item.product.name_uz }} ({{ item.product.brand.name }}) -
+          {{ item.quantity }} ta -
+          {{
+            item.product.sale.isSale
+              ? numberFormat(item.product.sale.price)
+              : numberFormat(item.product.price)
+          }}
+          so'm
+        </div>
+        <div class="mt-5">
+          <UButton color="red" size="xl" block>Bekor Qilish</UButton>
+        </div>
       </UCard>
     </UModal>
   </div>

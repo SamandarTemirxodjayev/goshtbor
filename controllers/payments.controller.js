@@ -10,15 +10,9 @@ const {wsSendMessage} = require("../ws/server");
 let error_message = "";
 
 server.addMethod("CheckPerformTransaction", async (params) => {
-	let orderId;
-	try {
-		orderId = new Types.ObjectId(params.account.order_id);
-	} catch (error) {
-		error_message = "Buyurtma Topilmadi";
-		throw new RpcError(-31060, "Invalid order ID format");
-	}
-
-	let order = await Orders.findById(orderId);
+	let order = await Orders.findOne({
+		id: params.account.order_id,
+	});
 	if (!order) {
 		error_message = "Buyurtma Topilmadi";
 		throw new RpcError(-31061, "Order not found");
@@ -141,14 +135,9 @@ server.addMethod("PerformTransaction", async (params) => {
 });
 
 server.addMethod("CreateTransaction", async (params) => {
-	let orderId;
-	try {
-		orderId = new Types.ObjectId(params.account.order_id);
-	} catch (error) {
-		error_message = "Buyurtma Topilmadi";
-		throw new RpcError(-31060, "Invalid order ID format");
-	}
-	const order = await Orders.findById(orderId);
+	const order = await Orders.findOne({
+		id: params.account.order_id,
+	});
 	if (!order) {
 		error_message = "Buyurtma Topilmadi";
 		throw new RpcError(-31060, "Order not found");
@@ -285,7 +274,9 @@ exports.clickGetInfo = async (req, res) => {
 				error_note: "Ошибка в запросе от CLICK ",
 			});
 		}
-		const order = await Orders.findById(req.body.params.order_id);
+		const order = await Orders.findOne({
+			id: req.body.params.order_id,
+		});
 		if (!order) {
 			return res.json({
 				error: -5,
@@ -332,7 +323,9 @@ exports.clickPrepare = async (req, res) => {
 	try {
 		const id = +Date.now();
 
-		const order = await Orders.findById(req.body.merchant_trans_id);
+		const order = await Orders.findOne({
+			id: req.body.merchant_trans_id,
+		});
 		if (!order) {
 			return res.json({
 				error: -5,
@@ -409,7 +402,9 @@ exports.clickComplete = async (req, res) => {
 };
 exports.uzumCheck = async (req, res) => {
 	try {
-		const order = await Orders.findById(req.body.params.order_id);
+		const order = await Orders.findOne({
+			id: req.body.params.order_id,
+		});
 		if (!order) {
 			return res.status(400).json({
 				serviceId: req.body.serviceId,
@@ -449,7 +444,9 @@ exports.uzumCheck = async (req, res) => {
 };
 exports.uzumCreate = async (req, res) => {
 	try {
-		const order = await Orders.findById(req.body.params.order_id);
+		const order = await Orders.findOne({
+			id: req.body.params.order_id,
+		});
 		if (!order) {
 			return res.status(400).json({
 				serviceId: req.body.serviceId,

@@ -53,7 +53,7 @@ const handleSubmitChangeProfile = async () => {
     if (state.password != state.repeated_password) {
       return;
     }
-    await $fetch(`${BASE_URL}/collectors/edit`, {
+    await $fetch(`${BASE_URL}/helper/edit`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -74,7 +74,7 @@ const handleSubmitChangeProfile = async () => {
 };
 onMounted(async () => {
   try {
-    const resData = await $fetch(`${BASE_URL}/collectors/get-me`, {
+    const resData = await $fetch(`${BASE_URL}/helper/get-me`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

@@ -90,3 +90,41 @@ exports.getActiveOrders = async (req, res) => {
 		});
 	}
 };
+exports.getme = async (req, res) => {
+	try {
+		return res.json({
+			message: "success",
+			status: "success",
+			data: req.helperId,
+		});
+	} catch (error) {
+		return res.status(500).json({
+			message: error.message,
+			status: "error",
+			data: error,
+		});
+	}
+};
+exports.editProfile = async (req, res) => {
+	try {
+		req.helperId.name = req.body.name;
+		req.helperId.surname = req.body.surname;
+		req.helperId.login = req.body.login;
+		if (req.body.password) {
+			let hashedCode = await createHash(req.body.password.toString());
+			req.helperId.password = hashedCode;
+		}
+		await req.helperId.save();
+		return res.json({
+			message: "success",
+			status: "success",
+			data: req.helperId,
+		});
+	} catch (error) {
+		return res.status(500).json({
+			message: error.message,
+			status: "error",
+			data: error,
+		});
+	}
+};

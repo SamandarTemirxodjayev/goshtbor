@@ -22,7 +22,7 @@ const links = [
     to: "/profile",
   },
   {
-    label: "Mahsulotlar",
+    label: "Buyurtmalar",
     icon: "i-heroicons-squares-2x2",
     to: "/products",
   },

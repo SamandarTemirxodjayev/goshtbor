@@ -26,6 +26,10 @@ const courierSchema = new Schema({
 		type: Types.Decimal128,
 		default: 5.0,
 	},
+	phone_number: {
+		type: String,
+		required: true,
+	},
 	login: {
 		type: String,
 		required: true,
