@@ -11,7 +11,7 @@ let error_message = "";
 
 server.addMethod("CheckPerformTransaction", async (params) => {
 	let order = await Orders.findOne({
-		id: params.account.order_id,
+		order_id: params.account.order_id,
 	});
 	if (!order) {
 		error_message = "Buyurtma Topilmadi";
@@ -275,7 +275,7 @@ exports.clickGetInfo = async (req, res) => {
 			});
 		}
 		const order = await Orders.findOne({
-			id: req.body.params.order_id,
+			order_id: req.body.params.order_id,
 		});
 		if (!order) {
 			return res.json({
@@ -324,7 +324,7 @@ exports.clickPrepare = async (req, res) => {
 		const id = +Date.now();
 
 		const order = await Orders.findOne({
-			id: req.body.merchant_trans_id,
+			order_id: req.body.merchant_trans_id,
 		});
 		if (!order) {
 			return res.json({
@@ -403,7 +403,7 @@ exports.clickComplete = async (req, res) => {
 exports.uzumCheck = async (req, res) => {
 	try {
 		const order = await Orders.findOne({
-			id: req.body.params.order_id,
+			order_id: req.body.params.order_id,
 		});
 		if (!order) {
 			return res.status(400).json({
@@ -445,7 +445,7 @@ exports.uzumCheck = async (req, res) => {
 exports.uzumCreate = async (req, res) => {
 	try {
 		const order = await Orders.findOne({
-			id: req.body.params.order_id,
+			order_id: req.body.params.order_id,
 		});
 		if (!order) {
 			return res.status(400).json({
