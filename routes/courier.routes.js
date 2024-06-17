@@ -9,7 +9,7 @@ router.post("/register", AdminMiddleware, controller.createCourier);
 router.post("/login", controller.loginCourier);
 router.get("/get-me", UserMiddleware, controller.getMe);
 router.get("/available-orders", UserMiddleware, controller.getAvailableOrders);
-router.get("/available-orders", UserMiddleware, controller.getAvailableOrders);
+router.get("/received-orders", UserMiddleware, controller.getReceivedOrders);
 router.post(
 	"/confirm-order/:id",
 	UserMiddleware,

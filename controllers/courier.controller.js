@@ -110,11 +110,33 @@ exports.getAvailableOrders = async (req, res) => {
 		});
 	}
 };
+exports.getReceivedOrders = async (req, res) => {
+	try {
+		const orders = await Orders.find({
+			status: 3,
+			"delivery.courier": req.courierId._id,
+		})
+			.populate({
+				path: "products.product",
+				populate: [{path: "brand"}, {path: "category"}, {path: "subcategory"}],
+			})
+			.populate("collector.collector_id");
+		return res.json({
+			message: "success",
+			status: "success",
+			data: orders,
+		});
+	} catch (error) {
+		return res.status(500).json({
+			error: error.message,
+		});
+	}
+};
 exports.confirmGettingOrder = async (req, res) => {
 	try {
 		if (!Types.ObjectId.isValid(req.params.id)) {
 			return res.status(400).json({
-				message: "not found order",
+				message: "not valid Id",
 				status: "error",
 			});
 		}
