@@ -39,7 +39,7 @@ exports.upload = async (req, res) => {
 
 			const fileUrl = `https://cdn.goshtbor.uz/${fileName}`;
 
-			const files = await new Files({
+			const files = await Files.create({
 				fileName,
 				fileId,
 				fileUrl,
