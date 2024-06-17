@@ -136,7 +136,7 @@ server.addMethod("PerformTransaction", async (params) => {
 
 server.addMethod("CreateTransaction", async (params) => {
 	const order = await Orders.findOne({
-		id: params.account.order_id,
+		order_id: params.account.order_id,
 	});
 	if (!order) {
 		error_message = "Buyurtma Topilmadi";
