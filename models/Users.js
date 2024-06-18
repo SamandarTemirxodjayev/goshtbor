@@ -11,12 +11,19 @@ const userSchema = new Schema({
 	},
 	photo_url: {
 		type: String,
+		default: null,
+	},
+	birth_date: {
+		type: Date,
+		default: null,
 	},
 	email: {
 		type: String,
+		default: null,
 	},
 	phone: {
 		type: String,
+		default: null,
 	},
 	google: {
 		token: String,
@@ -41,9 +48,11 @@ const userSchema = new Schema({
 	},
 	oneSignalId: {
 		type: String,
+		default: null,
 	},
 	deviceId: {
 		type: String,
+		default: null,
 	},
 	isBan: {
 		type: Boolean,

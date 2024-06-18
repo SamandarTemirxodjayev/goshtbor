@@ -13,7 +13,7 @@
             <UDivider><span>ID: </span></UDivider>
             <UDivider
               ><span
-                ><b>{{ item.content.id }}</b></span
+                ><b>{{ item.content.order_id }}</b></span
               ></UDivider
             >
           </div>

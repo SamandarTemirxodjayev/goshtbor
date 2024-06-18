@@ -116,6 +116,9 @@ exports.postUserEdit = async (req, res) => {
 		if (req.body.deviceId) {
 			req.userId.deviceId = req.body.deviceId;
 		}
+		if (req.body.birth_date) {
+			req.userId.birth_date = req.body.birth_date;
+		}
 		if (req.body.photo_url) {
 			req.userId.photo_url = req.body.photo_url;
 		}

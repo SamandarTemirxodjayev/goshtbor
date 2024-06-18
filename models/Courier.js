@@ -28,7 +28,6 @@ const courierSchema = new Schema({
 	},
 	phone_number: {
 		type: String,
-		required: true,
 	},
 	login: {
 		type: String,

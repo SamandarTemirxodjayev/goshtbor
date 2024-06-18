@@ -248,14 +248,31 @@ exports.confirmOrderDeliveryEnd = async (req, res) => {
 };
 exports.getOrderHistory = async (req, res) => {
 	try {
+		const {page = 1, limit = 10} = req.query;
+
 		const orders = await Orders.find({
 			status: 3,
 			"delivery.courier": req.courierId._id,
+		})
+			.limit(limit * 1)
+			.skip((page - 1) * limit)
+			.exec();
+
+		const count = await Orders.countDocuments({
+			status: 3,
+			"delivery.courier": req.courierId._id,
 		});
+
 		return res.json({
 			message: "find orders successfully",
 			status: "success",
 			data: orders,
+			_meta: {
+				currentPage: page,
+				perPage: limit,
+				totalCount: count,
+				pageCount: Math.ceil(count / limit),
+			},
 		});
 	} catch (error) {
 		return res.status(500).json({
@@ -264,6 +281,7 @@ exports.getOrderHistory = async (req, res) => {
 		});
 	}
 };
+
 exports.getOrderHistoryById = async (req, res) => {
 	try {
 		const order = await Orders.findById(req.params.id)

@@ -209,8 +209,44 @@
           so'm
         </div>
         <div class="mt-5">
-          <UButton color="red" size="xl" block>Bekor Qilish</UButton>
+          <UButton color="red" size="xl" block @click="openCancelModal"
+            >Bekor Qilish</UButton
+          >
         </div>
+      </UCard>
+    </UModal>
+    <UModal v-model="pageData.cancelModal" prevent-close>
+      <UCard
+        :ui="{
+          ring: '',
+          divide: 'divide-y divide-gray-100 dark:divide-gray-800',
+        }"
+      >
+        <template #header>
+          <div class="flex items-center justify-between">
+            <h3
+              class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
+            >
+              Buyurtma ID: {{ pageData.order.id }} -
+              {{ statusFormat(pageData.order.status) }}
+            </h3>
+            <UButton
+              color="gray"
+              variant="ghost"
+              icon="i-heroicons-x-mark-20-solid"
+              class="-my-1"
+              @click="pageData.cancelModal = false"
+            />
+          </div>
+        </template>
+        <UForm @submit="handleSubmitCancel">
+          <UFormGroup label="Bekor Qilish Sababi" required>
+            <UInput size="2xl" v-model="pageData.cancelReason"
+          /></UFormGroup>
+          <UFormGroup class="my-2">
+            <UButton type="submit" size="xl" block>Tasdiqlash</UButton>
+          </UFormGroup>
+        </UForm>
       </UCard>
     </UModal>
   </div>
@@ -227,6 +263,8 @@ const pageData = reactive({
   order: {},
   isPrint: true,
   audioRef: "",
+  cancelModal: false,
+  cancelReason: "",
 });
 
 const orders = ref([]);
@@ -295,4 +333,33 @@ const openModal = async (order) => {
     console.log(error);
   }
 };
+const openCancelModal = async () => {
+  pageData.cancelModal = true;
+};
+const handleSubmitCancel = async () => {
+  
+  try {
+    const resData = await $fetch(`${BASE_URL}/helper/cancel-order/${order._id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("collectorToken")}`,
+      },
+      body: JSON.stringify({
+        reason: pageData.cancelReason,
+      }),
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+defineShortcuts({
+  escape: {
+    usingInput: true,
+    handler: () => {
+      pageData.cancelModal = false;
+      pageData.modal = false;
+    },
+  },
+});
 </script>
