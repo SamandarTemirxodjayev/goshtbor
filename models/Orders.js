@@ -244,6 +244,16 @@ const orderSchema = new Schema({
 			default: 0,
 		},
 	},
+	cancel: {
+		reason: {
+			type: String,
+			default: null,
+		},
+		date: {
+			type: Date,
+			default: null,
+		},
+	},
 });
 orderSchema.set("timestamps", true);
 orderSchema.plugin(AutoIncrement, {inc_field: "order_id", start_seq: 1000});

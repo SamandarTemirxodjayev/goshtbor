@@ -10,5 +10,11 @@ router.post("/login", controller.loginHelper);
 router.get("/active-orders", userMiddleware, controller.getActiveOrders);
 router.get("/get-me", userMiddleware, controller.getme);
 router.post("/edit", userMiddleware, controller.editProfile);
+router.post("/cancel-order/:id", userMiddleware, controller.cancelOrder);
+router.post(
+	"/order/search",
+	userMiddleware,
+	controller.searchOrderByIdOrByPhone,
+);
 
 module.exports = router;

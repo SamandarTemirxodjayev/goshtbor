@@ -128,3 +128,53 @@ exports.editProfile = async (req, res) => {
 		});
 	}
 };
+exports.cancelOrder = async (req, res) => {
+	try {
+		const order = await Orders.findById(req.params.id);
+		if (order.status == 0) {
+			order.status = -9;
+		} else if (order.status == 1) {
+			order.status = -1;
+		} else if (order.status == 2) {
+			order.status = -2;
+		} else if (order.status == 3) {
+			order.status = -3;
+		}
+		order.cancel.reason = req.body.reason;
+		order.cancel.date = new Date();
+		await order.save();
+		return res.json({
+			message: "success",
+			status: "success",
+			data: order,
+		});
+	} catch (error) {
+		return res.status(500).json({
+			message: error.message,
+			status: "error",
+			data: error,
+		});
+	}
+};
+exports.searchOrderByIdOrByPhone = async (req, res) => {
+	try {
+		const orders = await Orders.aggregate([
+			{
+				$match: {
+					$or: [{order_id: req.body.data}, {"phone.number": req.body.data}],
+				},
+			},
+		]);
+		return res.json({
+			message: "success",
+			status: "success",
+			data: orders,
+		});
+	} catch (error) {
+		return res.status(500).json({
+			message: error.message,
+			status: "error",
+			data: error,
+		});
+	}
+};

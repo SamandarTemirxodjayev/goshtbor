@@ -163,6 +163,19 @@
               }}
               so'm
             </div>
+            <div class="font-semibold">Tolov ID:</div>
+            <div v-if="pageData.order.pay.type == 'payme'">
+              {{ pageData.order.pay[pageData.order.pay.type].id }}
+            </div>
+            <div v-if="pageData.order.pay.type == 'click'">
+              {{ pageData.order.pay[pageData.order.pay.type].click_trans_id }}
+            </div>
+            <div v-if="pageData.order.pay.type == 'uzum'">
+              {{ pageData.order.pay[pageData.order.pay.type].transId }}
+            </div>
+            <div v-if="pageData.order.pay.type == 'card'">
+              {{ pageData.order.pay[pageData.order.pay.type].uuid }}
+            </div>
           </div>
           <UDivider label="Goshtbor" orientation="vertical" />
 
@@ -239,13 +252,13 @@
             />
           </div>
         </template>
-        <UForm @submit="handleSubmitCancel">
+        <UForm>
           <UFormGroup label="Bekor Qilish Sababi" required>
             <UInput size="2xl" v-model="pageData.cancelReason"
           /></UFormGroup>
-          <UFormGroup class="my-2">
-            <UButton type="submit" size="xl" block>Tasdiqlash</UButton>
-          </UFormGroup>
+          <UButton @click="handleSubmitCancel" class="my-2" size="xl" block
+            >Tasdiqlash</UButton
+          >
         </UForm>
       </UCard>
     </UModal>
@@ -298,7 +311,7 @@ onMounted(async () => {
 
     orders.value = resData.data;
 
-    const intervalId = setInterval(fetchActiveOrders, 60000);
+    const intervalId = setInterval(fetchActiveOrders, 6000);
 
     onUnmounted(() => {
       clearInterval(intervalId);
@@ -337,21 +350,28 @@ const openCancelModal = async () => {
   pageData.cancelModal = true;
 };
 const handleSubmitCancel = async () => {
-  
+  pageData.buttonLoading = true;
   try {
-    const resData = await $fetch(`${BASE_URL}/helper/cancel-order/${order._id}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("collectorToken")}`,
-      },
-      body: JSON.stringify({
-        reason: pageData.cancelReason,
-      }),
-    });
+    const resData = await $fetch(
+      `${BASE_URL}/helper/cancel-order/${pageData.order._id}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("collectorToken")}`,
+        },
+        body: JSON.stringify({
+          reason: pageData.cancelReason,
+        }),
+      }
+    );
+    console.log(resData);
   } catch (error) {
     console.log(error);
   }
+  pageData.cancelReason = "";
+  pageData.cancelModal = false;
+  pageData.buttonLoading = false;
 };
 defineShortcuts({
   escape: {

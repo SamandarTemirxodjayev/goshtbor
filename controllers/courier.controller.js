@@ -254,6 +254,7 @@ exports.getOrderHistory = async (req, res) => {
 			status: 3,
 			"delivery.courier": req.courierId._id,
 		})
+			.sort({_id: -1})
 			.limit(limit * 1)
 			.skip((page - 1) * limit)
 			.exec();
@@ -268,8 +269,8 @@ exports.getOrderHistory = async (req, res) => {
 			status: "success",
 			data: orders,
 			_meta: {
-				currentPage: page,
-				perPage: limit,
+				currentPage: parseInt(page),
+				perPage: parseInt(limit),
 				totalCount: count,
 				pageCount: Math.ceil(count / limit),
 			},
