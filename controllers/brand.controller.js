@@ -1,4 +1,5 @@
 const Brand = require("../models/Brands");
+require("dotenv").config();
 
 exports.createBrand = async (req, res) => {
 	const {photo_url, name} = req.body;
@@ -39,10 +40,39 @@ exports.deleteBrand = async (req, res) => {
 };
 exports.getBrands = async (req, res) => {
 	try {
-		const brands = await Brand.find();
+		const page = parseInt(req.query.page) || 1;
+		const perPage = parseInt(req.query.perPage) || 10;
+
+		const totalCount = await Brand.countDocuments();
+		const totalPages = Math.ceil(totalCount / perPage);
+
+		const brands = await Brand.find()
+			.skip((page - 1) * perPage)
+			.limit(perPage);
+
+		const url = process.env.URL || "http://localhost:3000";
 		return res.status(200).json({
 			message: "Brands fetched successfully!",
 			data: brands,
+			_meta: {
+				currentPage: page,
+				perPage: perPage,
+				totalCount: totalCount,
+				totalPages: totalPages,
+			},
+			_links: {
+				self: `${url}/api/partners?page=${page}&perPage=${perPage}`,
+				first: `${url}/api/partners?page=1&perPage=${perPage}`,
+				prev:
+					page > 1
+						? `${url}/api/partners?page=${page - 1}&perPage=${perPage}`
+						: null,
+				next:
+					page < totalPages
+						? `${url}/api/partners?page=${page + 1}&perPage=${perPage}`
+						: null,
+				last: `${url}/api/partners?page=${totalPages}&perPage=${perPage}`,
+			},
 		});
 	} catch (error) {
 		return res.status(500).json({message: error.message});
