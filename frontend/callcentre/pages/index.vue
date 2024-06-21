@@ -11,7 +11,7 @@
           <UDivider><span>ID: </span></UDivider>
           <UDivider
             ><span
-              ><b>{{ item.content.id }}</b></span
+              ><b>{{ item.content.order_id }}</b></span
             ></UDivider
           >
         </div>
@@ -56,9 +56,15 @@
             ><span
               ><b
                 >{{
-                  numberFormat(
-                    item.content.pay[item.content.pay.type].total_amount
-                  )
+                  pageData.order &&
+                  pageData.order.pay &&
+                  pageData.order.pay[pageData.order.pay.type] &&
+                  pageData.order.pay[pageData.order.pay.type].total_amount !=
+                    null
+                    ? numberFormat(
+                        pageData.order.pay[pageData.order.pay.type].total_amount
+                      )
+                    : "To'lanmagan"
                 }}
                 so'm</b
               ></span
@@ -157,9 +163,14 @@
             <div class="font-semibold">Tolov Summasi:</div>
             <div>
               {{
-                numberFormat(
-                  pageData.order.pay[pageData.order.pay.type].total_amount
-                )
+                pageData.order &&
+                pageData.order.pay &&
+                pageData.order.pay[pageData.order.pay.type] &&
+                pageData.order.pay[pageData.order.pay.type].total_amount != null
+                  ? numberFormat(
+                      pageData.order.pay[pageData.order.pay.type].total_amount
+                    )
+                  : "To'lanmagan"
               }}
               so'm
             </div>

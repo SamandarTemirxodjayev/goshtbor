@@ -1,5 +1,6 @@
 const Helpers = require("../models/Helper");
 const Orders = require("../models/Orders");
+const Products = require("../models/Products");
 const {createHash, compare} = require("../utils/codeHash");
 const {createToken} = require("../utils/token");
 
@@ -161,14 +162,41 @@ exports.searchOrderByIdOrByPhone = async (req, res) => {
 		const orders = await Orders.aggregate([
 			{
 				$match: {
-					$or: [{order_id: req.body.data}, {"phone.number": req.body.data}],
+					$or: [
+						{order_id: parseInt(req.body.data)},
+						{"phone.number": parseInt(req.body.data)},
+					],
 				},
 			},
+		]);
+		const populatedOrders = await Orders.populate(orders, [
+			{
+				path: "products.product",
+				populate: [{path: "brand"}, {path: "category"}, {path: "subcategory"}],
+			},
+			{path: "delivery.courier"},
+			{path: "userId"},
 		]);
 		return res.json({
 			message: "success",
 			status: "success",
-			data: orders,
+			data: populatedOrders,
+		});
+	} catch (error) {
+		return res.status(500).json({
+			message: error.message,
+			status: "error",
+			data: error,
+		});
+	}
+};
+exports.findProduct = async (req, res) => {
+	try {
+		const products = await Products.searchByName(req.body.data);
+		return res.json({
+			message: "success",
+			status: "success",
+			data: products,
 		});
 	} catch (error) {
 		return res.status(500).json({

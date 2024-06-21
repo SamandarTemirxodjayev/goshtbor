@@ -113,7 +113,7 @@ exports.createOrder = async (req, res) => {
 		if (req.body.pay.type == "uzum") {
 			newOrder.pay.order_url =
 				"https://www.apelsin.uz/open-service?serviceId=498616071&order_id=" +
-				newOrder._id;
+				newOrder.order_id;
 		}
 		if (req.body.pay.type == "payme") {
 			let totalAmount = 0;
@@ -129,7 +129,7 @@ exports.createOrder = async (req, res) => {
 				totalAmount += subtotal;
 			}
 			const stringToEncode = `m=663b1ac0fe41a3907df8f595;ac.order_id=${
-				newOrder._id
+				newOrder.order_id
 			};a=${totalAmount * 100}`;
 
 			const base64EncodedString =
@@ -150,7 +150,7 @@ exports.createOrder = async (req, res) => {
 				const subtotal = price * product.quantity;
 				totalAmount += subtotal;
 			}
-			newOrder.pay.order_url = `https://my.click.uz/services/pay?service_id=33923&merchant_id=25959&amount=${totalAmount}&transaction_param=${newOrder._id}`;
+			newOrder.pay.order_url = `https://my.click.uz/services/pay?service_id=33923&merchant_id=25959&amount=${totalAmount}&transaction_param=${newOrder.order_id}`;
 		}
 		await newOrder.save();
 

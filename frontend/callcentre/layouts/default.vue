@@ -9,7 +9,6 @@ const isDark = computed({
     colorMode.preference = colorMode.value === "dark" ? "light" : "dark";
   },
 });
-
 const links = [
   {
     label: "Asosiy Sahifa",
@@ -25,6 +24,11 @@ const links = [
     label: "Buyurtmalar",
     icon: "i-heroicons-squares-2x2",
     to: "/products",
+  },
+  {
+    label: "Yangi Buyurtma",
+    icon: "i-heroicons-paper-airplane",
+    to: "/new-order",
   },
   {
     label: "Chiqish",

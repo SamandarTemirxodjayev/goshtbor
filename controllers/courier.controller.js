@@ -233,6 +233,7 @@ exports.confirmOrderDeliveryEnd = async (req, res) => {
 		}
 		order.status = 4;
 		order.delivery.stars = req.body.stars ? req.body.stars : 5;
+		order.delivery.comment = req.body.comment ? req.body.comment : "";
 		order.delivery.date.end = Date.now();
 		await order.save();
 		return res.json({

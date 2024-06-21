@@ -114,6 +114,19 @@ productSchema.statics.searchByName = async function (name) {
 		.populate("category")
 		.populate("subcategory");
 };
+productSchema.statics.searchByNameOrProductId = async function (nameOrId) {
+	return this.find({
+		$or: [
+			{name_uz: {$regex: nameOrId, $options: "i"}},
+			{name_ru: {$regex: nameOrId, $options: "i"}},
+			{name_en: {$regex: nameOrId, $options: "i"}},
+			{product_id: nameOrId},
+		],
+	})
+		.populate("brand")
+		.populate("category")
+		.populate("subcategory");
+};
 
 const Products = model("products", productSchema);
 

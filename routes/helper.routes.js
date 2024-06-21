@@ -16,5 +16,6 @@ router.post(
 	userMiddleware,
 	controller.searchOrderByIdOrByPhone,
 );
+router.post("/products/find", userMiddleware, controller.findProduct);
 
 module.exports = router;

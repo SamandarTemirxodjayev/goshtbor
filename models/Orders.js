@@ -243,6 +243,10 @@ const orderSchema = new Schema({
 			type: Number,
 			default: 0,
 		},
+		comment: {
+			type: String,
+			default: "",
+		},
 	},
 	cancel: {
 		reason: {
