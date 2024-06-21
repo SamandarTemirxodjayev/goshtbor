@@ -61,17 +61,17 @@ exports.getBrands = async (req, res) => {
 				totalPages: totalPages,
 			},
 			_links: {
-				self: `${url}/api/partners?page=${page}&perPage=${perPage}`,
-				first: `${url}/api/partners?page=1&perPage=${perPage}`,
+				self: `${url}/api/brands?page=${page}&perPage=${perPage}`,
+				first: `${url}/api/brands?page=1&perPage=${perPage}`,
 				prev:
 					page > 1
-						? `${url}/api/partners?page=${page - 1}&perPage=${perPage}`
+						? `${url}/api/brands?page=${page - 1}&perPage=${perPage}`
 						: null,
 				next:
 					page < totalPages
-						? `${url}/api/partners?page=${page + 1}&perPage=${perPage}`
+						? `${url}/api/brands?page=${page + 1}&perPage=${perPage}`
 						: null,
-				last: `${url}/api/partners?page=${totalPages}&perPage=${perPage}`,
+				last: `${url}/api/brands?page=${totalPages}&perPage=${perPage}`,
 			},
 		});
 	} catch (error) {
