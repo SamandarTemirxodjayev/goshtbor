@@ -5,8 +5,9 @@ const controller = require("../controllers/blogs.controller.js");
 const router = Router();
 
 router.get("/", controller.getBlogs);
+router.get("/:id", controller.getBlogById);
 router.post("/", adminMiddleware, controller.createBlogs);
-// router.delete("/:id", adminMiddleware, controller.deleteBrand);
-// router.put("/:id", adminMiddleware, controller.updateBrand);
+router.put("/:id", adminMiddleware, adminMiddleware, controller.updateBlog);
+router.delete("/:id", adminMiddleware, controller.deleteBlog);
 
 module.exports = router;
