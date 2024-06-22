@@ -9,6 +9,6 @@ router.get("/", userMiddleware, controller.getNotifications);
 router.post("/:id/read", userMiddleware, controller.markNotificationAsRead);
 router.post("/readall", userMiddleware, controller.markAsReadAllNotifications);
 router.delete("/:id", adminMiddleware, controller.deleteNotification);
-router.patch("/:id", adminMiddleware, controller.upadateNotification);
+router.put("/:id", adminMiddleware, controller.updateNotification);
 
 module.exports = router;

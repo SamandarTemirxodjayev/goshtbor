@@ -1,30 +1,51 @@
 const Products = require("../models/Products");
+const dotenv = require("dotenv");
+
+dotenv.config();
 
 exports.getProducts = async (req, res) => {
 	try {
 		const page = parseInt(req.query.page, 10) || 1;
-		const limit = parseInt(req.query.limit, 10) || 10;
-		const skip = (page - 1) * limit;
+		const perPage = parseInt(req.query.perPage, 10) || 10;
+		const skip = (page - 1) * perPage;
 
 		const products = await Products.find()
 			.populate("category")
 			.populate("brand")
 			.populate("subcategory")
 			.skip(skip)
-			.limit(limit);
+			.limit(perPage);
 
 		const totalItems = await Products.countDocuments();
-		const totalPages = Math.ceil(totalItems / limit);
+		const totalPages = Math.ceil(totalItems / perPage);
+
+		const url = process.env.URL || "http://localhost:3000";
+		const _meta = {
+			currentPage: page,
+			perPage: perPage,
+			totalCount: totalItems,
+			totalPages: totalPages,
+		};
+
+		const _links = {
+			self: `${url}/api/products?page=${page}&perPage=${perPage}`,
+			first: `${url}/api/products?page=1&perPage=${perPage}`,
+			prev:
+				page > 1
+					? `${url}/api/products?page=${page - 1}&perPage=${perPage}`
+					: null,
+			next:
+				page < totalPages
+					? `${url}/api/products?page=${page + 1}&perPage=${perPage}`
+					: null,
+			last: `${url}/api/products?page=${totalPages}&perPage=${perPage}`,
+		};
 
 		return res.status(200).json({
 			message: "Products fetched successfully!",
 			data: products,
-			pagination: {
-				totalItems,
-				currentPage: page,
-				totalPages,
-				limit,
-			},
+			_meta: _meta,
+			_links: _links,
 		});
 	} catch (error) {
 		return res.status(500).json({message: error.message});
@@ -35,14 +56,14 @@ exports.getNewProducts = async (req, res) => {
 	try {
 		const fiveDaysAgo = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000);
 		const page = parseInt(req.query.page, 10) || 1;
-		const limit = parseInt(req.query.limit, 10) || 10;
-		const skip = (page - 1) * limit;
+		const perPage = parseInt(req.query.perPage, 10) || 10;
+		const skip = (page - 1) * perPage;
 
 		let products = await Products.find({
 			createdAt: {$gte: fiveDaysAgo},
 		})
 			.skip(skip)
-			.limit(limit)
+			.limit(perPage)
 			.exec();
 
 		let totalItems;
@@ -56,48 +77,85 @@ exports.getNewProducts = async (req, res) => {
 			});
 		}
 
-		const totalPages = Math.ceil(totalItems / limit);
+		const totalPages = Math.ceil(totalItems / perPage);
+
+		const url = process.env.URL || "http://localhost:3000";
+		const _meta = {
+			currentPage: page,
+			perPage: perPage,
+			totalCount: totalItems,
+			totalPages: totalPages,
+		};
+
+		const _links = {
+			self: `${url}/api/products/new?page=${page}&perPage=${perPage}`,
+			first: `${url}/api/products/new?page=1&perPage=${perPage}`,
+			prev:
+				page > 1
+					? `${url}/api/products/new?page=${page - 1}&perPage=${perPage}`
+					: null,
+			next:
+				page < totalPages
+					? `${url}/api/products/new?page=${page + 1}&perPage=${perPage}`
+					: null,
+			last: `${url}/api/products/new?page=${totalPages}&perPage=${perPage}`,
+		};
 
 		return res.json({
 			message: "New Products fetched successfully!",
 			status: 200,
 			data: products,
-			pagination: {
-				totalItems,
-				currentPage: page,
-				totalPages,
-				limit,
-			},
+			_meta: _meta,
+			_links: _links,
 		});
 	} catch (error) {
 		return res.status(500).send(error);
 	}
 };
+
 exports.getPopularProducts = async (req, res) => {
 	try {
 		const page = parseInt(req.query.page, 10) || 1;
-		const limit = parseInt(req.query.limit, 10) || 10;
-		const skip = (page - 1) * limit;
+		const perPage = parseInt(req.query.perPage, 10) || 10;
+		const skip = (page - 1) * perPage;
 
 		const products = await Products.find({})
 			.sort({saleds: -1})
 			.skip(skip)
-			.limit(limit)
+			.limit(perPage)
 			.exec();
 
 		const totalItems = await Products.countDocuments({});
-		const totalPages = Math.ceil(totalItems / limit);
+		const totalPages = Math.ceil(totalItems / perPage);
+
+		const url = process.env.URL || "http://localhost:3000";
+		const _meta = {
+			currentPage: page,
+			perPage: perPage,
+			totalCount: totalItems,
+			totalPages: totalPages,
+		};
+
+		const _links = {
+			self: `${url}/api/products/popular?page=${page}&perPage=${perPage}`,
+			first: `${url}/api/products/popular?page=1&perPage=${perPage}`,
+			prev:
+				page > 1
+					? `${url}/api/products/popular?page=${page - 1}&perPage=${perPage}`
+					: null,
+			next:
+				page < totalPages
+					? `${url}/api/products/popular?page=${page + 1}&perPage=${perPage}`
+					: null,
+			last: `${url}/api/products/popular?page=${totalPages}&perPage=${perPage}`,
+		};
 
 		return res.json({
 			message: "Popular Products fetched successfully!",
 			status: 200,
 			data: products,
-			pagination: {
-				totalItems,
-				currentPage: page,
-				totalPages,
-				limit,
-			},
+			_meta: _meta,
+			_links: _links,
 		});
 	} catch (error) {
 		return res.status(500).send(error);
@@ -115,6 +173,7 @@ exports.createProduct = async (req, res) => {
 		return res.status(500).json({message: error.message});
 	}
 };
+
 exports.deleteProduct = async (req, res) => {
 	try {
 		const productId = req.params.id;
@@ -127,6 +186,7 @@ exports.deleteProduct = async (req, res) => {
 		return res.status(500).json({message: error.message});
 	}
 };
+
 exports.updateProduct = async (req, res) => {
 	try {
 		const productId = req.params.id;
@@ -138,7 +198,7 @@ exports.updateProduct = async (req, res) => {
 			},
 		);
 		return res.status(200).json({
-			message: "Mahsulotlar Yuklandi",
+			message: "Product updated successfully!",
 			status: 200,
 			data: updatedProduct,
 		});
@@ -146,6 +206,7 @@ exports.updateProduct = async (req, res) => {
 		return res.status(500).json({message: error.message});
 	}
 };
+
 exports.searchProduct = async (req, res) => {
 	try {
 		const search = {};
@@ -155,44 +216,172 @@ exports.searchProduct = async (req, res) => {
 		if (req.body.brand) {
 			search.brand = req.body.brand;
 		}
+		const page = parseInt(req.query.page, 10) || 1;
+		const perPage = parseInt(req.query.perPage, 10) || 10;
+		const skip = (page - 1) * perPage;
+
 		const products = await Products.find(search)
 			.populate("brand")
 			.populate("category")
-			.populate("subcategory");
+			.populate("subcategory")
+			.skip(skip)
+			.limit(perPage);
+
+		const totalItems = await Products.countDocuments(search);
+		const totalPages = Math.ceil(totalItems / perPage);
+
+		const url = process.env.URL || "http://localhost:3000";
+		const _meta = {
+			currentPage: page,
+			perPage: perPage,
+			totalCount: totalItems,
+			totalPages: totalPages,
+		};
+
+		const _links = {
+			self: `${url}/api/products/search?page=${page}&perPage=${perPage}`,
+			first: `${url}/api/products/search?page=1&perPage=${perPage}`,
+			prev:
+				page > 1
+					? `${url}/api/products/search?page=${page - 1}&perPage=${perPage}`
+					: null,
+			next:
+				page < totalPages
+					? `${url}/api/products/search?page=${page + 1}&perPage=${perPage}`
+					: null,
+			last: `${url}/api/products/search?page=${totalPages}&perPage=${perPage}`,
+		};
+
 		return res.status(200).json({
-			message: "Mahsulotlar Yuklandi",
+			message: "Products fetched successfully!",
 			status: 200,
 			data: products,
+			_meta: _meta,
+			_links: _links,
 		});
 	} catch (error) {
 		return res.status(500).json({message: error.message});
 	}
 };
+
 exports.searchProductByName = async (req, res) => {
 	try {
-		const products = await Products.searchByName(req.body.name);
+		const page = parseInt(req.query.page, 10) || 1;
+		const perPage = parseInt(req.query.limit, 10) || 10;
+		const skip = (page - 1) * perPage;
+
+		const products = await Products.find({
+			$or: [
+				{name_uz: {$regex: req.body.name, $options: "i"}},
+				{name_ru: {$regex: req.body.name, $options: "i"}},
+				{name_en: {$regex: req.body.name, $options: "i"}},
+			],
+		})
+			.skip(skip)
+			.limit(perPage);
+
+		const totalItems = await Products.countDocuments({
+			$or: [
+				{name_uz: {$regex: req.body.name, $options: "i"}},
+				{name_ru: {$regex: req.body.name, $options: "i"}},
+				{name_en: {$regex: req.body.name, $options: "i"}},
+			],
+		});
+		const totalPages = Math.ceil(totalItems / perPage);
+
+		const url = process.env.URL || "http://localhost:3000";
+		const _meta = {
+			currentPage: page,
+			perPage: perPage,
+			totalCount: totalItems,
+			totalPages: totalPages,
+		};
+
+		const _links = {
+			self: `${url}/api/products/search/bysubcategory?page=${page}&perPage=${perPage}`,
+			first: `${url}/api/products/search/bysubcategory?page=1&perPage=${perPage}`,
+			prev:
+				page > 1
+					? `${url}/api/products/search/bysubcategory?page=${
+							page - 1
+					  }&perPage=${perPage}`
+					: null,
+			next:
+				page < totalPages
+					? `${url}/api/products/search/bysubcategory?page=${
+							page + 1
+					  }&perPage=${perPage}`
+					: null,
+			last: `${url}/api/products/search/bysubcategory?page=${totalPages}&perPage=${perPage}`,
+		};
+
 		return res.json({
 			status: "success",
 			data: products,
+			_meta: _meta,
+			_links: _links,
 		});
 	} catch (error) {
+		console.log(error);
 		return res.status(500).json({message: error.message});
 	}
 };
+
 exports.searchProductBySubCategories = async (req, res) => {
 	try {
+		const page = parseInt(req.query.page, 10) || 1;
+		const perPage = parseInt(req.query.limit, 10) || 10;
+		const skip = (page - 1) * perPage;
+
 		const products = await Products.find({
 			category: req.body.category,
 			subcategory: req.body.subcategory,
 		})
 			.populate("brand")
 			.populate("category")
-			.populate("subcategory");
+			.populate("subcategory")
+			.skip(skip)
+			.limit(perPage);
+
+		const totalItems = await Products.countDocuments({
+			category: req.body.category,
+			subcategory: req.body.subcategory,
+		});
+		const totalPages = Math.ceil(totalItems / perPage);
+
+		const url = process.env.URL || "http://localhost:3000";
+		const _meta = {
+			currentPage: page,
+			perPage: perPage,
+			totalCount: totalItems,
+			totalPages: totalPages,
+		};
+
+		const _links = {
+			self: `${url}/api/products/search/bysubcategory?page=${page}&perPage=${perPage}`,
+			first: `${url}/api/products/search/bysubcategory?page=1&perPage=${perPage}`,
+			prev:
+				page > 1
+					? `${url}/api/products/search/bysubcategory?page=${
+							page - 1
+					  }&perPage=${perPage}`
+					: null,
+			next:
+				page < totalPages
+					? `${url}/api/products/search/bysubcategory?page=${
+							page + 1
+					  }&perPage=${perPage}`
+					: null,
+			last: `${url}/api/products/search/bysubcategory?page=${totalPages}&perPage=${perPage}`,
+		};
+
 		return res.json({
 			status: "success",
 			data: products,
+			_meta: _meta,
+			_links: _links,
 		});
 	} catch (error) {
-		return res.status(500).json({message: error.message});
+		return res.status500().json({message: error.message});
 	}
 };
