@@ -91,8 +91,10 @@
             >
               <span>
                 <b>
-                  <UButton size="lg" @click="counterStore.add(item.content)"
-                    >+</UButton
+                  <UButton
+                    size="lg"
+                    @click="counterStore.deleteProduct(item.content)"
+                    >-</UButton
                   >
                   <span class="mx-3">
                     {{
@@ -100,10 +102,9 @@
                         .quantity
                     }}
                   </span>
-                  <UButton
-                    size="lg"
-                    @click="counterStore.deleteProduct(item.content)"
-                    >-</UButton
+
+                  <UButton size="lg" @click="counterStore.add(item.content)"
+                    >+</UButton
                   >
                 </b>
               </span>
@@ -144,8 +145,8 @@ const handleSubmit = async () => {
     const resData = await $fetch(`${BASE_URL}/helper/products/find`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("collectorToken")}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("collectorToken")}`,
       },
       body: JSON.stringify({
         data: pageData.searchData,

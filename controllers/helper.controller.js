@@ -192,7 +192,16 @@ exports.searchOrderByIdOrByPhone = async (req, res) => {
 };
 exports.findProduct = async (req, res) => {
 	try {
-		const products = await Products.searchByName(req.body.data);
+		const products = await Products.find({
+			$or: [
+				{name_uz: {$regex: req.body.data, $options: "i"}}, // Case-insensitive search
+				{name_ru: {$regex: req.body.data, $options: "i"}},
+				{name_en: {$regex: req.body.data, $options: "i"}},
+			],
+		})
+			.populate("brand")
+			.populate("category")
+			.populate("subcategory");
 		return res.json({
 			message: "success",
 			status: "success",

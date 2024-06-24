@@ -16,6 +16,7 @@ const routerSubCategory = require("./subcategory.routes.js");
 const routerCourier = require("./courier.routes.js");
 const routerCollector = require("./collector.routes.js");
 const routerHelper = require("./helper.routes.js");
+const routerPreOrder = require("./preorder.routes.js");
 const router = Router();
 
 router.use("/register", routerRegister);
@@ -35,5 +36,6 @@ router.use("/subcategory", routerSubCategory);
 router.use("/courier", routerCourier);
 router.use("/collectors", routerCollector);
 router.use("/helper", routerHelper);
+router.use("/preorders", routerPreOrder);
 
 module.exports = router;
