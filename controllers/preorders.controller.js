@@ -3,9 +3,17 @@ const {sendSMSUrl} = require("../utils/SMS");
 
 exports.createPreOrderByHelper = async (req, res) => {
 	try {
+		console.log(req.body);
+		const {products, ...otherFields} = req.body;
+		const transformedProducts = products.map((product) => ({
+			product: product._id,
+			quantity: product.quantity,
+		}));
+
 		const newPreOrder = await PreOrders.create({
 			helperId: req.helperId,
-			...req.body,
+			...otherFields,
+			products: transformedProducts,
 		});
 		await newPreOrder.save();
 		await sendSMSUrl(

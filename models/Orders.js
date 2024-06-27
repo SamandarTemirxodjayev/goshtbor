@@ -5,7 +5,6 @@ const AutoIncrement = require("mongoose-sequence")(mongoose);
 const orderSchema = new Schema({
 	userId: {
 		type: Types.ObjectId,
-		required: true,
 		ref: "users",
 	},
 	products: [

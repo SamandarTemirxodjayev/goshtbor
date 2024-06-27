@@ -16,6 +16,7 @@ const subCategorySchema = new Schema({
 	category: {
 		type: Types.ObjectId,
 		required: true,
+		ref: "categories",
 	},
 });
 

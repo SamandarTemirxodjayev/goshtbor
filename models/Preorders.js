@@ -5,6 +5,10 @@ const preOrderSchema = new Schema({
 		type: Types.ObjectId,
 		required: true,
 	},
+	userId: {
+		type: String,
+		default: null,
+	},
 	name: {
 		type: String,
 		required: true,

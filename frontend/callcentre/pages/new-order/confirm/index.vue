@@ -64,6 +64,7 @@
       <UFormGroup label="Foydalanuvchi Telefon Raqami" required>
         <UInput
           size="lg"
+          type="number"
           placeholder="998999999999"
           v-model="pageData.order.phone_number"
         />
@@ -71,11 +72,47 @@
       <UFormGroup label="Foydalanuvchi Ismi" required class="my-4">
         <UInput size="lg" placeholder="Eshmat" v-model="pageData.order.name" />
       </UFormGroup>
-      <UFormGroup label="Foydalanuvchi Familiyasi" required>
+      <UFormGroup label="Foydalanuvchi Familiyasi" required class="mb-4">
         <UInput
           size="lg"
           placeholder="Toshmatov"
           v-model="pageData.order.surname"
+        />
+      </UFormGroup>
+      <div class="flex gap-x-2">
+        <UFormGroup label="Yetkazilish Sanasi(dan)" required class="mb-4">
+          <VueDatePicker
+            v-model="pageData.order.delivery.date.from"
+            :min-date="new Date()"
+            :max-date="new Date().setDate(new Date().getDate() + 2)"
+            time-picker-inline
+          />
+        </UFormGroup>
+        <UFormGroup label="Yetkazilish Sanasi(gacha)" required class="mb-4">
+          <VueDatePicker
+            v-model="pageData.order.delivery.date.to"
+            :min-date="new Date()"
+            :max-date="new Date().setDate(new Date().getDate() + 2)"
+            time-picker-inline
+          />
+        </UFormGroup>
+      </div>
+      <UFormGroup
+        label="Foydalanuvchi Yetkaziladigan Manzili"
+        required
+        class="mb-4"
+      >
+        <UInput
+          size="lg"
+          placeholder="Arnasoy ko'chasi 22"
+          v-model="pageData.order.delivery.address.name"
+        />
+      </UFormGroup>
+      <UFormGroup label="Kommentariya" required>
+        <UInput
+          size="lg"
+          placeholder="Srochniy ..."
+          v-model="pageData.order.delivery.comment"
         />
       </UFormGroup>
       <UButton size="lg" block class="my-4" type="submit"> Tasdiqlash </UButton>
@@ -87,6 +124,8 @@
 </template>
 <script setup>
 import { useCounterStore } from "~/store";
+import VueDatePicker from "@vuepic/vue-datepicker";
+import "@vuepic/vue-datepicker/dist/main.css";
 
 const pageData = reactive({
   loading: true,
@@ -95,6 +134,16 @@ const pageData = reactive({
     phone_number: "",
     name: "",
     surname: "",
+    delivery: {
+      date: {
+        from: "",
+        to: "",
+      },
+      address: {
+        name: "",
+      },
+      comment: "",
+    },
   },
 });
 
@@ -154,7 +203,10 @@ const handleSubmitOrder = async () => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("collectorToken")}`,
       },
-      body: JSON.stringify(pageData.order),
+      body: JSON.stringify({
+        ...pageData.order,
+        products: counterStore.get(),
+      }),
     });
     console.log(resData);
     pageData.order = {
