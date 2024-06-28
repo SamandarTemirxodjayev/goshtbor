@@ -7,6 +7,7 @@ const LocalStorage = require("../models/Localstorage.js");
 const Orders = require("../models/Orders.js");
 const Users = require("../models/Users.js");
 require("dotenv").config();
+console.log("Bot is run");
 
 const token = process.env.BOT_TOKEN;
 

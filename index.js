@@ -5,8 +5,9 @@ const mongoose = require("mongoose");
 const cron = require("node-cron");
 const router = require("./routes/router.js");
 const bodyParser = require("body-parser");
-require("./bot/index.js");
-
+if (process.env.BOT_RUN == "true") {
+	require("./bot/index.js");
+}
 const app = express();
 
 app.use(express.json());
