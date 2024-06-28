@@ -91,7 +91,7 @@
         <UFormGroup label="Yetkazilish Sanasi(gacha)" required class="mb-4">
           <VueDatePicker
             v-model="pageData.order.delivery.date.to"
-            :min-date="new Date()"
+            :min-date="pageData.order.delivery.date.from"
             :max-date="new Date().setDate(new Date().getDate() + 2)"
             time-picker-inline
           />
@@ -126,6 +126,8 @@
 import { useCounterStore } from "~/store";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
+import Swal from "sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
 
 const pageData = reactive({
   loading: true,
@@ -197,7 +199,7 @@ const rowsWithSummary = computed(() => {
 const handleSubmitOrder = async () => {
   pageData.buttonLoading = true;
   try {
-    const resData = await $fetch(BASE_URL + "/preorders", {
+    await $fetch(BASE_URL + "/preorders", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -208,12 +210,24 @@ const handleSubmitOrder = async () => {
         products: counterStore.get(),
       }),
     });
-    console.log(resData);
+    await Swal.fire("Yaratildi", "Muvaffiqatli Yaratildi", "success");
     pageData.order = {
       phone_number: "",
       name: "",
       surname: "",
+      delivery: {
+        date: {
+          from: "",
+          to: "",
+        },
+        address: {
+          name: "",
+        },
+        comment: "",
+      },
     };
+    navigateTo("/new-order");
+    counterStore.resetAll();
   } catch (error) {
     console.log(error);
   }

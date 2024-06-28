@@ -363,7 +363,7 @@ const openCancelModal = async () => {
 const handleSubmitCancel = async () => {
   pageData.buttonLoading = true;
   try {
-    const resData = await $fetch(
+    let resData = await $fetch(
       `${BASE_URL}/helper/cancel-order/${pageData.order._id}`,
       {
         method: "POST",
@@ -376,7 +376,17 @@ const handleSubmitCancel = async () => {
         }),
       }
     );
-    console.log(resData);
+    resData = await $fetch(`${BASE_URL}/helper/order/search`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("collectorToken")}`,
+      },
+      body: JSON.stringify({
+        data: pageData.searchData,
+      }),
+    });
+    pageData.orders = resData.data;
   } catch (error) {
     console.log(error);
   }

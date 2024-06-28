@@ -145,8 +145,8 @@ const handleSubmit = async () => {
     const resData = await $fetch(`${BASE_URL}/helper/products/find`, {
       method: "POST",
       headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("collectorToken")}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("collectorToken")}`,
       },
       body: JSON.stringify({
         data: pageData.searchData,
@@ -160,7 +160,7 @@ const handleSubmit = async () => {
 const formattedMessages = computed(() => {
   return pageData.products.map((order) => {
     return {
-      label: order.name_uz,
+      label: `${order.name_uz} - ${order.category.name_uz} ( ${order.brand.name} )`,
       content: order,
     };
   });
