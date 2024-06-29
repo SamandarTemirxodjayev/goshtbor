@@ -6,6 +6,7 @@ const server = new JSONRPCServer();
 const fs = require("fs");
 const {Types} = require("mongoose");
 const {wsSendMessage} = require("../ws/server");
+const {sendMessageByBot} = require("../utils/sendTelegramBotMessage");
 
 let error_message = "";
 
@@ -125,6 +126,12 @@ server.addMethod("PerformTransaction", async (params) => {
 		wsSendMessage(order);
 
 		await order.save();
+		if (order.userId.telegram.id) {
+			await sendMessageByBot(
+				order.userId.telegram.id,
+				"Buyurtmagiz to'lovi payme orqali qabul qilindi",
+			);
+		}
 	}
 
 	return {
@@ -389,6 +396,12 @@ exports.clickComplete = async (req, res) => {
 		const id = +new Date();
 		await order.save();
 		wsSendMessage(order);
+		if (order.userId.telegram.id) {
+			await sendMessageByBot(
+				order.userId.telegram.id,
+				"Buyurtmagiz to'lovi click orqali qabul qilindi",
+			);
+		}
 		return res.json({
 			error: 0,
 			error_note: "Успешно",
@@ -550,6 +563,12 @@ exports.uzumConfirm = async (req, res) => {
 				: productDoc.price;
 			const subtotal = price * product.quantity;
 			totalAmount += subtotal;
+		}
+		if (order.userId.telegram.id) {
+			await sendMessageByBot(
+				order.userId.telegram.id,
+				"Buyurtmagiz to'lovi click orqali qabul qilindi",
+			);
 		}
 		return res.json({
 			serviceId: req.body.serviceId,
