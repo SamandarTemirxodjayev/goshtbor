@@ -1,6 +1,7 @@
 const Products = require("../models/Products");
 const SubCategory = require("../models/SubCategory");
 const dotenv = require("dotenv");
+const filterByLang = require("../utils/filters");
 
 dotenv.config();
 
@@ -12,10 +13,17 @@ exports.getAllSubCategories = async (req, res) => {
 		const totalCount = await SubCategory.countDocuments();
 		const totalPages = Math.ceil(totalCount / perPage);
 
-		const subcategories = await SubCategory.find()
+		let subcategories = await SubCategory.find()
 			.populate("category")
 			.skip((page - 1) * perPage)
 			.limit(perPage);
+
+		subcategories = filterByLang(
+			subcategories,
+			req.query._l,
+			"category.name",
+			"name",
+		);
 
 		const url = process.env.URL || "http://localhost:3000";
 		const _meta = {
@@ -98,7 +106,7 @@ exports.getSubCategoriesProducts = async (req, res) => {
 			subcategory: req.body.subcategory,
 		};
 
-		const products = await Products.find(query)
+		let products = await Products.find(query)
 			.populate("category")
 			.populate("brand")
 			.populate("subcategory")
@@ -107,6 +115,15 @@ exports.getSubCategoriesProducts = async (req, res) => {
 
 		const totalItems = await Products.countDocuments(query);
 		const totalPages = Math.ceil(totalItems / perPage);
+
+		products = filterByLang(
+			products,
+			req.query._l,
+			"name",
+			"description",
+			"category.name",
+			"subcategory.name",
+		);
 
 		const url = process.env.URL || "http://localhost:3000";
 		const _meta = {

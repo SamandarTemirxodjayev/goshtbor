@@ -1,5 +1,6 @@
 const Products = require("../models/Products");
 const dotenv = require("dotenv");
+const filterByLang = require("../utils/filters");
 
 dotenv.config();
 
@@ -9,7 +10,7 @@ exports.getProducts = async (req, res) => {
 		const perPage = parseInt(req.query.perPage, 10) || 10;
 		const skip = (page - 1) * perPage;
 
-		const products = await Products.find()
+		let products = await Products.find()
 			.populate("category")
 			.populate("brand")
 			.populate("subcategory")
@@ -18,6 +19,15 @@ exports.getProducts = async (req, res) => {
 
 		const totalItems = await Products.countDocuments();
 		const totalPages = Math.ceil(totalItems / perPage);
+
+		products = filterByLang(
+			products,
+			req.query._l,
+			"name",
+			"description",
+			"category.name",
+			"subcategory.name",
+		);
 
 		const url = process.env.URL || "http://localhost:3000";
 		const _meta = {
@@ -79,6 +89,15 @@ exports.getNewProducts = async (req, res) => {
 
 		const totalPages = Math.ceil(totalItems / perPage);
 
+		products = filterByLang(
+			products,
+			req.query._l,
+			"name",
+			"description",
+			"category.name",
+			"subcategory.name",
+		);
+
 		const url = process.env.URL || "http://localhost:3000";
 		const _meta = {
 			currentPage: page,
@@ -127,6 +146,15 @@ exports.getPopularProducts = async (req, res) => {
 
 		const totalItems = await Products.countDocuments({});
 		const totalPages = Math.ceil(totalItems / perPage);
+
+		products = filterByLang(
+			products,
+			req.query._l,
+			"name",
+			"description",
+			"category.name",
+			"subcategory.name",
+		);
 
 		const url = process.env.URL || "http://localhost:3000";
 		const _meta = {
@@ -230,6 +258,15 @@ exports.searchProduct = async (req, res) => {
 		const totalItems = await Products.countDocuments(search);
 		const totalPages = Math.ceil(totalItems / perPage);
 
+		products = filterByLang(
+			products,
+			req.query._l,
+			"name",
+			"description",
+			"category.name",
+			"subcategory.name",
+		);
+
 		const url = process.env.URL || "http://localhost:3000";
 		const _meta = {
 			currentPage: page,
@@ -270,7 +307,7 @@ exports.searchProductByName = async (req, res) => {
 		const perPage = parseInt(req.query.limit, 10) || 10;
 		const skip = (page - 1) * perPage;
 
-		const products = await Products.find({
+		let products = await Products.find({
 			$or: [
 				{name_uz: {$regex: req.body.name, $options: "i"}},
 				{name_ru: {$regex: req.body.name, $options: "i"}},
@@ -288,6 +325,15 @@ exports.searchProductByName = async (req, res) => {
 			],
 		});
 		const totalPages = Math.ceil(totalItems / perPage);
+
+		products = filterByLang(
+			products,
+			req.query._l,
+			"name",
+			"description",
+			"category.name",
+			"subcategory.name",
+		);
 
 		const url = process.env.URL || "http://localhost:3000";
 		const _meta = {
@@ -333,7 +379,7 @@ exports.searchProductBySubCategories = async (req, res) => {
 		const perPage = parseInt(req.query.limit, 10) || 10;
 		const skip = (page - 1) * perPage;
 
-		const products = await Products.find({
+		let products = await Products.find({
 			category: req.body.category,
 			subcategory: req.body.subcategory,
 		})
@@ -348,6 +394,15 @@ exports.searchProductBySubCategories = async (req, res) => {
 			subcategory: req.body.subcategory,
 		});
 		const totalPages = Math.ceil(totalItems / perPage);
+
+		products = filterByLang(
+			products,
+			req.query._l,
+			"name",
+			"description",
+			"category.name",
+			"subcategory.name",
+		);
 
 		const url = process.env.URL || "http://localhost:3000";
 		const _meta = {

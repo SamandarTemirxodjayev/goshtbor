@@ -1,5 +1,6 @@
 const Notification = require("../models/Notification");
 const Users = require("../models/Users.js");
+const filterByLang = require("../utils/filters.js");
 const oneSignalClient = require("../utils/oneSignalclient.js");
 const dotenv = require("dotenv");
 
@@ -63,14 +64,21 @@ exports.getNotifications = async (req, res) => {
 		const totalCount = await Notification.countDocuments();
 		const totalPages = Math.ceil(totalCount / perPage);
 
-		const notifications = await Notification.find()
+		let notifications = await Notification.find()
 			.skip((page - 1) * perPage)
 			.limit(perPage);
 
-		const customizedNotifications = notifications.map((notification) => ({
+		let customizedNotifications = notifications.map((notification) => ({
 			...notification.toObject(),
 			isRead: notification.readBy.includes(userId),
 		}));
+
+		customizedNotifications = filterByLang(
+			customizedNotifications,
+			req.query._l,
+			"title",
+			"content",
+		);
 
 		const url = process.env.URL || "http://localhost:3000";
 		const _meta = {
@@ -102,6 +110,7 @@ exports.getNotifications = async (req, res) => {
 			_links: _links,
 		});
 	} catch (error) {
+		console.log(error);
 		res.status(400).send(error);
 	}
 };

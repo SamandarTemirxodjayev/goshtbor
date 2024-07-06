@@ -15,6 +15,8 @@ wss.on("connection", (ws) => {
 	});
 });
 
+console.log(`WebSocket Order server is running on port ${process.env.WSPORT}`);
+
 function broadcast(data) {
 	clients.forEach((client) => {
 		if (client.readyState === WebSocket.OPEN) {

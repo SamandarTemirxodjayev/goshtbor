@@ -6,3 +6,7 @@ exports.stripos = (haystack = "", needle = "", offset = 0) => {
 
 	return position !== -1 ? true : false;
 };
+
+exports.numberFormat = (number) => {
+	return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+};

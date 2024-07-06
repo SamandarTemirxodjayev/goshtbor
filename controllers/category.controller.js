@@ -1,4 +1,5 @@
 const Category = require("../models/Category");
+const filterByLang = require("../utils/filters");
 require("dotenv").config();
 exports.getAllCategories = async (req, res) => {
 	try {
@@ -8,9 +9,11 @@ exports.getAllCategories = async (req, res) => {
 		const totalCount = await Category.countDocuments();
 		const totalPages = Math.ceil(totalCount / perPage);
 
-		const categories = await Category.find()
+		let categories = await Category.find()
 			.skip((page - 1) * perPage)
 			.limit(perPage);
+
+		categories = filterByLang(categories, req.query._l, "name");
 
 		const url = process.env.URL || "http://localhost:3000";
 		const _meta = {

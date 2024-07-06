@@ -1,11 +1,12 @@
 const PreOrders = require("../models/Preorders.js");
-const {stripos} = require("../utils/funtions.js");
+const {stripos, numberFormat} = require("../utils/funtions.js");
 const TelegramBot = require("node-telegram-bot-api");
 const mongoose = require("mongoose");
 const Products = require("../models/Products.js");
 const LocalStorage = require("../models/Localstorage.js");
 const Orders = require("../models/Orders.js");
 const Users = require("../models/Users.js");
+const {statusFormat} = require("../utils/sendTelegramBotMessage.js");
 require("dotenv").config();
 console.log("Bot is run");
 
@@ -90,11 +91,66 @@ Yetkaziladigan Manzilni Yuboring`;
 		const user = await Users.findOne({
 			"telegram.id": chatId,
 		});
+
 		const orders = await Orders.find({
 			userId: new mongoose.Types.ObjectId(user._id),
-		});
-		console.log(orders);
-		bot.sendMessage(chatId, "Buyurtmalaringiz");
+		})
+			.populate({
+				path: "products.product",
+				populate: [{path: "brand"}, {path: "category"}, {path: "subcategory"}],
+			})
+			.sort({_id: -1})
+			.limit(5);
+
+		if (orders.length === 0) {
+			return bot.sendMessage(chatId, "Sizda hech qanday buyurtmalar yo'q.");
+		}
+
+		let message = "Buyurtmalaringiz:\n\n";
+
+		for (const order of orders) {
+			let totalAmount = 0;
+
+			const productPromises = order.products.map(async (item) => {
+				const productDoc = await Products.findById(item.product);
+				if (!productDoc) {
+					await bot.sendMessage(
+						chatId,
+						"Mahsulot topilmadi. Iltimos, yana urinib ko'ring.",
+					);
+					return;
+				}
+				const price = productDoc.sale.isSale
+					? productDoc.sale.price
+					: productDoc.price;
+				const subtotal = price * item.quantity;
+				totalAmount += subtotal;
+			});
+
+			await Promise.all(productPromises);
+
+			message += `Buyurtma ID: ${order.order_id}\n`;
+			message += `Holat: ${statusFormat(order.status)}\n`;
+			message += `Umumiy Summasi: ${numberFormat(totalAmount)} so'm\n`;
+			message += `To'lov miqdor: ${
+				order.pay.card.total_amount ||
+				order.pay.payme.total_amount ||
+				order.pay.click.total_amount ||
+				order.pay.uzum.total_amount ||
+				"To'lov qilinmagan"
+			} so'm\n`;
+			message += `Mahsulotlar:\n`;
+
+			order.products.forEach((item) => {
+				message += `- ${
+					item.product.name_uz || item.product.name_ru || item.product.name_en
+				}: ${item.quantity} ta\n`;
+			});
+
+			message += `\n\n`;
+		}
+
+		bot.sendMessage(chatId, message);
 	}
 });
 

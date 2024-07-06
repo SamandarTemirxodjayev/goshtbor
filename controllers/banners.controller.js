@@ -1,5 +1,6 @@
 const Banners = require("../models/Banners");
 const dotenv = require("dotenv");
+const filterByLang = require("../utils/filters");
 
 dotenv.config();
 
@@ -11,13 +12,20 @@ exports.getBanners = async (req, res) => {
 		const totalCount = await Banners.countDocuments();
 		const totalPages = Math.ceil(totalCount / perPage);
 
-		const banners = await Banners.find()
+		let banners = await Banners.find()
 			.skip((page - 1) * perPage)
 			.limit(perPage)
 			.populate("brand")
 			.populate("connect_item.category")
 			.populate("connect_item.product");
 
+		banners = filterByLang(
+			banners,
+			req.query._l,
+			"title",
+			"connect_item.category.name",
+			"connect_item.product.name",
+		);
 		const url = process.env.URL || "http://localhost:3000";
 		const _meta = {
 			currentPage: page,
@@ -27,11 +35,13 @@ exports.getBanners = async (req, res) => {
 		};
 
 		const _links = {
-			self: `${url}/api/banners?page=${page}&perPage=${perPage}`,
+			self: `${url}/api/banners?page=${page}&perPage=${perPage}&_l=${req.query._l}`,
 			first: `${url}/api/banners?page=1&perPage=${perPage}`,
 			prev:
 				page > 1
-					? `${url}/api/banners?page=${page - 1}&perPage=${perPage}`
+					? `${url}/api/banners?page=${page - 1}&perPage=${perPage}&_l=${
+							req.query._l
+					  }`
 					: null,
 			next:
 				page < totalPages

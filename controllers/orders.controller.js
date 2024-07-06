@@ -7,6 +7,7 @@ const {getMulticardToken} = require("../utils/authTokenMulticard");
 const axios = require("axios");
 const https = require("https");
 const Products = require("../models/Products");
+const {wsSendMessage} = require("../ws/server");
 
 exports.getAllOrders = async (req, res) => {
 	try {
@@ -110,48 +111,48 @@ exports.createOrder = async (req, res) => {
 				data: newOrder,
 			});
 		}
-			if (req.body.pay.type == "uzum") {
-				newOrder.pay.order_url =
-					"https://www.apelsin.uz/open-service?serviceId=498616071&order_id=" +
-					newOrder.order_id;
-			}
-			if (req.body.pay.type == "payme") {
-				let totalAmount = 0;
-				for (const product of newOrder.products) {
-					const productDoc = await Products.findById(product.product);
-					if (!productDoc) {
-						return res.json({error: "Product not found"});
-					}
-					const price = productDoc.sale.isSale
-						? productDoc.sale.price
-						: productDoc.price;
-					const subtotal = price * product.quantity;
-					totalAmount += subtotal;
+		if (req.body.pay.type == "uzum") {
+			newOrder.pay.order_url =
+				"https://www.apelsin.uz/open-service?serviceId=498616071&order_id=" +
+				newOrder.order_id;
+		}
+		if (req.body.pay.type == "payme") {
+			let totalAmount = 0;
+			for (const product of newOrder.products) {
+				const productDoc = await Products.findById(product.product);
+				if (!productDoc) {
+					return res.json({error: "Product not found"});
 				}
-				const stringToEncode = `m=663b1ac0fe41a3907df8f595;ac.order_id=${
-					newOrder.order_id
-				};a=${totalAmount * 100}`;
+				const price = productDoc.sale.isSale
+					? productDoc.sale.price
+					: productDoc.price;
+				const subtotal = price * product.quantity;
+				totalAmount += subtotal;
+			}
+			const stringToEncode = `m=663b1ac0fe41a3907df8f595;ac.order_id=${
+				newOrder.order_id
+			};a=${totalAmount * 100}`;
 
-				const base64EncodedString =
-					Buffer.from(stringToEncode).toString("base64");
-				newOrder.pay.order_url =
-					"https://checkout.paycom.uz/" + base64EncodedString;
-			}
-			if (req.body.pay.type == "click") {
-				let totalAmount = 0;
-				for (const product of newOrder.products) {
-					const productDoc = await Products.findById(product.product);
-					if (!productDoc) {
-						return res.json({error: "Product not found"});
-					}
-					const price = productDoc.sale.isSale
-						? productDoc.sale.price
-						: productDoc.price;
-					const subtotal = price * product.quantity;
-					totalAmount += subtotal;
+			const base64EncodedString =
+				Buffer.from(stringToEncode).toString("base64");
+			newOrder.pay.order_url =
+				"https://checkout.paycom.uz/" + base64EncodedString;
+		}
+		if (req.body.pay.type == "click") {
+			let totalAmount = 0;
+			for (const product of newOrder.products) {
+				const productDoc = await Products.findById(product.product);
+				if (!productDoc) {
+					return res.json({error: "Product not found"});
 				}
-				newOrder.pay.order_url = `https://my.click.uz/services/pay?service_id=33923&merchant_id=25959&amount=${totalAmount}&transaction_param=${newOrder.order_id}`;
+				const price = productDoc.sale.isSale
+					? productDoc.sale.price
+					: productDoc.price;
+				const subtotal = price * product.quantity;
+				totalAmount += subtotal;
 			}
+			newOrder.pay.order_url = `https://my.click.uz/services/pay?service_id=33923&merchant_id=25959&amount=${totalAmount}&transaction_param=${newOrder.order_id}`;
+		}
 		await newOrder.save();
 
 		return res.json({
@@ -201,6 +202,7 @@ exports.orderConfirmByCard = async (req, res) => {
 			order.status = 1;
 			order.pay.status = "payed";
 			order.pay.pay_date = new Date().toISOString();
+			wsSendMessage(order);
 			await order.save();
 
 			return res.status(200).json({

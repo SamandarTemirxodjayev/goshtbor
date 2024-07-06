@@ -14,3 +14,25 @@ exports.sendMessageByBot = async (chatId, message) => {
 		return error;
 	}
 };
+
+exports.statusFormat = (id) => {
+	if (id == 0) {
+		return "Yaratilgan";
+	} else if (id == 1) {
+		return "To'langan";
+	} else if (id == 2) {
+		return "Yig'ilgan";
+	} else if (id == 3) {
+		return "Yetkazilmoqda";
+	} else if (id == -9) {
+		return "Yaratilgan (Bekor qilingan)";
+	} else if (id == -1) {
+		return "To'langan (Bekor qilingan)";
+	} else if (id == -2) {
+		return "Yig'ilgan (Bekor qilingan)";
+	} else if (id == -3) {
+		return "Yetkazilmoqda (Bekor qilingan)";
+	} else {
+		return "Yetkazildi";
+	}
+};

@@ -33,11 +33,12 @@
           >
             <span>
               <b>
-                <UButton size="xl" class="mx-3">
-                  <UIcon
-                    name="i-heroicons-trash"
-                    @click="counterStore.productDelete(row)"
-                  />
+                <UButton
+                  size="xl"
+                  class="mx-3"
+                  @click="counterStore.productDelete(row)"
+                >
+                  <UIcon name="i-heroicons-trash" />
                 </UButton>
                 <UButton size="lg" @click="counterStore.deleteProduct(row)"
                   >-</UButton

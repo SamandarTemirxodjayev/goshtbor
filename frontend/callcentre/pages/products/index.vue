@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="!pageData.loading">
     <UForm @submit="handleSubmit" class="mb-4">
       <div class="w-[50%] flex justify-between">
         <UInput
@@ -309,6 +309,9 @@
       </UCard>
     </UModal>
   </div>
+  <div v-else>
+    <Loader />
+  </div>
 </template>
 <script setup>
 const pageData = reactive({
@@ -318,6 +321,10 @@ const pageData = reactive({
   order: {},
   cancelModal: false,
   cancelReason: "",
+  loading: true,
+});
+onMounted(() => {
+  pageData.loading = false;
 });
 const handleSubmit = async () => {
   try {

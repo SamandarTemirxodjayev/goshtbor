@@ -5,4 +5,9 @@ export default defineNuxtConfig({
 		preference: "light",
 	},
 	modules: ["@nuxt/ui", "@pinia/nuxt", "@pinia-plugin-persistedstate/nuxt"],
+	nitro: {
+		experimental: {
+			websocket: true,
+		},
+	},
 });

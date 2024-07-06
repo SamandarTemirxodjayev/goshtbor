@@ -17,6 +17,8 @@ const routerCourier = require("./courier.routes.js");
 const routerCollector = require("./collector.routes.js");
 const routerHelper = require("./helper.routes.js");
 const routerPreOrder = require("./preorder.routes.js");
+const routerTranslations = require("./translations.routes.js");
+const routerMessages = require("./messages.routes.js");
 const router = Router();
 
 router.use("/register", routerRegister);
@@ -37,5 +39,7 @@ router.use("/courier", routerCourier);
 router.use("/collectors", routerCollector);
 router.use("/helper", routerHelper);
 router.use("/preorders", routerPreOrder);
+router.use("/translations", routerTranslations);
+router.use("/messages", routerMessages);
 
 module.exports = router;

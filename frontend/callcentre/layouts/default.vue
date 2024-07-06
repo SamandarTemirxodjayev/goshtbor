@@ -43,7 +43,7 @@ const links = [
       class="fixed left-0 w-[15%] top-0 h-full transition-transform -translate-x-full sm:translate-x-0 border-r border-gray-300 shadow-inner z-10"
     >
       <ul class="mt-4">
-        <UVerticalNavigation :links="links"> </UVerticalNavigation>
+        <UVerticalNavigation :links="links" size="lg"> </UVerticalNavigation>
       </ul>
       <div class="ml-2 absolute bottom-[5%]">
         <ClientOnly>

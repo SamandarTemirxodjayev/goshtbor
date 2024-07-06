@@ -1,5 +1,6 @@
 const Blogs = require("../models/Blogs");
 const dotenv = require("dotenv");
+const filterByLang = require("../utils/filters");
 
 dotenv.config();
 
@@ -11,9 +12,17 @@ exports.getBlogs = async (req, res) => {
 		const totalCount = await Blogs.countDocuments();
 		const totalPages = Math.ceil(totalCount / perPage);
 
-		const blogs = await Blogs.find()
+		let blogs = await Blogs.find()
 			.skip((page - 1) * perPage)
 			.limit(perPage);
+
+		blogs = filterByLang(
+			blogs,
+			req.query._l,
+			"title",
+			"description",
+			"content",
+		);
 
 		const url = process.env.URL || "http://localhost:3000";
 		const _meta = {
@@ -105,9 +114,16 @@ exports.createBlogs = async (req, res) => {
 
 exports.getBlogById = async (req, res) => {
 	try {
-		const blog = await Blogs.findById(req.params.id);
+		let blog = await Blogs.findById(req.params.id);
 		if (!blog) return res.status(404).json({message: "Blog not found"});
-		return res.json({data: blog, status: "success"});
+		blog = filterByLang(
+			[blog],
+			req.query._l,
+			"title",
+			"description",
+			"content",
+		);
+		return res.json({data: blog[0], status: "success"});
 	} catch (error) {
 		return res.status(500).json({message: error.message});
 	}

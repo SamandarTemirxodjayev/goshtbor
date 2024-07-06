@@ -5,6 +5,7 @@ const {createToken} = require("../utils/token");
 const oneSignalClient = require("../utils/oneSignalclient.js");
 const Users = require("../models/Users.js");
 const {calculateStars} = require("../utils/starsCalc.js");
+const {sendMessageByBot} = require("../utils/sendTelegramBotMessage.js");
 
 exports.createCourier = async (req, res) => {
 	try {
@@ -141,10 +142,12 @@ exports.confirmGettingOrder = async (req, res) => {
 				status: "error",
 			});
 		}
-		const order = await Orders.findById(req.params.id).populate({
-			path: "products.product",
-			populate: [{path: "brand"}, {path: "category"}, {path: "subcategory"}],
-		});
+		const order = await Orders.findById(req.params.id)
+			.populate({
+				path: "products.product",
+				populate: [{path: "brand"}, {path: "category"}, {path: "subcategory"}],
+			})
+			.populate("userId");
 		if (!order) {
 			return res.status(400).json({
 				message: "not found order",
@@ -154,6 +157,12 @@ exports.confirmGettingOrder = async (req, res) => {
 		order.delivery.courier = req.courierId._id;
 		order.status = 3;
 		await order.save();
+		if (order.userId.telegram.id) {
+			await sendMessageByBot(
+				order.userId.telegram.id,
+				"Buyurtmagizni kuryer oldi",
+			);
+		}
 		return res.json({
 			message: "confirmed",
 			status: "success",
@@ -168,9 +177,8 @@ exports.confirmGettingOrder = async (req, res) => {
 };
 exports.confirmOrderDelivery = async (req, res) => {
 	try {
-		const order = await Orders.findById(req.params.id);
-		const user = await Users.findById(order.userId);
-		if (!user || !user.oneSignalId) {
+		const order = await Orders.findById(req.params.id).populate("userId");
+		if (!order.userId || !order.userId.oneSignalId) {
 			return res.status(400).json({
 				message: "User not found or OneSignal ID is missing",
 				status: "error",
@@ -188,14 +196,17 @@ exports.confirmOrderDelivery = async (req, res) => {
 				uz: text,
 				ru: text,
 			},
-			include_player_ids: [user.oneSignalId],
+			include_player_ids: [order.userId.oneSignalId],
 		};
 
 		oneSignalClient
 			.createNotification(notificationPayload)
 			.then((response) => console.log(response))
 			.catch((e) => console.error(e));
-
+		await sendMessageByBot(
+			order.userId.telegram.id,
+			"Buyurtmagiz manzilga yetib keldi",
+		);
 		return res.json({
 			message: "success",
 			status: "success",
