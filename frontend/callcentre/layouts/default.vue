@@ -31,6 +31,11 @@ const links = [
     to: "/new-order",
   },
   {
+    label: "Chat",
+    icon: "i-heroicons-chat-bubble-bottom-center-text",
+    to: "/chat",
+  },
+  {
     label: "Chiqish",
     icon: "i-heroicons-chevron-double-left",
     to: "/exit",

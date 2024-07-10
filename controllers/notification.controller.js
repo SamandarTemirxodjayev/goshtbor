@@ -39,10 +39,15 @@ exports.createNotification = async (req, res) => {
 				include_player_ids: oneSignalIds,
 			};
 
-			oneSignalClient
-				.createNotification(notificationPayload)
-				.then((response) => console.log(response))
-				.catch((e) => console.error(e));
+			try {
+				console.log("Sending notification with payload:", notificationPayload);
+				const response = await oneSignalClient.createNotification(
+					notificationPayload,
+				);
+				console.log("Notification sent successfully:", response.body);
+			} catch (e) {
+				console.error("Error sending notification:", e);
+			}
 		}
 
 		return res.json({
@@ -51,6 +56,7 @@ exports.createNotification = async (req, res) => {
 			data: notifications,
 		});
 	} catch (error) {
+		console.error("Error creating notification:", error);
 		return res.status(500).json(error);
 	}
 };

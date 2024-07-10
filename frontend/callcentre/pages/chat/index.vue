@@ -11,36 +11,63 @@
           v-model="pageData.search_user"
           placeholder="Qidirish..."
         />
-        <div v-for="user in filteredUsers" :key="user._id">
-          <div
-            :class="['flex my-2 gap-x-2 cursor-pointer']"
-            @click="openChat2(user)"
-          >
-            <div v-if="user.newMessage">
-              <UAvatar
-                :src="user.photo_url"
-                :alt="user.name"
-                chip-color="primary"
-                chip-text=""
-                chip-position="top-right"
-              />
+        <div class="overflow-scroll h-[90vh]">
+          <div v-for="user in filteredUsers" :key="user._id">
+            <div
+              :class="['flex my-2 gap-x-2 cursor-pointer']"
+              @click="openChat2(user)"
+            >
+              <div v-if="user.newMessage">
+                <UAvatar
+                  :src="user.photo_url"
+                  :alt="`${user.name} ${user.surname}`"
+                  chip-color="primary"
+                  chip-text=""
+                  chip-position="top-right"
+                />
+              </div>
+              <div v-else>
+                <UAvatar
+                  :src="user.photo_url"
+                  :alt="`${user.name} ${user.surname}`"
+                />
+              </div>
+              {{ user.name }} {{ user.surname }}
             </div>
-            <div v-else>
-              <UAvatar :src="user.photo_url" :alt="user.name" />
-            </div>
-            {{ user.name }} {{ user.surname }}
+            <UDivider />
           </div>
-          <UDivider />
         </div>
       </div>
       <div class="w-full ml-[5%]">
         <UCard>
           <template #header>
-            {{ pageData.selected_user ? pageData.selected_user.name : "" }}
-            {{ pageData.selected_user ? pageData.selected_user.surname : "" }}
+            <div
+              class="items-center flex gap-x-4"
+              v-if="pageData.selected_user"
+            >
+              <UAvatar
+                :src="pageData.selected_user.photo_url"
+                :alt="`${pageData.selected_user.name} ${pageData.selected_user.surname}`"
+              />
+              <div>
+                {{ pageData.selected_user ? pageData.selected_user.name : "" }}
+                {{
+                  pageData.selected_user ? pageData.selected_user.surname : ""
+                }}
+              </div>
+            </div>
           </template>
 
-          <div class="h-[70vh] overflow-scroll scroll-top pb-20">
+          <div class="h-[70vh] overflow-scroll scroll-top pb-20 relative">
+            <div class="fixed bottom-24 right-16">
+              <UButton
+                size="xl"
+                :ui="{ rounded: 'rounded-full' }"
+                @click="chatDown"
+              >
+                <UIcon name="i-heroicons-arrow-down"
+              /></UButton>
+            </div>
             <div v-for="message in pageData.messages" :key="message._id">
               <div>
                 <div v-if="message.is_admin">
@@ -91,6 +118,7 @@
 </template>
 
 <script setup>
+const showScrollButton = ref(true);
 const pageData = reactive({
   loading: true,
   users: [],
@@ -102,11 +130,13 @@ const pageData = reactive({
 });
 
 const filteredUsers = computed(() => {
-  const searchTerm = pageData.search_user.toLowerCase();
-  return pageData.users.filter(
-    (user) =>
-      user.name.toLowerCase().includes(searchTerm) ||
-      user.surname.toLowerCase().includes(searchTerm)
+  const searchTerm = (pageData.search_user || "").toLowerCase();
+  return pageData.users.filter((user) =>
+    user.name
+      ? user.name.toLowerCase().includes(searchTerm)
+      : "" || user.surname
+      ? user.surname.toLowerCase().includes(searchTerm)
+      : ""
   );
 });
 
@@ -187,6 +217,13 @@ const openChat = async (user) => {
     behavior: "smooth",
   });
 };
+const chatDown = async () => {
+  const item = document.querySelector(".scroll-top");
+  item.scrollTo({
+    top: item.scrollHeight,
+    behavior: "smooth",
+  });
+};
 
 const handleSendMessageToUser = async () => {
   pageData.content_loading = true;
@@ -225,7 +262,7 @@ const handleSendMessageToUser = async () => {
   pageData.content_loading = false;
 };
 
-const socketUrl = "ws://localhost:3031";
+const socketUrl = "ws://193.124.33.145:3031";
 let socket;
 
 const isConnected = ref(false);
