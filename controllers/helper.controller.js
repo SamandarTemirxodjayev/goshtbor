@@ -1,6 +1,8 @@
+const {default: mongoose} = require("mongoose");
 const Helpers = require("../models/Helper");
 const Orders = require("../models/Orders");
 const Products = require("../models/Products");
+const Users = require("../models/Users");
 const {createHash, compare} = require("../utils/codeHash");
 const {createToken} = require("../utils/token");
 
@@ -206,6 +208,37 @@ exports.findProduct = async (req, res) => {
 			message: "success",
 			status: "success",
 			data: products,
+		});
+	} catch (error) {
+		return res.status(500).json({
+			message: error.message,
+			status: "error",
+			data: error,
+		});
+	}
+};
+exports.findUserById = async (req, res) => {
+	try {
+		const user = await Users.findById(
+			new mongoose.Types.ObjectId(req.params.id),
+		);
+		const orders = await Orders.find({
+			userId: user._id,
+		})
+			.populate("userId")
+			.populate({
+				path: "products.product",
+				populate: [{path: "brand"}, {path: "category"}, {path: "subcategory"}],
+			})
+			.populate("collector.collector_id")
+			.populate("delivery.courier");
+		return res.json({
+			message: "success",
+			status: "success",
+			data: {
+				user: user,
+				orders: orders,
+			},
 		});
 	} catch (error) {
 		return res.status(500).json({

@@ -138,7 +138,7 @@ exports.getPopularProducts = async (req, res) => {
 		const perPage = parseInt(req.query.perPage, 10) || 10;
 		const skip = (page - 1) * perPage;
 
-		const products = await Products.find({})
+		let products = await Products.find({})
 			.sort({saleds: -1})
 			.skip(skip)
 			.limit(perPage)
@@ -186,6 +186,7 @@ exports.getPopularProducts = async (req, res) => {
 			_links: _links,
 		});
 	} catch (error) {
+		console.log(error);
 		return res.status(500).send(error);
 	}
 };
