@@ -22,8 +22,10 @@
             <UDivider
               ><span
                 ><b
-                  >{{ item.content.userId.name }}
-                  {{ item.content.userId.surname }}</b
+                  >{{ item.content.userId ? item.content.userId.name : "" }}
+                  {{
+                    item.content.userId ? item.content.userId.surname : ""
+                  }}</b
                 ></span
               ></UDivider
             >
@@ -247,7 +249,7 @@ onMounted(async () => {
 
     messages.value = resData.data;
 
-    ws = new WebSocket("ws://193.124.33.145:3031");
+    ws = new WebSocket(socketUrl);
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
       messages.value.unshift(data);

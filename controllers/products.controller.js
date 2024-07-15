@@ -249,7 +249,7 @@ exports.searchProduct = async (req, res) => {
 		const perPage = parseInt(req.query.perPage, 10) || 10;
 		const skip = (page - 1) * perPage;
 
-		const products = await Products.find(search)
+		let products = await Products.find(search)
 			.populate("brand")
 			.populate("category")
 			.populate("subcategory")

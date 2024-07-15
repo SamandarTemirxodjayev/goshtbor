@@ -424,6 +424,40 @@
         </div>
       </UCard>
     </UModal>
+    <UModal v-model="pageData.cancelModal" prevent-close>
+      <UCard
+        :ui="{
+          ring: '',
+          divide: 'divide-y divide-gray-100 dark:divide-gray-800',
+        }"
+      >
+        <template #header>
+          <div class="flex items-center justify-between">
+            <h3
+              class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
+            >
+              Buyurtma ID: {{ pageData.order.order_id }} -
+              {{ statusFormat(pageData.order.status) }}
+            </h3>
+            <UButton
+              color="gray"
+              variant="ghost"
+              icon="i-heroicons-x-mark-20-solid"
+              class="-my-1"
+              @click="pageData.cancelModal = false"
+            />
+          </div>
+        </template>
+        <UForm>
+          <UFormGroup label="Bekor Qilish Sababi" required>
+            <UInput size="2xl" v-model="pageData.cancelReason"
+          /></UFormGroup>
+          <UButton @click="handleSubmitCancel" class="my-2" size="xl" block
+            >Tasdiqlash</UButton
+          >
+        </UForm>
+      </UCard>
+    </UModal>
   </div>
   <div v-else><Loader /></div>
 </template>
@@ -442,6 +476,8 @@ const pageData = reactive({
   user_data: null,
   modal: false,
   order: null,
+  cancelModal: false,
+  cancelReason: "",
 });
 
 const filteredUsers = computed(() => {
@@ -636,6 +672,33 @@ const openModal = async (order) => {
   } catch (error) {
     console.log(error);
   }
+};
+const openCancelModal = async () => {
+  pageData.cancelModal = true;
+};
+const handleSubmitCancel = async () => {
+  pageData.buttonLoading = true;
+  try {
+    const resData = await $fetch(
+      `${BASE_URL}/helper/cancel-order/${pageData.order._id}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("collectorToken")}`,
+        },
+        body: JSON.stringify({
+          reason: pageData.cancelReason,
+        }),
+      }
+    );
+    console.log(resData);
+  } catch (error) {
+    console.log(error);
+  }
+  pageData.cancelReason = "";
+  pageData.cancelModal = false;
+  pageData.buttonLoading = false;
 };
 </script>
 

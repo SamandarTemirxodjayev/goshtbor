@@ -28,8 +28,8 @@
           <UDivider
             ><span
               ><b
-                >{{ item.content.userId.name }}
-                {{ item.content.userId.surname }}</b
+                >{{ item.content.userId ? item.content.userId.name : "" }}
+                {{ item.content.userId ? item.content.userId.surname : "" }}</b
               ></span
             ></UDivider
           >
