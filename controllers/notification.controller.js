@@ -1,7 +1,7 @@
 const Notification = require("../models/Notification");
 const Users = require("../models/Users.js");
 const filterByLang = require("../utils/filters.js");
-const oneSignalClient = require("../utils/oneSignalclient.js");
+const client = require("../utils/oneSignalclient.js");
 const dotenv = require("dotenv");
 
 dotenv.config();
