@@ -26,6 +26,7 @@ exports.createNotification = async (req, res) => {
 
 		if (oneSignalIds.length > 0) {
 			const notificationPayload = {
+				app_id: "fa42a951-2647-4c7a-b1a4-1403203415a6",
 				contents: {
 					en: req.body.content_en,
 					uz: req.body.content_uz,
@@ -41,13 +42,16 @@ exports.createNotification = async (req, res) => {
 
 			try {
 				console.log("Sending notification with payload:", notificationPayload);
-				const response = await oneSignalClient.createNotification(
-					notificationPayload,
-				);
+				const response = await client.createNotification(notificationPayload);
 				console.log("Notification sent successfully:", response.body);
 			} catch (e) {
-				console.error("Error sending notification:", e);
+				console.error(
+					"Error sending notification:",
+					e.response ? e.response.data : e,
+				);
 			}
+		} else {
+			console.log("No valid player IDs to send notifications.");
 		}
 
 		return res.json({
