@@ -19,6 +19,7 @@ const routerHelper = require("./helper.routes.js");
 const routerPreOrder = require("./preorder.routes.js");
 const routerTranslations = require("./translations.routes.js");
 const routerMessages = require("./messages.routes.js");
+const routerAdmin = require("./admin.routes.js");
 const router = Router();
 
 router.use("/register", routerRegister);
@@ -41,5 +42,6 @@ router.use("/helper", routerHelper);
 router.use("/preorders", routerPreOrder);
 router.use("/translations", routerTranslations);
 router.use("/messages", routerMessages);
+router.use("/admin", routerAdmin);
 
 module.exports = router;
