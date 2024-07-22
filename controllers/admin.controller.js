@@ -15,6 +15,7 @@ exports.getOrders = async (req, res) => {
 				populate: [{path: "brand"}, {path: "category"}, {path: "subcategory"}],
 			})
 			.populate("delivery.courier")
+			.populate("collector.collector_id")
 			.skip(skip)
 			.limit(perPage);
 
@@ -61,6 +62,7 @@ exports.getOrderById = async (req, res) => {
 				path: "products.product",
 				populate: [{path: "brand"}, {path: "category"}, {path: "subcategory"}],
 			})
+			.populate("collector.collector_id")
 			.populate("delivery.courier");
 		if (!order) {
 			return res.status(404).json({
@@ -89,6 +91,7 @@ exports.getOrderByOrderId = async (req, res) => {
 				path: "products.product",
 				populate: [{path: "brand"}, {path: "category"}, {path: "subcategory"}],
 			})
+      .populate("collector.collector_id")
 			.populate("delivery.courier");
 		if (!order) {
 			return res.status(404).json({
@@ -133,6 +136,7 @@ exports.getOrderByPeriod = async (req, res) => {
 				path: "products.product",
 				populate: [{path: "brand"}, {path: "category"}, {path: "subcategory"}],
 			})
+      .populate("collector.collector_id")
 			.populate("delivery.courier")
 			.skip(skip)
 			.limit(perPage);
@@ -188,6 +192,7 @@ exports.getOrderByPhoneNumber = async (req, res) => {
 				path: "products.product",
 				populate: [{path: "brand"}, {path: "category"}, {path: "subcategory"}],
 			})
+      .populate("collector.collector_id")
 			.populate("delivery.courier")
 			.skip(skip)
 			.limit(perPage);
