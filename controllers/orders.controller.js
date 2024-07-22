@@ -18,7 +18,8 @@ exports.getAllOrders = async (req, res) => {
 				path: "products.product",
 				populate: [{path: "brand"}, {path: "category"}, {path: "subcategory"}],
 			})
-			.populate("delivery.courier");
+			.populate("delivery.courier")
+			.populate("collector.collector_id");
 		return res.json({
 			status: "success",
 			data: orders,
