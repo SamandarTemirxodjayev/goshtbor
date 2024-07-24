@@ -31,5 +31,15 @@ router.get(
 	adminMiddleware,
 	controller.getCouriersOrders,
 );
+router.post("/create/collector", adminMiddleware, controller.createCollector);
+router.delete("/create/collector/:id", adminMiddleware, controller.deleteCollector);
+router.patch("/create/collector/:id", adminMiddleware, controller.updateCollector);
+router.get("/create/collector/:id", adminMiddleware, controller.getCollectorById);
+router.get("/create/collectors", adminMiddleware, controller.getCollectors);
+router.get(
+	"/orders/collector/:id",
+	adminMiddleware,
+	controller.getCollectorOrders,
+);
 
 module.exports = router;

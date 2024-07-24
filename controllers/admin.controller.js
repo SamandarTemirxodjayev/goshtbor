@@ -1,6 +1,8 @@
 const {default: mongoose} = require("mongoose");
 const Courier = require("../models/Courier");
 const Orders = require("../models/Orders");
+const Collectors = require("../models/Collectors");
+const {createHash} = require("../utils/codeHash");
 
 exports.getOrders = async (req, res) => {
 	try {
@@ -91,7 +93,7 @@ exports.getOrderByOrderId = async (req, res) => {
 				path: "products.product",
 				populate: [{path: "brand"}, {path: "category"}, {path: "subcategory"}],
 			})
-      .populate("collector.collector_id")
+			.populate("collector.collector_id")
 			.populate("delivery.courier");
 		if (!order) {
 			return res.status(404).json({
@@ -136,7 +138,7 @@ exports.getOrderByPeriod = async (req, res) => {
 				path: "products.product",
 				populate: [{path: "brand"}, {path: "category"}, {path: "subcategory"}],
 			})
-      .populate("collector.collector_id")
+			.populate("collector.collector_id")
 			.populate("delivery.courier")
 			.skip(skip)
 			.limit(perPage);
@@ -192,7 +194,7 @@ exports.getOrderByPhoneNumber = async (req, res) => {
 				path: "products.product",
 				populate: [{path: "brand"}, {path: "category"}, {path: "subcategory"}],
 			})
-      .populate("collector.collector_id")
+			.populate("collector.collector_id")
 			.populate("delivery.courier")
 			.skip(skip)
 			.limit(perPage);
@@ -297,7 +299,7 @@ exports.getCourierById = async (req, res) => {
 			_meta: null,
 		});
 	} catch (error) {
-		return res.status500().json({message: error.message});
+		return res.status(500).json({message: error.message});
 	}
 };
 exports.getCouriers = async (req, res) => {
@@ -344,7 +346,7 @@ exports.getCouriers = async (req, res) => {
 			_links: _links,
 		});
 	} catch (error) {
-		return res.status500().json({message: error.message});
+		return res.status(500).json({message: error.message});
 	}
 };
 exports.getCouriersOrders = async (req, res) => {
@@ -401,6 +403,179 @@ exports.getCouriersOrders = async (req, res) => {
 			_links: _links,
 		});
 	} catch (error) {
-		return res.status500().json({message: error.message});
+		return res.status(500).json({message: error.message});
+	}
+};
+exports.createCollector = async (req, res) => {
+	try {
+		let hashedCode = await createHash(req.body.password.toString());
+		const collector = await Collectors.create({
+			name: req.body.name,
+			surname: req.body.surname,
+			login: req.body.login,
+			password: hashedCode,
+		});
+		await collector.save();
+		return res.status(200).json({
+			message: "Collector created",
+			data: collector,
+			_meta: null,
+			_links: null,
+		});
+	} catch (error) {
+		return res.status(500).json({message: error});
+	}
+};
+exports.getCollectors = async (req, res) => {
+	try {
+		const page = parseInt(req.query.page, 10) || 1;
+		const perPage = parseInt(req.query.perPage, 10) || 10;
+		const skip = (page - 1) * perPage;
+
+		let collectors = await Collectors.find().skip(skip).limit(perPage);
+
+		const totalItems = await Collectors.countDocuments();
+		const totalPages = Math.ceil(totalItems / perPage);
+
+		const url = process.env.URL || "http://localhost:3000";
+		const _meta = {
+			currentPage: page,
+			perPage: perPage,
+			totalCount: totalItems,
+			totalPages: totalPages,
+		};
+
+		const _links = {
+			self: `${url}/api/admin/create/collectors?page=${page}&perPage=${perPage}`,
+			first: `${url}/api/admin/create/collectors?page=1&perPage=${perPage}`,
+			prev:
+				page > 1
+					? `${url}/api/admin/create/collectors?page=${
+							page - 1
+					  }&perPage=${perPage}`
+					: null,
+			next:
+				page < totalPages
+					? `${url}/api/admin/create/collectors?page=${
+							page + 1
+					  }&perPage=${perPage}`
+					: null,
+			last: `${url}/api/admin/create/collectors?page=${totalPages}&perPage=${perPage}`,
+		};
+
+		return res.status(200).json({
+			message: "Collectors fetched successfully!",
+			data: collectors,
+			_meta: _meta,
+			_links: _links,
+		});
+	} catch (error) {
+		return res.status(500).json({message: error});
+	}
+};
+exports.deleteCollector = async (req, res) => {
+	try {
+		await Collectors.findByIdAndDelete(
+			new mongoose.Types.ObjectId(req.params.id),
+		);
+		return res.status(200).json({
+			message: "Courier deleted",
+			data: null,
+			_meta: null,
+			_links: null,
+		});
+	} catch (error) {
+		return res.status(500).json({message: error});
+	}
+};
+exports.updateCollector = async (req, res) => {
+	try {
+		const updatedCollector = await Collectors.findByIdAndUpdate(
+			req.params.id,
+			req.body,
+			{
+				new: true,
+				runValidators: true,
+			},
+		);
+
+		if (!updatedCollector) {
+			return res.status(404).json({message: "Collector not found"});
+		}
+
+		return res.status(200).json({
+			message: "Collector updated successfully",
+			data: updatedCollector,
+			_meta: null,
+			_links: null,
+		});
+	} catch (error) {
+		return res.status(500).json({message: error});
+	}
+};
+exports.getCollectorById = async (req, res) => {
+	try {
+		const collector = await Collectors.findOne(
+			new mongoose.Types.ObjectId(req.params.id),
+		);
+		return res.status(200).json({
+			message: "Collector updated successfully",
+			data: collector,
+			_meta: null,
+			_links: null,
+		});
+	} catch (error) {
+		return res.status(500).json({message: error});
+	}
+};
+exports.getCollectorOrders = async (req, res) => {
+	try {
+		const page = parseInt(req.query.page, 10) || 1;
+		const perPage = parseInt(req.query.perPage, 10) || 10;
+		const skip = (page - 1) * perPage;
+
+		let orders = await Orders.find({
+			"collector.collector_id": new mongoose.Types.ObjectId(req.params.id),
+		})
+			.skip(skip)
+			.limit(perPage);
+
+		const totalItems = await Orders.countDocuments();
+		const totalPages = Math.ceil(totalItems / perPage);
+
+		const url = process.env.URL || "http://localhost:3000";
+		const _meta = {
+			currentPage: page,
+			perPage: perPage,
+			totalCount: totalItems,
+			totalPages: totalPages,
+		};
+
+		const _links = {
+			self: `${url}/api/admin/orders/collector/${req.params.id}?page=${page}&perPage=${perPage}`,
+			first: `${url}/api/admin/orders/collector/${req.params.id}?page=1&perPage=${perPage}`,
+			prev:
+				page > 1
+					? `${url}/api/admin/orders/collector/${req.params.id}?page=${
+							page - 1
+					  }&perPage=${perPage}`
+					: null,
+			next:
+				page < totalPages
+					? `${url}/api/admin/orders/collector/${req.params.id}?page=${
+							page + 1
+					  }&perPage=${perPage}`
+					: null,
+			last: `${url}/api/admin/orders/collector/${req.params.id}?page=${totalPages}&perPage=${perPage}`,
+		};
+
+		return res.status(200).json({
+			message: "Collectors fetched successfully!",
+			data: orders,
+			_meta: _meta,
+			_links: _links,
+		});
+	} catch (error) {
+		return res.status(500).json({message: error});
 	}
 };
