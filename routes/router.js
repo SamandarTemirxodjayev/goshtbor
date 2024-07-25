@@ -21,6 +21,8 @@ const routerTranslations = require("./translations.routes.js");
 const routerMessages = require("./messages.routes.js");
 const routerAdmin = require("./admin.routes.js");
 const router = Router();
+const path = require("path");
+const fs = require("fs");
 
 router.use("/register", routerRegister);
 router.use("/user", routerUser);
@@ -43,5 +45,19 @@ router.use("/preorders", routerPreOrder);
 router.use("/translations", routerTranslations);
 router.use("/messages", routerMessages);
 router.use("/admin", routerAdmin);
+router.get("/", (req, res) => {
+	try {
+		fs.readFile("./db/notworking.json", "utf8", (err, data) => {
+			if (err) {
+				console.error(err);
+				return res.status(500).json({error: "Failed to read file"});
+			}
+			const file = JSON.parse(data);
+			return res.json({
+				data: file,
+			});
+		});
+	} catch (error) {}
+});
 
 module.exports = router;

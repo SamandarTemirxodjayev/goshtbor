@@ -32,9 +32,21 @@ router.get(
 	controller.getCouriersOrders,
 );
 router.post("/create/collector", adminMiddleware, controller.createCollector);
-router.delete("/create/collector/:id", adminMiddleware, controller.deleteCollector);
-router.patch("/create/collector/:id", adminMiddleware, controller.updateCollector);
-router.get("/create/collector/:id", adminMiddleware, controller.getCollectorById);
+router.delete(
+	"/create/collector/:id",
+	adminMiddleware,
+	controller.deleteCollector,
+);
+router.patch(
+	"/create/collector/:id",
+	adminMiddleware,
+	controller.updateCollector,
+);
+router.get(
+	"/create/collector/:id",
+	adminMiddleware,
+	controller.getCollectorById,
+);
 router.get("/create/collectors", adminMiddleware, controller.getCollectors);
 router.get(
 	"/orders/collector/:id",
@@ -42,4 +54,14 @@ router.get(
 	controller.getCollectorOrders,
 );
 
+router.post("/create/helper", adminMiddleware, controller.createHelper);
+router.delete(
+	"/create/helper/:id",
+	adminMiddleware,
+	controller.deleteHelper,
+);
+router.patch("/create/helper/:id", adminMiddleware, controller.updateHelper);
+router.get("/create/helper/:id", adminMiddleware, controller.getHelperById);
+router.get("/create/helpers", adminMiddleware, controller.getAllHelpers);
+router.post("/not-working", adminMiddleware, controller.notWorkingPageEdit);
 module.exports = router;

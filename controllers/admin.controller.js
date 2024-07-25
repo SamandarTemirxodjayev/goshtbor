@@ -3,6 +3,8 @@ const Courier = require("../models/Courier");
 const Orders = require("../models/Orders");
 const Collectors = require("../models/Collectors");
 const {createHash} = require("../utils/codeHash");
+const Helpers = require("../models/Helper");
+const fs = require("fs");
 
 exports.getOrders = async (req, res) => {
 	try {
@@ -575,6 +577,148 @@ exports.getCollectorOrders = async (req, res) => {
 			_meta: _meta,
 			_links: _links,
 		});
+	} catch (error) {
+		return res.status(500).json({message: error});
+	}
+};
+exports.createHelper = async (req, res) => {
+	try {
+		let hashedCode = await createHash(req.body.password.toString());
+		const collector = await Helpers.create({
+			name: req.body.name,
+			surname: req.body.surname,
+			login: req.body.login,
+			password: hashedCode,
+		});
+		await collector.save();
+		return res.status(200).json({
+			message: "Collector created",
+			data: collector,
+			_meta: null,
+			_links: null,
+		});
+	} catch (error) {
+		return res.status(500).json({message: error});
+	}
+};
+exports.updateHelper = async (req, res) => {
+	try {
+		const updatedHelper = await Helpers.findByIdAndUpdate(
+			req.params.id,
+			req.body,
+			{
+				new: true,
+				runValidators: true,
+			},
+		);
+
+		if (!updatedHelper) {
+			return res.status(404).json({message: "Helper not found"});
+		}
+
+		return res.status(200).json({
+			message: "Helper updated successfully",
+			data: updatedHelper,
+			_meta: null,
+			_links: null,
+		});
+	} catch (error) {
+		return res.status(500).json({message: error});
+	}
+};
+exports.getHelperById = async (req, res) => {
+	try {
+		const helper = await Helpers.findById(
+			new mongoose.Types.ObjectId(req.params.id),
+		);
+		return res.status(200).json({
+			message: "Helper",
+			data: helper,
+			_meta: null,
+			_links: null,
+		});
+	} catch (error) {
+		return res.status(500).json({message: error});
+	}
+};
+exports.getAllHelpers = async (req, res) => {
+	try {
+		const page = parseInt(req.query.page, 10) || 1;
+		const perPage = parseInt(req.query.perPage, 10) || 10;
+		const skip = (page - 1) * perPage;
+
+		let helpers = await Helpers.find().skip(skip).limit(perPage);
+
+		const totalItems = await Helpers.countDocuments();
+		const totalPages = Math.ceil(totalItems / perPage);
+
+		const url = process.env.URL || "http://localhost:3000";
+		const _meta = {
+			currentPage: page,
+			perPage: perPage,
+			totalCount: totalItems,
+			totalPages: totalPages,
+		};
+
+		const _links = {
+			self: `${url}/api/admin/create/helpers?page=${page}&perPage=${perPage}`,
+			first: `${url}/api/admin/create/helpers?page=1&perPage=${perPage}`,
+			prev:
+				page > 1
+					? `${url}/api/admin/create/helpers?page=${
+							page - 1
+					  }&perPage=${perPage}`
+					: null,
+			next:
+				page < totalPages
+					? `${url}/api/admin/create/helpers?page=${
+							page + 1
+					  }&perPage=${perPage}`
+					: null,
+			last: `${url}/api/admin/create/helpers?page=${totalPages}&perPage=${perPage}`,
+		};
+
+		return res.status(200).json({
+			message: "Helpers fetched successfully!",
+			data: helpers,
+			_meta: _meta,
+			_links: _links,
+		});
+	} catch (error) {
+		return res.status(500).json({message: error});
+	}
+};
+exports.deleteHelper = async (req, res) => {
+	try {
+		await Helpers.findByIdAndDelete(new mongoose.Types.ObjectId(req.params.id));
+		return res.status(200).json({
+			message: "Helpers deleted successfully!",
+			data: null,
+			_meta: null,
+			_links: null,
+		});
+	} catch (error) {
+		return res.status(500).json({message: error});
+	}
+};
+exports.notWorkingPageEdit = async (req, res) => {
+	try {
+		const notworking = req.body;
+		fs.writeFile(
+			"./db/notworking.json",
+			JSON.stringify(notworking, null, 2),
+			(writeErr) => {
+				if (writeErr) {
+					console.error(writeErr);
+					return res.status(500).json({error: "Failed to write file"});
+				}
+
+				return res.json({
+					data: notworking,
+					status: "success",
+				});
+			},
+		);
 	} catch (error) {
 		return res.status(500).json({message: error});
 	}
