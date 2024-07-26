@@ -2,10 +2,13 @@ module.exports = {
 	apps: [
 		{
 			name: "Collector",
-			port: "3003",
+			script: "./.output/server/index.mjs",
 			exec_mode: "cluster",
 			instances: "max",
-			script: "./.output/server/index.mjs",
+			env: {
+				PORT: 3003,
+				NODE_ENV: "production",
+			},
 		},
 	],
 };

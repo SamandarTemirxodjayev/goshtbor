@@ -2,10 +2,13 @@ module.exports = {
 	apps: [
 		{
 			name: "CallCentre",
-			port: "3004",
+			script: "./.output/server/index.mjs",
 			exec_mode: "cluster",
 			instances: "max",
-			script: "./.output/server/index.mjs",
+			env: {
+				PORT: 3004,
+				NODE_ENV: "production",
+			},
 		},
 	],
 };
