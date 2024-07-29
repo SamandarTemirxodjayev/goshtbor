@@ -39,10 +39,18 @@ const productSchema = new Schema({
 		type: String,
 		required: true,
 	},
-	description_photo: {
-		type: String,
-		default: null,
-	},
+	description_photo: [
+		{
+			url: {
+				type: String,
+				required: true,
+			},
+			id: {
+				type: String,
+				required: true,
+			},
+		},
+	],
 	weight: {
 		type: Number,
 		required: true,

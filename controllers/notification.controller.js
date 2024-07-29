@@ -76,7 +76,8 @@ exports.getNotifications = async (req, res) => {
 
 		let notifications = await Notification.find()
 			.skip((page - 1) * perPage)
-			.limit(perPage);
+			.limit(perPage)
+			.sort({_id: -1});
 
 		let customizedNotifications = notifications.map((notification) => ({
 			...notification.toObject(),
