@@ -100,6 +100,20 @@ const productSchema = new Schema({
 		type: Number,
 		default: 0,
 	},
+	info: {
+		kkal: {
+			type: Number,
+			default: 0,
+		},
+		oqsillar: {
+			type: Number,
+			default: 0,
+		},
+		yoglar: {
+			type: Number,
+			default: 0,
+		},
+	},
 	MXIK: {
 		code: {
 			type: String,
