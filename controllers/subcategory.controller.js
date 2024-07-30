@@ -2,6 +2,7 @@ const Products = require("../models/Products");
 const SubCategory = require("../models/SubCategory");
 const dotenv = require("dotenv");
 const filterByLang = require("../utils/filters");
+const {default: mongoose} = require("mongoose");
 
 dotenv.config();
 
@@ -90,6 +91,20 @@ exports.updateSubCategory = async (req, res) => {
 			status: 200,
 			message: "Kategoriya Muvaffaqiyatli Yangilandi",
 			data: category,
+		});
+	} catch (error) {
+		return res.status(500).json({message: error.message});
+	}
+};
+exports.getSubcatgoriesByCategoryId = async (req, res) => {
+	try {
+		const subcategories = await SubCategory.find({
+			category: new mongoose.Types.ObjectId(req.params.id),
+		}).populate("category");
+		return res.status(200).json({
+			status: 200,
+			message: "Kategoriya Muvaffaqiyatli Yangilandi",
+			data: subcategories,
 		});
 	} catch (error) {
 		return res.status(500).json({message: error.message});
