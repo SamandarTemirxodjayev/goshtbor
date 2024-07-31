@@ -17,7 +17,8 @@ exports.getAllSubCategories = async (req, res) => {
 		let subcategories = await SubCategory.find()
 			.populate("category")
 			.skip((page - 1) * perPage)
-			.limit(perPage);
+			.limit(perPage)
+			.sort({_id: -1});
 
 		subcategories = filterByLang(
 			subcategories,

@@ -11,7 +11,8 @@ exports.getAllCategories = async (req, res) => {
 
 		let categories = await Category.find()
 			.skip((page - 1) * perPage)
-			.limit(perPage);
+			.limit(perPage)
+			.sort({_id: -1});
 
 		categories = filterByLang(categories, req.query._l, "name");
 

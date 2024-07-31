@@ -110,7 +110,11 @@
         <div class="h-full">
           <div v-for="(order, i) in pageData.order.products" :key="i">
             <div class="flex items-center justify-between mx-1 my-3">
-              <img :src="order.product.photo_urls[0]" alt="" width="150px" />
+              <img
+                :src="order.product.photo_urls[0].url"
+                alt=""
+                width="150px"
+              />
               <div>{{ order.product.name_uz }}</div>
               <div>{{ order.quantity }} ta</div>
             </div>
