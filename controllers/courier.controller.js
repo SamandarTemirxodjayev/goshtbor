@@ -6,6 +6,7 @@ const oneSignalClient = require("../utils/oneSignalclient.js");
 const Users = require("../models/Users.js");
 const {calculateStars} = require("../utils/starsCalc.js");
 const {sendMessageByBot} = require("../utils/sendTelegramBotMessage.js");
+const {wsOrderCDelivery} = require("../ws/delivery.js");
 
 exports.createCourier = async (req, res) => {
 	try {
@@ -308,6 +309,21 @@ exports.getOrderHistoryById = async (req, res) => {
 			message: "find order successfully",
 			status: "success",
 			data: order,
+		});
+	} catch (error) {
+		return res.status(500).json({
+			message: error.message,
+			status: "error",
+		});
+	}
+};
+exports.sendInfoToUserSocket = async (req, res) => {
+	try {
+		await wsOrderCDelivery(req.body);
+		return res.json({
+			message: "message sent successfully",
+			status: "success",
+			data: req.body,
 		});
 	} catch (error) {
 		return res.status(500).json({

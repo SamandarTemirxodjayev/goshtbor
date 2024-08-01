@@ -33,5 +33,6 @@ router.get(
 	controller.getOrderHistoryById,
 );
 router.post("/edit", UserMiddleware, controller.editProfile);
+router.post("/about-order", UserMiddleware, controller.sendInfoToUserSocket)
 
 module.exports = router;
