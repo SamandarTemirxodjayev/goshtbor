@@ -42,9 +42,9 @@ server.on("upgrade", (request, socket, head) => {
 	});
 });
 
-server.listen(process.env.WSMESSAGERPORT, () => {
+server.listen(process.env.WSCOURIERORDERPORT, () => {
 	console.log(
-		`WebSocket Message server is running on port ${process.env.WSMESSAGERPORT}`,
+		`WebSocket Order Courier server is running on port ${process.env.WSCOURIERORDERPORT}`,
 	);
 });
 
@@ -56,10 +56,10 @@ function broadcast(data) {
 	});
 }
 
-function wsMessager(data) {
+function wsOrderCourier(data) {
 	broadcast(data);
 }
 
 module.exports = {
-	wsMessager,
+	wsOrderCourier,
 };

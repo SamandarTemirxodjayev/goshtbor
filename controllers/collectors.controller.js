@@ -3,6 +3,7 @@ const Collectors = require("../models/Collectors");
 const Orders = require("../models/Orders");
 const {createHash, compare} = require("../utils/codeHash");
 const {createToken} = require("../utils/token");
+const {wsOrderCourier} = require("../ws/order");
 
 exports.createCollector = async (req, res) => {
 	try {
@@ -104,6 +105,7 @@ exports.submitOrderById = async (req, res) => {
 		order.collector.finish_time = new Date();
 		order.collector.collector_id = req.collectorId._id;
 		order.save();
+		wsOrderCourier(order);
 		return res.json({
 			message: "success",
 			status: "success",
