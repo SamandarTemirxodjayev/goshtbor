@@ -133,6 +133,7 @@ server.addMethod("PerformTransaction", async (params) => {
 			const subtotal = price * product.quantity;
 			totalAmount += subtotal;
 			productDoc.quantity -= product.quantity;
+			productDoc.saleds += product.quantity;
 			if (productDoc.quantity <= 0) {
 				productDoc.stock = false;
 			}
@@ -419,6 +420,7 @@ exports.clickComplete = async (req, res) => {
 			const subtotal = price * product.quantity;
 			totalAmount += subtotal;
 			productDoc.quantity -= product.quantity;
+			productDoc.saleds += product.quantity;
 			if (productDoc.quantity <= 0) {
 				productDoc.stock = false;
 			}
@@ -592,6 +594,7 @@ exports.uzumConfirm = async (req, res) => {
 			const subtotal = price * product.quantity;
 			totalAmount += subtotal;
 			productDoc.quantity -= product.quantity;
+			productDoc.saleds += product.quantity;
 			if (productDoc.quantity <= 0) {
 				productDoc.stock = false;
 			}
