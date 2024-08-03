@@ -62,20 +62,32 @@ exports.createOrder = async (req, res) => {
 				type: req.body.pay.type,
 			},
 			"phone.number": req.body.phone.number,
-			products: req.body.products,
-			comment: req.body.comment || "",
-		});
-		await newOrder.save();
-		if (req.body.pay.type == "card") {
-			let totalAmount = 0;
-			for (const product of newOrder.products) {
+			products: req.body.products.map(async (product) => {
 				const productDoc = await Products.findById(product.product);
+				if (!productDoc) {
+					throw new Error("Product not found");
+				}
 				const price = productDoc.sale.isSale
 					? productDoc.sale.price
 					: productDoc.price;
-				const subtotal = price * product.quantity;
-				totalAmount += subtotal;
-			}
+				return {
+					product: product.product,
+					quantity: product.quantity,
+					price, // Store the determined price
+				};
+			}),
+			comment: req.body.comment || "",
+		});
+
+		await Promise.all(newOrder.products);
+
+		// Calculate total amount based on the stored prices
+		let totalAmount = 0;
+		newOrder.products.forEach((product) => {
+			totalAmount += product.price * product.quantity;
+		});
+
+		if (req.body.pay.type == "card") {
 			const {token} = await getMulticardToken();
 			const agent = new https.Agent({
 				rejectUnauthorized: false,
@@ -112,24 +124,14 @@ exports.createOrder = async (req, res) => {
 				data: newOrder,
 			});
 		}
+
 		if (req.body.pay.type == "uzum") {
 			newOrder.pay.order_url =
 				"https://www.apelsin.uz/open-service?serviceId=498616071&order_id=" +
 				newOrder.order_id;
 		}
+
 		if (req.body.pay.type == "payme") {
-			let totalAmount = 0;
-			for (const product of newOrder.products) {
-				const productDoc = await Products.findById(product.product);
-				if (!productDoc) {
-					return res.json({error: "Product not found"});
-				}
-				const price = productDoc.sale.isSale
-					? productDoc.sale.price
-					: productDoc.price;
-				const subtotal = price * product.quantity;
-				totalAmount += subtotal;
-			}
 			const stringToEncode = `m=663b1ac0fe41a3907df8f595;ac.order_id=${
 				newOrder.order_id
 			};a=${totalAmount * 100}`;
@@ -139,21 +141,11 @@ exports.createOrder = async (req, res) => {
 			newOrder.pay.order_url =
 				"https://checkout.paycom.uz/" + base64EncodedString;
 		}
+
 		if (req.body.pay.type == "click") {
-			let totalAmount = 0;
-			for (const product of newOrder.products) {
-				const productDoc = await Products.findById(product.product);
-				if (!productDoc) {
-					return res.json({error: "Product not found"});
-				}
-				const price = productDoc.sale.isSale
-					? productDoc.sale.price
-					: productDoc.price;
-				const subtotal = price * product.quantity;
-				totalAmount += subtotal;
-			}
 			newOrder.pay.order_url = `https://my.click.uz/services/pay?service_id=33923&merchant_id=25959&amount=${totalAmount}&transaction_param=${newOrder.order_id}`;
 		}
+
 		await newOrder.save();
 
 		return res.json({
@@ -162,7 +154,7 @@ exports.createOrder = async (req, res) => {
 		});
 	} catch (error) {
 		console.log(error);
-		return res.status(500).json({error: error});
+		return res.status(500).json({error: error.message});
 	}
 };
 exports.orderConfirmByCard = async (req, res) => {

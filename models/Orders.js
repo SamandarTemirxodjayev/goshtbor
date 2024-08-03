@@ -14,6 +14,7 @@ const orderSchema = new Schema({
 				ref: "products",
 			},
 			quantity: Number,
+			price: Number,
 		},
 	],
 	status: {
