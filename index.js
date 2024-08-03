@@ -7,10 +7,13 @@ const router = require("./routes/router.js");
 const bodyParser = require("body-parser");
 const path = require("path");
 const fs = require("fs");
+const helmet = require("helmet");
 if (process.env.BOT_RUN == "true") {
 	require("./bot/index.js");
 }
 const app = express();
+
+app.use(helmet());
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({extended: true}));
@@ -58,7 +61,5 @@ cron.schedule("0 */1 * * *", async () => {
 	await Confirmations.deleteMany({expiredAt: {$lt: now}});
 	console.log("Expired confirmations cleaned up");
 });
-
-
 
 app.use("/api", router);

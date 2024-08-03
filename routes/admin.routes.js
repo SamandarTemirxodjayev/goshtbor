@@ -55,13 +55,14 @@ router.get(
 );
 
 router.post("/create/helper", adminMiddleware, controller.createHelper);
-router.delete(
-	"/create/helper/:id",
-	adminMiddleware,
-	controller.deleteHelper,
-);
+router.delete("/create/helper/:id", adminMiddleware, controller.deleteHelper);
 router.patch("/create/helper/:id", adminMiddleware, controller.updateHelper);
 router.get("/create/helper/:id", adminMiddleware, controller.getHelperById);
 router.get("/create/helpers", adminMiddleware, controller.getAllHelpers);
 router.post("/not-working", adminMiddleware, controller.notWorkingPageEdit);
+router.post(
+	"/results/orders",
+	adminMiddleware,
+	controller.getInformationAboutOrders,
+);
 module.exports = router;

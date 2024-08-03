@@ -124,6 +124,20 @@ server.addMethod("PerformTransaction", async (params) => {
 		order.pay.pay_date = new Date().toISOString();
 		order.pay.type = "payme";
 		wsSendMessage(order);
+		let totalAmount = 0;
+		for (const product of order.products) {
+			const productDoc = await Products.findById(product.product);
+			const price = productDoc.sale.isSale
+				? productDoc.sale.price
+				: productDoc.price;
+			const subtotal = price * product.quantity;
+			totalAmount += subtotal;
+			productDoc.quantity -= product.quantity;
+			if (productDoc.quantity <= 0) {
+				productDoc.stock = false;
+			}
+			await productDoc.save();
+		}
 
 		await order.save();
 		if (order.userId.telegram.id) {
@@ -396,6 +410,20 @@ exports.clickComplete = async (req, res) => {
 		const id = +new Date();
 		await order.save();
 		wsSendMessage(order);
+		let totalAmount = 0;
+		for (const product of order.products) {
+			const productDoc = await Products.findById(product.product);
+			const price = productDoc.sale.isSale
+				? productDoc.sale.price
+				: productDoc.price;
+			const subtotal = price * product.quantity;
+			totalAmount += subtotal;
+			productDoc.quantity -= product.quantity;
+			if (productDoc.quantity <= 0) {
+				productDoc.stock = false;
+			}
+			await productDoc.save();
+		}
 		if (order.userId.telegram.id) {
 			await sendMessageByBot(
 				order.userId.telegram.id,
@@ -563,11 +591,16 @@ exports.uzumConfirm = async (req, res) => {
 				: productDoc.price;
 			const subtotal = price * product.quantity;
 			totalAmount += subtotal;
+			productDoc.quantity -= product.quantity;
+			if (productDoc.quantity <= 0) {
+				productDoc.stock = false;
+			}
+			await productDoc.save();
 		}
 		if (order.userId.telegram.id) {
 			await sendMessageByBot(
 				order.userId.telegram.id,
-				"Buyurtmagiz to'lovi click orqali qabul qilindi",
+				"Buyurtmagiz to'lovi uzum orqali qabul qilindi",
 			);
 		}
 		return res.json({

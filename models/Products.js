@@ -124,6 +124,10 @@ const productSchema = new Schema({
 			required: true,
 		},
 	},
+	quantity: {
+		type: Number,
+		default: 1,
+	},
 });
 
 productSchema.set("timestamps", true);
@@ -133,7 +137,7 @@ productSchema.statics.searchByName = async function (name) {
 	return this.model("products")
 		.find({
 			$or: [
-				{name_uz: {$regex: name, $options: "i"}}, // Case-insensitive search
+				{name_uz: {$regex: name, $options: "i"}},
 				{name_ru: {$regex: name, $options: "i"}},
 				{name_en: {$regex: name, $options: "i"}},
 			],

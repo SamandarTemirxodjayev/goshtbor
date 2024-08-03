@@ -129,7 +129,7 @@ exports.postUserEdit = async (req, res) => {
 			data: req.userId,
 		});
 	} catch (error) {
-		return res.status(500).send(error);
+		return res.status(500).json({error: error.message});
 	}
 };
 exports.postUserEditPhone = async (req, res) => {

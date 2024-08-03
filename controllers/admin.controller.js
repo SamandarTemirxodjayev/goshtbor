@@ -723,3 +723,71 @@ exports.notWorkingPageEdit = async (req, res) => {
 		return res.status(500).json({message: error});
 	}
 };
+exports.getInformationAboutOrders = async (req, res) => {
+	try {
+		const fromDate = new Date(req.body.from);
+		const toDate = new Date(req.body.to);
+
+		const result = await Orders.aggregate([
+			{
+				$match: {
+					createdAt: {
+						$gte: fromDate,
+						$lte: toDate,
+					},
+				},
+			},
+			{
+				$group: {
+					_id: null,
+					totalOrders: {$sum: 1},
+					totalCardAmount: {$sum: "$pay.card.total_amount"},
+					totalPaymeAmount: {$sum: "$pay.payme.total_amount"},
+					totalClickAmount: {$sum: "$pay.click.total_amount"},
+					totalUzumAmount: {$sum: "$pay.uzum.total_amount"},
+					statusCounts: {
+						$push: {
+							status: "$status",
+						},
+					},
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					totalOrders: 1,
+					totalAmount: {
+						$add: [
+							"$totalCardAmount",
+							"$totalPaymeAmount",
+							"$totalClickAmount",
+							"$totalUzumAmount",
+						],
+					},
+					statusCounts: 1,
+				},
+			},
+		]);
+
+		// Calculate the status counts from the result
+		const statusCounts =
+			result[0]?.statusCounts.reduce((acc, cur) => {
+				acc[cur.status] = (acc[cur.status] || 0) + 1;
+				return acc;
+			}, {}) || {};
+
+		const totalOrders = result[0]?.totalOrders || 0;
+		const totalAmount = result[0]?.totalAmount || 0;
+
+		return res.json({
+			data: {
+				total_orders: totalOrders,
+				total_amount: totalAmount,
+				status_counts: statusCounts,
+			},
+			status: "success",
+		});
+	} catch (error) {
+		return res.status(500).json({message: error.message});
+	}
+};
