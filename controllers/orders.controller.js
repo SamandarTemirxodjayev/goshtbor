@@ -188,7 +188,12 @@ exports.orderConfirmByCard = async (req, res) => {
 		);
 		const order = await Orders.findOne({
 			"pay.card.uuid": uuid,
-		});
+		})
+			.populate("userId")
+			.populate({
+				path: "products.product",
+				populate: [{path: "brand"}, {path: "category"}, {path: "subcategory"}],
+			});
 
 		if (!order || order.status != 0) {
 			return res.status(400).json({
@@ -198,6 +203,21 @@ exports.orderConfirmByCard = async (req, res) => {
 					order: "Not Found",
 				},
 			});
+		}
+		let totalAmount = 0;
+		for (const product of order.products) {
+			const productDoc = await Products.findById(product.product);
+			const price = productDoc.sale.isSale
+				? productDoc.sale.price
+				: productDoc.price;
+			const subtotal = price * product.quantity;
+			totalAmount += subtotal;
+			productDoc.quantity -= product.quantity;
+			productDoc.saleds += product.quantity;
+			if (productDoc.quantity <= 0) {
+				productDoc.stock = false;
+			}
+			await productDoc.save();
 		}
 		if (response.data.success) {
 			order.status = 1;
