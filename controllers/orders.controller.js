@@ -75,7 +75,7 @@ exports.createOrder = async (req, res) => {
 					: productDoc.price;
 				const subtotal = price * product.quantity;
 				totalAmount += subtotal;
-				
+				product.price = price;
 			}
 			const {token} = await getMulticardToken();
 			const agent = new https.Agent({
