@@ -117,6 +117,16 @@ exports.createOrder = async (req, res) => {
 			newOrder.pay.order_url =
 				"https://www.apelsin.uz/open-service?serviceId=498616071&order_id=" +
 				newOrder.order_id;
+			let totalAmount = 0;
+			for (const product of newOrder.products) {
+				const productDoc = await Products.findById(product.product);
+				const price = productDoc.sale.isSale
+					? productDoc.sale.price
+					: productDoc.price;
+				const subtotal = price * product.quantity;
+				totalAmount += subtotal;
+				product.price = price;
+			}
 		}
 		if (req.body.pay.type == "payme") {
 			let totalAmount = 0;
@@ -130,6 +140,7 @@ exports.createOrder = async (req, res) => {
 					: productDoc.price;
 				const subtotal = price * product.quantity;
 				totalAmount += subtotal;
+				product.price = price;
 			}
 			const stringToEncode = `m=663b1ac0fe41a3907df8f595;ac.order_id=${
 				newOrder.order_id
@@ -152,6 +163,7 @@ exports.createOrder = async (req, res) => {
 					: productDoc.price;
 				const subtotal = price * product.quantity;
 				totalAmount += subtotal;
+				product.price = price;
 			}
 			newOrder.pay.order_url = `https://my.click.uz/services/pay?service_id=33923&merchant_id=25959&amount=${totalAmount}&transaction_param=${newOrder.order_id}`;
 		}
