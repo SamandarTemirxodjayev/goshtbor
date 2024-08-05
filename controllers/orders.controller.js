@@ -349,3 +349,33 @@ exports.confirmationCodeUUID = async (req, res) => {
 		return res.status(500).json(error);
 	}
 };
+exports.cancelOrderById = async (req, res) => {
+	try {
+		let order = await Orders.findOne({
+			userId: req.userId._id,
+			_id: req.params.id,
+		}).populate({
+			path: "products.product",
+			populate: [{path: "brand"}, {path: "category"}, {path: "subcategory"}],
+		});
+		if (order.status == 0) {
+			order.status = -9;
+		} else if (order.status == 1) {
+			order.status = -1;
+		} else if (order.status == 2) {
+			order.status = -2;
+		} else if (order.status == 3) {
+			order.status = -3;
+		}
+		order.cancel.reason = "Cancel By User";
+		order.cancel.date = new Date();
+		await order.save();
+		return res.json({
+			message: "success",
+			status: "success",
+			data: order,
+		});
+	} catch (error) {
+		return res.status(500).json(error);
+	}
+};
