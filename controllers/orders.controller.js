@@ -364,8 +364,12 @@ exports.cancelOrderById = async (req, res) => {
 			order.status = -1;
 		} else if (order.status == 2) {
 			order.status = -2;
-		} else if (order.status == 3) {
-			order.status = -3;
+		} else {
+			return res.status(400).json({
+				message: "cannot cancel order",
+				status: "error",
+				data: order,
+			});
 		}
 		order.cancel.reason = "Cancel By User";
 		order.cancel.date = new Date();
