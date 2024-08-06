@@ -51,7 +51,7 @@ exports.getAllCategories = async (req, res) => {
 	}
 };
 exports.createCategory = async (req, res) => {
-	const {name_uz, name_ru, name_en, photo_url} = req.body;
+	const {name_uz, name_ru, name_en, light_photo_url, dark_photo_url} = req.body;
 	try {
 		const category = new Category({
 			name_uz,
