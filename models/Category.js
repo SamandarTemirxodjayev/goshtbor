@@ -13,7 +13,11 @@ const categorySchema = new Schema({
 		type: String,
 		required: true,
 	},
-	photo_url: {
+	light_photo_url: {
+		type: String,
+		required: true,
+	},
+	dark_photo_url: {
 		type: String,
 		required: true,
 	},

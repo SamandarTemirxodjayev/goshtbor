@@ -57,7 +57,8 @@ exports.createCategory = async (req, res) => {
 			name_uz,
 			name_ru,
 			name_en,
-			photo_url,
+			light_photo_url,
+			dark_photo_url,
 		});
 		await category.save();
 		return res.status(200).json({
