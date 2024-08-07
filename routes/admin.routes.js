@@ -65,4 +65,7 @@ router.post(
 	adminMiddleware,
 	controller.getInformationAboutOrders,
 );
+router.get("/batches", adminMiddleware, controller.getBatchesByStatus);
+router.delete("/batches/:id", adminMiddleware, controller.cancelBatchById);
+router.put("/batches/:id", adminMiddleware, controller.confirmBatchById);
 module.exports = router;

@@ -5,6 +5,8 @@ const Collectors = require("../models/Collectors");
 const {createHash} = require("../utils/codeHash");
 const Helpers = require("../models/Helper");
 const fs = require("fs");
+const Batch = require("../models/Batch");
+const Products = require("../models/Products");
 
 exports.getOrders = async (req, res) => {
 	try {
@@ -786,6 +788,84 @@ exports.getInformationAboutOrders = async (req, res) => {
 				status_counts: statusCounts,
 			},
 			status: "success",
+		});
+	} catch (error) {
+		return res.status(500).json({message: error.message});
+	}
+};
+exports.getBatchesByStatus = async (req, res) => {
+	try {
+		const batches = await Batch.find({
+			status: req.query.status,
+		})
+			.populate("products._id")
+			.populate("collectorId")
+			.populate({
+				path: "products._id",
+				populate: [{path: "brand"}, {path: "category"}, {path: "subcategory"}],
+			});
+		return res.json({
+			status: "success",
+			data: batches,
+		});
+	} catch (error) {
+		return res.status(500).json({message: error.message});
+	}
+};
+exports.cancelBatchById = async (req, res) => {
+	try {
+		const batch = await Batch.findById(req.params.id)
+			.populate("products._id")
+			.populate("collectorId")
+			.populate({
+				path: "products._id",
+				populate: [{path: "brand"}, {path: "category"}, {path: "subcategory"}],
+			});
+		if (batch.status != 1) {
+			return res.status(400).json({
+				message: "Invalid",
+				data: null,
+			});
+		}
+		batch.status = -1;
+		batch.date.finished_date = new Date();
+		await batch.save();
+		return res.json({
+			status: "success",
+			data: batch,
+		});
+	} catch (error) {
+		return res.status(500).json({message: error.message});
+	}
+};
+exports.confirmBatchById = async (req, res) => {
+	try {
+		const batch = await Batch.findById(req.params.id)
+			.populate("products._id")
+			.populate("collectorId")
+			.populate({
+				path: "products._id",
+				populate: [{path: "brand"}, {path: "category"}, {path: "subcategory"}],
+			});
+		if (batch.status != 1) {
+			return res.status(400).json({
+				message: "Invalid",
+				data: null,
+			});
+		}
+		batch.status = 2;
+		batch.date.finished_date = new Date();
+		await batch.save();
+		for (const product of batch.products) {
+			const productDoc = await Products.findById(product._id._id);
+			productDoc.quantity += product.quantity;
+			productDoc.stock = true;
+			productDoc.initial_price = product.amount;
+			await productDoc.save();
+		}
+		return res.json({
+			status: "success",
+			data: batch,
 		});
 	} catch (error) {
 		return res.status(500).json({message: error.message});

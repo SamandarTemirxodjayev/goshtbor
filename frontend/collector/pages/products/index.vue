@@ -186,7 +186,7 @@ const columns = ref([
   },
   {
     key: "date.finished_date",
-    label: "Tasdqilangan Vaqti",
+    label: "Tasdqilangan/Bekor Qilingan Vaqti",
   },
   {
     key: "products",
