@@ -16,7 +16,9 @@
         {{ row.products.length }}
       </template>
       <template #status-data="{ row }">
-        {{ row.status == 1 ? "Yuborilgan" : "Tasdiqlangan" }}
+        <div v-if="row.status == 1">Yuborilgan</div>
+        <div v-if="row.status == 2">Tasdiqlangan</div>
+        <div v-if="row.status == -1">Bekor Qilingan</div>
       </template>
     </UTable>
     <UModal v-model="pageData.modal" prevent-close fullscreen>

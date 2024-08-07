@@ -73,6 +73,10 @@ const productSchema = new Schema({
 		type: Number,
 		required: true,
 	},
+	initial_price: {
+		type: Number,
+		required: true,
+	},
 	stock: {
 		type: Boolean,
 		default: true,

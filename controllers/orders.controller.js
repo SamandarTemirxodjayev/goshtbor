@@ -76,6 +76,7 @@ exports.createOrder = async (req, res) => {
 				const subtotal = price * product.quantity;
 				totalAmount += subtotal;
 				product.price = price;
+				product.initial_price = productDoc.initial_price || 0;
 			}
 			const {token} = await getMulticardToken();
 			const agent = new https.Agent({
@@ -126,6 +127,7 @@ exports.createOrder = async (req, res) => {
 				const subtotal = price * product.quantity;
 				totalAmount += subtotal;
 				product.price = price;
+				product.initial_price = productDoc.initial_price || 0;
 			}
 		}
 		if (req.body.pay.type == "payme") {
@@ -141,6 +143,7 @@ exports.createOrder = async (req, res) => {
 				const subtotal = price * product.quantity;
 				totalAmount += subtotal;
 				product.price = price;
+				product.initial_price = productDoc.initial_price || 0;
 			}
 			const stringToEncode = `m=663b1ac0fe41a3907df8f595;ac.order_id=${
 				newOrder.order_id
@@ -164,6 +167,7 @@ exports.createOrder = async (req, res) => {
 				const subtotal = price * product.quantity;
 				totalAmount += subtotal;
 				product.price = price;
+				product.initial_price = productDoc.initial_price || 0;
 			}
 			newOrder.pay.order_url = `https://my.click.uz/services/pay?service_id=33923&merchant_id=25959&amount=${totalAmount}&transaction_param=${newOrder.order_id}`;
 		}

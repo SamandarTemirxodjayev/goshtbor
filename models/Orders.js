@@ -15,6 +15,7 @@ const orderSchema = new Schema({
 			},
 			quantity: Number,
 			price: Number,
+			initial_price: Number,
 		},
 	],
 	status: {
