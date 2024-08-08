@@ -133,6 +133,9 @@ exports.login = async (req, res) => {
 
 			user.code = data.code;
 			user.token = data.token;
+			user.name = data.name;
+			user.surname = data.surname;
+			user.photo_url = data.photo_url;
 			await user.save();
 
 			const token = createToken(user._id);

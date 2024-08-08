@@ -141,6 +141,8 @@ exports.postRegister = async (req, res) => {
 					email: data.email,
 				},
 				name: data.name,
+				surname: data.surname,
+				photo_url: data.photo_url,
 			});
 			await newUser.save();
 			const token = createToken(newUser._id);
