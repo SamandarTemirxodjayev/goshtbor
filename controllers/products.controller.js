@@ -10,14 +10,16 @@ exports.getProducts = async (req, res) => {
 		const perPage = parseInt(req.query.perPage, 10) || 10;
 		const skip = (page - 1) * perPage;
 
-		let products = await Products.find()
+		let products = await Products.find({
+			stock: true,
+		})
 			.populate("category")
 			.populate("brand")
 			.populate("subcategory")
 			.skip(skip)
 			.limit(perPage);
 
-		const totalItems = await Products.countDocuments();
+		const totalItems = await Products.countDocuments({stock: true});
 		const totalPages = Math.ceil(totalItems / perPage);
 
 		products = filterByLang(
@@ -71,6 +73,7 @@ exports.getNewProducts = async (req, res) => {
 
 		let products = await Products.find({
 			createdAt: {$gte: fiveDaysAgo},
+			stock: true,
 		})
 			.skip(skip)
 			.limit(perPage)
@@ -79,11 +82,15 @@ exports.getNewProducts = async (req, res) => {
 		let totalItems;
 
 		if (!products.length && page === 1) {
-			products = await Products.find({}).sort({createdAt: -1}).limit(10).exec();
+			products = await Products.find({stock: true})
+				.sort({createdAt: -1})
+				.limit(10)
+				.exec();
 			totalItems = await Products.countDocuments({});
 		} else {
 			totalItems = await Products.countDocuments({
 				createdAt: {$gte: fiveDaysAgo},
+				stock: true,
 			});
 		}
 
@@ -138,13 +145,13 @@ exports.getPopularProducts = async (req, res) => {
 		const perPage = parseInt(req.query.perPage, 10) || 10;
 		const skip = (page - 1) * perPage;
 
-		let products = await Products.find({})
+		let products = await Products.find({stock: true})
 			.sort({saleds: -1})
 			.skip(skip)
 			.limit(perPage)
 			.exec();
 
-		const totalItems = await Products.countDocuments({});
+		const totalItems = await Products.countDocuments({stock: true});
 		const totalPages = Math.ceil(totalItems / perPage);
 
 		products = filterByLang(
@@ -238,7 +245,7 @@ exports.updateProduct = async (req, res) => {
 
 exports.searchProduct = async (req, res) => {
 	try {
-		const search = {};
+		const search = {stock: true};
 		if (req.body.category) {
 			search.category = req.body.category;
 		}
@@ -314,6 +321,7 @@ exports.searchProductByName = async (req, res) => {
 				{name_ru: {$regex: req.body.name, $options: "i"}},
 				{name_en: {$regex: req.body.name, $options: "i"}},
 			],
+			stock: true,
 		})
 			.skip(skip)
 			.limit(perPage);
@@ -324,6 +332,7 @@ exports.searchProductByName = async (req, res) => {
 				{name_ru: {$regex: req.body.name, $options: "i"}},
 				{name_en: {$regex: req.body.name, $options: "i"}},
 			],
+			stock: true,
 		});
 		const totalPages = Math.ceil(totalItems / perPage);
 
@@ -383,6 +392,7 @@ exports.searchProductBySubCategories = async (req, res) => {
 		let products = await Products.find({
 			category: req.body.category,
 			subcategory: req.body.subcategory,
+			stock: true,
 		})
 			.populate("brand")
 			.populate("category")
@@ -393,6 +403,7 @@ exports.searchProductBySubCategories = async (req, res) => {
 		const totalItems = await Products.countDocuments({
 			category: req.body.category,
 			subcategory: req.body.subcategory,
+			stock: true,
 		});
 		const totalPages = Math.ceil(totalItems / perPage);
 
