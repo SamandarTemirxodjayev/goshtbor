@@ -3,6 +3,7 @@ const Users = require("../models/Users.js");
 const filterByLang = require("../utils/filters.js");
 const client = require("../utils/oneSignalclient.js");
 const dotenv = require("dotenv");
+const {sendNotification} = require("../utils/sendNotification.js");
 
 dotenv.config();
 
@@ -19,40 +20,7 @@ exports.createNotification = async (req, res) => {
 		});
 		await notifications.save();
 
-		const users = await Users.find().select("oneSignalId");
-		const oneSignalIds = users
-			.map((user) => user.oneSignalId)
-			.filter((id) => id);
-
-		if (oneSignalIds.length > 0) {
-			const notificationPayload = {
-				app_id: "fa42a951-2647-4c7a-b1a4-1403203415a6",
-				contents: {
-					en: req.body.content_en,
-					uz: req.body.content_uz,
-					ru: req.body.content_ru,
-				},
-				headings: {
-					en: req.body.title_en,
-					uz: req.body.title_uz,
-					ru: req.body.title_ru,
-				},
-				include_player_ids: oneSignalIds,
-			};
-
-			try {
-				console.log("Sending notification with payload:", notificationPayload);
-				const response = await client.createNotification(notificationPayload);
-				console.log("Notification sent successfully:", response.body);
-			} catch (e) {
-				console.error(
-					"Error sending notification:",
-					e.response ? e.response.data : e,
-				);
-			}
-		} else {
-			console.log("No valid player IDs to send notifications.");
-		}
+		await sendNotification(req.body.title_uz, req.body.content_uz);
 
 		return res.json({
 			status: 200,
