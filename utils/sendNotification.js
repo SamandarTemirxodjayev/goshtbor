@@ -9,9 +9,10 @@ const client = new OneSignal.DefaultApi(configuration);
 
 const notification = new OneSignal.Notification();
 
-exports.sendNotification = async (heading, content) => {
+exports.sendNotification = async (heading, content, data) => {
 	notification.app_id = "fa42a951-2647-4c7a-b1a4-1403203415a6";
-	notification.name = "test_notification_name";
+	notification.name = content;
+	notification.data = data;
 	notification.contents = {
 		en: content,
 	};
