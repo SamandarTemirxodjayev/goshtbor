@@ -16,14 +16,14 @@ exports.sendNotification = async (data) => {
 	notification.contents = {
 		en: data.content_en,
 		ru: data.content_ru,
-		uz: data.content_uz,
+		tr: data.content_uz,
 	};
 
 	// required for Huawei
 	notification.headings = {
 		en: data.title_en,
 		ru: data.title_ru,
-		uz: data.title_uz,
+		tr: data.title_uz,
 	};
 
 	notification.included_segments = ["Active Subscriptions"];
