@@ -20,11 +20,7 @@ exports.createNotification = async (req, res) => {
 		});
 		await notifications.save();
 
-		await sendNotification(
-			req.body.title_uz,
-			req.body.content_uz,
-			notifications,
-		);
+		await sendNotification(notifications);
 
 		return res.json({
 			status: 200,
