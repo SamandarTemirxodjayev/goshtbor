@@ -18,6 +18,7 @@ exports.createCourier = async (req, res) => {
 				model: req.body.car.model,
 			},
 			phone_number: req.body.phone_number,
+			photo_url: req.body.photo_url,
 			login: "admin",
 			password: "admin",
 		});

@@ -1,108 +1,76 @@
-const Translations = require("../models/Translations");
-
-exports.getAll = async (req, res) => {
-	try {
-		const translations = await Translations.find();
-		return res.json({
-			data: translations.map((translation) => ({
-				id: translation._id,
-				message: translation.message,
-				uz: translation.uz ? translation.uz : null,
-				ru: translation.ru ? translation.ru : null,
-				en: translation.en ? translation.en : null,
-				kr: translation.kr ? translation.kr : null,
-			})),
-		});
-	} catch (err) {
-		return res.json(err);
-	}
-};
+const {updateOrAddObject, deleteObject} = require("../utils/db.updater");
+const path = require("path");
+const {open} = require("node:fs/promises");
 
 exports.findByLang = async (req, res) => {
+	const filePath = path.join(
+		__dirname,
+		"../db",
+		`${req.params.lang}-lang.json`,
+	);
+	// Read the file
+	// fs.readFile(filePath, 'utf8', (err, data) => {
+	//   if (err) {
+	//     if (err.code === 'ENOENT') {
+	//       // If file doesn't exist, return a 404 response
+	//       return res.status(404).json({ message: 'File not found' });
+	//     }
+	//     // Any other errors return a 500 response
+	//     return res.status(500).json({ message: 'Error reading file', error: err });
+	//   }
+
+	//   try {
+	//     // Parse file content to JSON
+	//     const jsonData = JSON.parse(data);
+	//     return res.json({
+	//       status: "success",
+	//       data: jsonData
+	//     }); // Return JSON response
+	//   } catch (parseError) {
+	//     // Handle JSON parsing errors
+	//     return res.status(500).json({ message: 'Error parsing JSON', error: parseError });
+	//   }
+	// });
 	try {
-		const {lang} = req.params;
-		const translations = await Translations.find();
-		const obj = {};
-		const result = [];
-		translations.forEach((translation) => {
-			obj[translation.message] = translation[lang] || null;
-		});
-		result.push(obj);
-		return res.json(result[0]);
-	} catch (err) {
-		return res.json(err);
-	}
-};
-
-exports.search = async (req, res) => {
-	try {
-		const {message} = req.params;
-		const regex = new RegExp(message, "i");
-
-		const translations = await Translations.find({
-			$or: [
-				{uz: {$regex: regex}},
-				{ru: {$regex: regex}},
-				{en: {$regex: regex}},
-				{kr: {$regex: regex}},
-			],
-		});
-
+		let filehandle = await open(filePath, "r");
+		let data = "";
+		for await (const line of filehandle.readLines()) {
+			data += line;
+		}
 		return res.json({
-			data: translations.map((translation) => ({
-				id: translation._id,
-				message: translation.message,
-				uz: translation.uz ? translation.uz : null,
-				ru: translation.ru ? translation.ru : null,
-				en: translation.en ? translation.en : null,
-				kr: translation.kr ? translation.kr : null,
-			})),
+			data: JSON.parse(data),
 		});
-	} catch (err) {
-		return res.json(err);
+	} catch (error) {
+		return res.status(500).json({
+			error,
+		});
 	}
 };
-
-exports.create = async (req, res) => {
+exports.createLang = async (req, res) => {
 	try {
-		const {lang} = req.params;
-		const message = Object.values(req.body)[0];
-		const text = Object.values(req.body)[1];
-		const findMessage = await Translations.findOne({
-			message: message,
+		await updateOrAddObject(`./db/${req.params.lang}-lang.json`, req.body);
+		return res.json({
+			status: "success",
+			data: {
+				message: "add successfully",
+			},
 		});
-		if (!findMessage) {
-			const createdTranslation = new Translations({
-				message: message,
-			});
-			createdTranslation[lang] = text;
-			await createdTranslation.save();
-			return res.json(createdTranslation);
-		} else {
-			if (!findMessage[lang]) {
-				findMessage[lang] = text;
-			}
-			await findMessage.save();
-			return res.json(findMessage);
-		}
-	} catch (err) {
-		return res.status(500).json({error: err.message});
+	} catch (error) {
+		console.log(error);
+		return res.json(error);
 	}
 };
-
-exports.update = async (req, res) => {
+exports.deleteObj = async (req, res) => {
 	try {
-		const {lang, translation} = req.body;
-		const {id} = req.params;
-		const findTranslation = await Translations.findById(id);
-		if (!findTranslation) {
-			return res.json("Translation not found");
-		}
-		findTranslation[lang] = translation;
-		await findTranslation.save();
-		res.json(findTranslation);
-	} catch (err) {
-		console.log(err);
-		return res.json(err);
+		await deleteObject(`./db/${req.params.lang}-lang.json`, req.params.name);
+		return res.json({
+			message: "success",
+			data: {
+				message: "deleted successfully",
+			},
+		});
+	} catch (error) {
+		console.log(error);
+		return res.json(error);
 	}
 };

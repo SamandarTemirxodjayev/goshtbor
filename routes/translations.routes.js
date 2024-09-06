@@ -1,11 +1,10 @@
 const {Router} = require("express");
 const translationController = require("../controllers/translations.controller.js");
+const middleware = require("../middleware/admin.middleware.js");
 const router = Router();
 
-router.get("/", translationController.getAll);
 router.get("/:lang", translationController.findByLang);
-router.get("/search/:message", translationController.search);
-router.post("/:lang", translationController.create);
-router.put("/:id", translationController.update);
+router.delete("/:lang/:name", middleware, translationController.deleteObj);
+router.post("/:lang", middleware, translationController.createLang);
 
 module.exports = router;
