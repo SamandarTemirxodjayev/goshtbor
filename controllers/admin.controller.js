@@ -796,7 +796,7 @@ exports.getInformationAboutOrders = async (req, res) => {
 exports.getBatchesByStatus = async (req, res) => {
 	try {
 		const batches = await Batch.find({
-			status: req.query.status,
+			status: parseInt(req.query.status),
 		})
 			.populate("products._id")
 			.populate("collectorId")
@@ -809,6 +809,7 @@ exports.getBatchesByStatus = async (req, res) => {
 			data: batches,
 		});
 	} catch (error) {
+		console.log(error);
 		return res.status(500).json({message: error.message});
 	}
 };
