@@ -872,3 +872,22 @@ exports.confirmBatchById = async (req, res) => {
 		return res.status(500).json({message: error.message});
 	}
 };
+exports.getBatchesById = async (req, res) => {
+	try {
+		const batches = await Batch.findById(
+			new mongoose.Types.ObjectId(req.params.id),
+		)
+			.populate("products._id")
+			.populate("collectorId")
+			.populate({
+				path: "products._id",
+				populate: [{path: "brand"}, {path: "category"}, {path: "subcategory"}],
+			});
+		return res.json({
+			status: "success",
+			data: batches,
+		});
+	} catch (error) {
+		return res.status(500).json({message: error.message});
+	}
+};
