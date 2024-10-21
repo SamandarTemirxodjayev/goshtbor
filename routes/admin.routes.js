@@ -4,6 +4,16 @@ const controller = require("../controllers/admin.controller.js");
 
 const router = Router();
 
+router.post("/register", controller.register);
+router.post("/login", controller.login);
+router.get("/me", adminMiddleware, controller.getme);
+router.post("/profile", adminMiddleware, controller.editUserProfile);
+router.post(
+	"/change-password",
+	adminMiddleware,
+	controller.changeAdminPassword,
+);
+
 router.get("/orders", adminMiddleware, controller.getOrders);
 router.get("/orders/:id", adminMiddleware, controller.getOrderById);
 router.patch(

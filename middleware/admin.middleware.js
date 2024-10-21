@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const Users = require("../models/Users");
+const Admins = require("../models/Admins");
 
 async function UserMiddleware(req, res, next) {
 	const authorizationHeader = req.headers.authorization;
@@ -26,19 +27,13 @@ async function UserMiddleware(req, res, next) {
 
 	try {
 		const decoded = jwt.verify(accessToken, "Samandar0321@02212006H193OC");
-		const user = await Users.findById(decoded._id);
+		const user = await Admins.findById(decoded._id);
 		if (!user) {
 			return res
 				.status(401)
 				.json({error: "Not Authorized!", message: "Invalid access token"});
 		}
 		req.userId = user;
-		if (req.userId.user_level === 0) {
-			return res.status(400).json({
-				status: "error",
-				message: "You are not authorized to perform this action",
-			});
-		}
 		return next();
 	} catch (error) {
 		if (error instanceof jwt.JsonWebTokenError) {

@@ -2,12 +2,103 @@ const {default: mongoose} = require("mongoose");
 const Courier = require("../models/Courier");
 const Orders = require("../models/Orders");
 const Collectors = require("../models/Collectors");
-const {createHash} = require("../utils/codeHash");
+const {createHash, compare} = require("../utils/codeHash");
 const Helpers = require("../models/Helper");
 const fs = require("fs");
 const Batch = require("../models/Batch");
 const Products = require("../models/Products");
+const Admins = require("../models/Admins");
+const {createToken} = require("../utils/token");
 
+exports.register = async (req, res) => {
+	try {
+		let {password, ...result} = req.body;
+		password = await createHash(password);
+		const newAdmin = await Admins.create({
+			...result,
+			password,
+		});
+		return res.status(200).json({
+			message: "Products fetched successfully!",
+			data: newAdmin,
+		});
+	} catch (error) {
+		return res.status(500).json({message: error.message});
+	}
+};
+exports.login = async (req, res) => {
+	try {
+		const {password, login} = req.body;
+		const admin = await Admins.findOne({login});
+		if (!admin) {
+			return res.status(400).json({
+				message: "User not found",
+				data: null,
+			});
+		}
+		const isMatch = await compare(password.toString(), admin.password);
+		if (!isMatch) {
+			return res.status(400).json({
+				status: "error",
+				message: "Kod Xato",
+			});
+		}
+		const token = await createToken(admin._id);
+
+		return res.json({
+			status: 200,
+			message: "Tasdiqlandi",
+			data: {
+				auth_token: token,
+				token_type: "bearer",
+				createdAt: new Date(),
+				expiredAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+				admin,
+			},
+		});
+	} catch (error) {
+		return res.status(500).json({message: error.message});
+	}
+};
+exports.getme = async (req, res) => {
+	try {
+		return res.json({
+			status: "success",
+			data: req.userId,
+			message: "Success",
+		});
+	} catch (error) {
+		return res.status(500).json({error});
+	}
+};
+exports.editUserProfile = async (req, res) => {
+	try {
+		const admin = await Admins.findByIdAndUpdate(req.userId._id, req.body, {
+			new: true,
+		});
+		return res.json({
+			status: "success",
+			data: admin,
+		});
+	} catch (error) {
+		return res.status(500).json({error});
+	}
+};
+exports.changeAdminPassword = async (req, res) => {
+	try {
+		let {password} = req.body;
+		let admin = await Admins.findById(req.userId._id);
+		password = await createHash(password);
+		admin.password = password;
+		await admin.save();
+		return res.json({
+			status: "success",
+			data: admin,
+		});
+	} catch (error) {
+		return res.status(500).json({error});
+	}
+};
 exports.getOrders = async (req, res) => {
 	try {
 		const page = parseInt(req.query.page, 10) || 1;
