@@ -33,6 +33,60 @@ exports.createNotification = async (req, res) => {
 	}
 };
 
+exports.getNotificationsForAdmin = async (req, res) => {
+	try {
+		const page = parseInt(req.query.page) || 1;
+		const perPage = parseInt(req.query.perPage) || 10;
+
+		const totalCount = await Notification.countDocuments();
+		const totalPages = Math.ceil(totalCount / perPage);
+
+		let notifications = await Notification.find()
+			.skip((page - 1) * perPage)
+			.limit(perPage)
+			.sort({_id: -1});
+
+		notifications = filterByLang(
+			notifications,
+			req.query._l,
+			"title",
+			"content",
+		);
+
+		const url = process.env.URL || "http://localhost:3000";
+		const _meta = {
+			currentPage: page,
+			perPage: perPage,
+			totalCount: totalCount,
+			totalPages: totalPages,
+		};
+
+		const _links = {
+			self: `${url}/api/notifications?page=${page}&perPage=${perPage}`,
+			first: `${url}/api/notifications?page=1&perPage=${perPage}`,
+			prev:
+				page > 1
+					? `${url}/api/notifications?page=${page - 1}&perPage=${perPage}`
+					: null,
+			next:
+				page < totalPages
+					? `${url}/api/notifications?page=${page + 1}&perPage=${perPage}`
+					: null,
+			last: `${url}/api/notifications?page=${totalPages}&perPage=${perPage}`,
+		};
+
+		res.status(200).send({
+			status: 200,
+			message: "Notifications",
+			data: notifications,
+			_meta: _meta,
+			_links: _links,
+		});
+	} catch (error) {
+		console.log(error);
+		res.status(400).send(error);
+	}
+};
 exports.getNotifications = async (req, res) => {
 	try {
 		const userId = req.userId._id;
