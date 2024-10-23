@@ -9,9 +9,9 @@ exports.getOferta = async (req, res) => {
 				return res.status(500).json({error: "Failed to read file"});
 			}
 			let file = JSON.parse(data);
-			file = filterByLang(file, req.query._l, "title", "description");
+			file = filterByLang([file], req.query._l, "title", "description");
 			return res.json({
-				data: file,
+				data: file[0],
 				status: "success",
 			});
 		});
