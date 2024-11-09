@@ -19,4 +19,8 @@ router.get("/get-all", AdminMiddleware, UserController.getAllUsers);
 router.delete("/", UserMiddleware, UserController.deleteUserProfile);
 router.delete("/:id", AdminMiddleware, UserController.deleteUser);
 
+router.post("/locations", UserMiddleware, UserController.addLocation);
+router.put("/locations/:id", UserMiddleware, UserController.editLocation);
+router.delete("/locations/:id", UserMiddleware, UserController.deleteLocation);
+
 module.exports = router;

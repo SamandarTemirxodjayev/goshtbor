@@ -215,7 +215,7 @@ exports.orderConfirmByCard = async (req, res) => {
 		const agent = new https.Agent({
 			rejectUnauthorized: false,
 		});
-
+		
 		const response = await axios.put(
 			process.env.MULTICARD_CONNECTION_API + "/payment/" + uuid,
 			{
@@ -228,6 +228,7 @@ exports.orderConfirmByCard = async (req, res) => {
 				},
 			},
 		);
+		console.log(response);
 		const order = await Orders.findOne({
 			"pay.card.uuid": uuid,
 		})

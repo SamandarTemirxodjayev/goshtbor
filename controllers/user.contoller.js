@@ -325,3 +325,81 @@ exports.deleteUser = async (req, res) => {
 		return res.status(500).send(error);
 	}
 };
+exports.addLocation = async (req, res) => {
+	try {
+		req.userId.locations.push(req.body);
+		await req.userId.save();
+		return res.json({
+			status: 200,
+			message: "Yangi Lokatsiya qoshildi",
+			data: req.userId,
+		});
+	} catch (error) {
+		console.log(error);
+		return res.status(500).send(error);
+	}
+};
+exports.editLocation = async (req, res) => {
+	try {
+		// Get the location _id from req.params.id
+		const locationId = req.params.id;
+
+		// Find the location within the user's locations array
+		const locationIndex = req.userId.locations.findIndex(
+			(location) => location._id.toString() === locationId,
+		);
+
+		// Check if the location exists
+		if (locationIndex === -1) {
+			return res.status(404).json({
+				status: 404,
+				message: "Location not found",
+			});
+		}
+
+		// Update the location with the new data from req.body
+		req.userId.locations[locationIndex] = {
+			...req.userId.locations[locationIndex], // Keep the old values
+			...req.body, // Overwrite with new values
+		};
+
+		// Save the updated user document
+		await req.userId.save();
+
+		return res.json({
+			status: 200,
+			message: "Location updated successfully",
+			data: req.userId,
+		});
+	} catch (error) {
+		console.log(error);
+		return res.status(500).send(error);
+	}
+};
+exports.deleteLocation = async (req, res) => {
+	try {
+		const user = await Users.findByIdAndUpdate(
+			req.userId,
+			{
+				$pull: {locations: {_id: req.params.id}},
+			},
+			{new: true},
+		);
+
+		if (!user) {
+			return res.status(404).json({
+				status: 404,
+				message: "User not found",
+			});
+		}
+
+		return res.json({
+			status: 200,
+			message: "Location deleted successfully",
+			data: user,
+		});
+	} catch (error) {
+		console.log(error);
+		return res.status(500).json({error: error.message});
+	}
+};

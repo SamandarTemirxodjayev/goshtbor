@@ -66,6 +66,37 @@ const userSchema = new Schema({
 		type: Types.Decimal128,
 		default: 5,
 	},
+	locations: [
+		{
+			longitude: {
+				type: Number,
+				required: true,
+			},
+			latitude: {
+				type: Number,
+				required: true,
+			},
+			name: {
+				type: String,
+				required: true,
+			},
+			podyezd: {
+				type: String,
+			},
+			qavat: {
+				type: String,
+			},
+			kvartira: {
+				type: String,
+			},
+			dkod: {
+				type: String,
+			},
+			comment: {
+				type: String,
+			},
+		},
+	],
 });
 
 userSchema.set("timestamps", true);
