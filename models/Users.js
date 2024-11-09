@@ -97,6 +97,28 @@ const userSchema = new Schema({
 			},
 		},
 	],
+	cards: [
+		{
+			card_pan: {
+				type: String,
+			},
+			card_token: {
+				type: String,
+			},
+			phone: {
+				type: String,
+			},
+			holder_name: {
+				type: String,
+			},
+			ps: {
+				type: String,
+			},
+			status: {
+				type: String,
+			},
+		},
+	],
 });
 
 userSchema.set("timestamps", true);

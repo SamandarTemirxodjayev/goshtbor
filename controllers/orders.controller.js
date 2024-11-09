@@ -111,8 +111,7 @@ exports.createOrder = async (req, res) => {
 				process.env.MULTICARD_CONNECTION_API + "/payment",
 				{
 					card: {
-						pan: req.body.pay.card.pan,
-						expiry: req.body.pay.card.expiry,
+						token: req.body.pay.card.token,
 					},
 					amount: totalAmount * 100,
 					store_id: process.env.MULTICARD_STORE_ID,
@@ -215,7 +214,7 @@ exports.orderConfirmByCard = async (req, res) => {
 		const agent = new https.Agent({
 			rejectUnauthorized: false,
 		});
-		
+
 		const response = await axios.put(
 			process.env.MULTICARD_CONNECTION_API + "/payment/" + uuid,
 			{

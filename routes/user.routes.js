@@ -23,4 +23,8 @@ router.post("/locations", UserMiddleware, UserController.addLocation);
 router.put("/locations/:id", UserMiddleware, UserController.editLocation);
 router.delete("/locations/:id", UserMiddleware, UserController.deleteLocation);
 
+router.post("/cards", UserMiddleware, UserController.addCard);
+router.put("/cards/:id", UserMiddleware, UserController.submitAddingCard);
+router.delete("/cards/:id", UserMiddleware, UserController.deleteCard);
+
 module.exports = router;

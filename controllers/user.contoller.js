@@ -5,6 +5,9 @@ const bcrypt = require("bcrypt");
 const {createToken} = require("../utils/token");
 const {sendEmail} = require("../utils/mail");
 const {sendSMS} = require("../utils/SMS");
+const {getMulticardToken} = require("../utils/authTokenMulticard");
+const axios = require("axios");
+const https = require("https");
 
 exports.getUser = async (req, res) => {
 	try {
@@ -397,6 +400,108 @@ exports.deleteLocation = async (req, res) => {
 			status: 200,
 			message: "Location deleted successfully",
 			data: user,
+		});
+	} catch (error) {
+		console.log(error);
+		return res.status(500).json({error: error.message});
+	}
+};
+exports.addCard = async (req, res) => {
+	try {
+		const {token} = await getMulticardToken();
+		const agent = new https.Agent({
+			rejectUnauthorized: false,
+		});
+
+		const response = await axios.post(
+			process.env.MULTICARD_CONNECTION_API + "/payment/card",
+			{
+				...req.body,
+			},
+			{
+				httpsAgent: agent,
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			},
+		);
+		const newCardToken = response.data.data.card_token;
+
+		// Check if card with the same token already exists for the user
+		const existingCard = req.userId.cards.find(
+			(card) => card.card_token === newCardToken,
+		);
+
+		// If the card already exists, return the existing card
+		if (existingCard) {
+			return res.json({
+				status: false,
+				message: "Card already exists",
+				data: existingCard,
+			});
+		}
+
+		return res.json({
+			status: true,
+			message: "Need submit card",
+			data: response.data.data,
+		});
+	} catch (error) {
+		console.log(error);
+		return res.status(500).json({error: error.message});
+	}
+};
+exports.submitAddingCard = async (req, res) => {
+	try {
+		const {token} = await getMulticardToken();
+		const agent = new https.Agent({
+			rejectUnauthorized: false,
+		});
+
+		const response = await axios.put(
+			process.env.MULTICARD_CONNECTION_API + "/payment/card/" + req.params.id,
+			{
+				...req.body,
+			},
+			{
+				httpsAgent: agent,
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			},
+		);
+		console.log(response);
+		req.userId.cards.push(response.data.data);
+		await req.userId.save();
+		return res.json({
+			status: true,
+			message: "Card was successfully submitted",
+			data: response.data.data,
+		});
+	} catch (error) {
+		console.log(error);
+		return res.status(500).json({error: error.message});
+	}
+};
+exports.deleteCard = async (req, res) => {
+	try {
+		const user = await Users.findOneAndUpdate(
+			{_id: req.userId._id},
+			{$pull: {cards: {_id: req.params.id}}}, // Pull the card from the array by _id
+			{new: true}, // Return the updated document
+		);
+
+		if (!user) {
+			return res.status(404).json({
+				status: false,
+				message: "scard does not exist",
+			});
+		}
+
+		return res.json({
+			status: true,
+			message: "Card deleted successfully",
+			data: user.cards, // Return the updated cards array if needed
 		});
 	} catch (error) {
 		console.log(error);
