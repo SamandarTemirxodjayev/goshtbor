@@ -68,15 +68,40 @@ exports.createOrder = async (req, res) => {
 		await newOrder.save();
 		if (req.body.pay.type == "card") {
 			let totalAmount = 0;
+			const validProducts = [];
+
 			for (const product of newOrder.products) {
 				const productDoc = await Products.findById(product.product);
-				const price = productDoc.sale.isSale
-					? productDoc.sale.price
-					: productDoc.price;
-				const subtotal = price * product.quantity;
-				totalAmount += subtotal;
-				product.price = price;
-				product.initial_price = productDoc.initial_price || 0;
+				if (productDoc) {
+					let productQuantity = product.quantity;
+
+					// Check if the requested quantity is higher than available stock
+					if (productQuantity > productDoc.quantity) {
+						productQuantity = productDoc.quantity;
+					}
+
+					const price = productDoc.sale.isSale
+						? productDoc.sale.price
+						: productDoc.price;
+					const subtotal = price * productQuantity;
+					totalAmount += subtotal;
+
+					// Update product details with adjusted quantity and prices
+					validProducts.push({
+						product: product.product,
+						quantity: productQuantity,
+						price: price,
+						initial_price: productDoc.initial_price || 0,
+					});
+				}
+			}
+
+			// Update the order with valid products only
+			newOrder.products = validProducts;
+
+			// If no valid products remain in the order, return an error response
+			if (validProducts.length === 0) {
+				return res.status(400).json({error: "No valid products in order."});
 			}
 			const {token} = await getMulticardToken();
 			const agent = new https.Agent({
