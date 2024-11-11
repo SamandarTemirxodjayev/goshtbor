@@ -94,6 +94,7 @@ exports.editProfile = async (req, res) => {
 exports.getAvailableOrders = async (req, res) => {
 	try {
 		const orders = await Orders.find({
+			status: 2,
 			"pay.status": "payed",
 			"delivery.courier": null,
 		})
