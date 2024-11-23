@@ -2,3 +2,5 @@ node_modules
 log
 db/*
 cdn/public/*
+package-lock.json
+pnpm-lock.yaml
