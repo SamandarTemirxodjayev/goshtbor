@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "@coders-tm/vue-number-format": "^3.34.1",
-    "@nuxt/ui": "latest",
-    "nuxt": "^3.11.2",
+    "@nuxt/ui": "2.18.5",
+    "nuxt": "^3.14.0",
     "nuxt-app": "file:",
     "vue": "^3.4.27",
     "vue-router": "^4.3.2"
