@@ -10,7 +10,7 @@
 		"postinstall": "nuxt prepare"
 	},
 	"dependencies": {
-		"@nuxt/ui": "latest",
+		"@nuxt/ui": "3.0.0",
 		"@pinia-plugin-persistedstate/nuxt": "^1.2.0",
 		"@pinia/nuxt": "^0.5.1",
 		"@vuepic/vue-datepicker": "^8.8.0",
